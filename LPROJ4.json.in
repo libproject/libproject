@@ -1,0 +1,12 @@
+{
+    \"Name\" : \"LPROJ4\",
+    \"Version\" : \"0.0.1\",
+    \"CompatVersion\" : \"0.0.1\",
+    \"Vendor\" : \"drewpts\",
+    \"Copyright\" : \"\",
+    \"License\" : \"Put your license information here\",
+    \"Description\" : \"Put a short description of your plugin here\",
+    \"Url\" : \"http://www.mycompany.com\",
+    $$dependencyList
+}
+
