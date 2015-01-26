@@ -1,0 +1,3 @@
+some info about .gitignore:
+
+http://ivan-orlov.com/ru/articles/podrobnee-o-faile-gitignore
