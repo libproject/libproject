@@ -2,11 +2,13 @@ DEFINES += LPROJ4_LIBRARY
 
 # LPROJ4 files
 
-SOURCES += lproj4plugin.cpp
+SOURCES += lproj4plugin.cpp \
+        tools/qt-json/json.cpp
 
 HEADERS += lproj4plugin.h \
         lproj4_global.h \
-        lproj4constants.h
+        lproj4constants.h \
+        tools/qt-json/json.h
 
 # Qt Creator linking
 
@@ -44,3 +46,10 @@ QTC_PLUGIN_RECOMMENDS += \
 
 include($$QTCREATOR_SOURCES/src/qtcreatorplugin.pri)
 
+# my additions
+
+//LIBS += -lqjson
+
+QMAKE_CXXFLAGS += -std=c++11
+
+DEFINES -= QT_NO_CAST_FROM_ASCII

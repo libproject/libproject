@@ -13,10 +13,10 @@
 #include <QMainWindow>
 #include <QMenu>
 #include <QFileDialog>
-#include <QJsonDocument>
-#include <QJsonObject>
 
 #include <QtPlugin>
+
+#include "tools/qt-json/json.h"
 
 using namespace LPROJ4::Internal;
 
@@ -55,17 +55,17 @@ ExtensionSystem::IPlugin::ShutdownFlag LPROJ4Plugin::aboutToShutdown()
 
 void LPROJ4Plugin::triggerAction()
 {
-    pluginFilename = QFileDialog::getOpenFileName(0, QLatin1String("Open File"));
+    QString pluginFilename = QFileDialog::getOpenFileName(0, QLatin1String("Open File"));
     QFile pluginFile(pluginFilename);
-    pluginFile.open( QFile::ReadOnly );
+    pluginFile.open( QIODevice::ReadOnly | QIODevice::Text );
     Q_ASSERT(pluginFile.isOpen());
 
-    // I found that method _fromJson_ is more friendly than similar method _fromRawData_
-    readJson(      QJsonDocument::fromJson(pluginFile.readAll()).object()     );
+    QTextStream inStream(&pluginFile);
+    readJson( inStream.readAll() );
 }
 
 //functions that works with Json format
-void LPROJ4Plugin::readJson(const QJsonObject & json)
+void LPROJ4Plugin::readJson(const QString & strJson)
 {
     /* TODO
      *
@@ -73,8 +73,14 @@ void LPROJ4Plugin::readJson(const QJsonObject & json)
      * make sure about correctness of input file.
      */
 
+    bool ok = false;
+    projectMetadata = QtJson::parse(strJson, ok).toMap();
+    Q_ASSERT(ok);
 
-    qDebug() << json[QLatin1String("author")].toString();
-    qDebug() << json[QLatin1String("os_relevant")].toBool();
-    qDebug() << json[QLatin1String("message")].toString();
+    qDebug() << "author:" << projectMetadata["author"].toString();
+    qDebug() << "os_relevant:" << projectMetadata["os_relevant"].toString();
+    qDebug() << "message:" << projectMetadata["message"].toString();
+
+
+
 }

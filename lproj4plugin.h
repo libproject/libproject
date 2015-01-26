@@ -6,6 +6,8 @@
 
 #include <extensionsystem/iplugin.h>
 
+#include <map>
+
 namespace LPROJ4 {
 namespace Internal {
 
@@ -23,13 +25,14 @@ public:
     ShutdownFlag aboutToShutdown();
 
 private:
-    void readJson(const QJsonObject& json);
+    void readJson(const QString & strJson);
 private slots:
     void triggerAction();
 
     //members
 private:
-    QString pluginFilename;
+
+    QVariantMap projectMetadata;
 };
 
 } // namespace Internal
