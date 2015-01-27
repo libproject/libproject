@@ -1,0 +1,14 @@
+{
+    "Name" : "libproj_test",
+    "Version" : "0.0.1",
+    "CompatVersion" : "0.0.1",
+    "Vendor" : "drewpts",
+    "Copyright" : "",
+    "License" : "",
+    "Description" : "",
+    "Url" : "",
+    "Dependencies" : [
+        { "Name" : "Core", "Version" : "3.3.81" }
+    ]
+}
+

@@ -1,14 +1,15 @@
-DEFINES += LPROJ4_LIBRARY
+DEFINES += LIBPROJ_LIBRARY
 
-# LPROJ4 files
+# libproj files
 
-SOURCES += lproj4plugin.cpp \
-        tools/qt-json/json.cpp
+SOURCES += libprojplugin.cpp \
+        ../tools/qt-json/json.cpp
 
-HEADERS += lproj4plugin.h \
-        lproj4_global.h \
-        lproj4constants.h \
-        tools/qt-json/json.h
+
+HEADERS += libprojplugin.h \
+        libproj_global.h \
+        libprojconstants.h \
+        ../tools/qt-json/json.h
 
 # Qt Creator linking
 
@@ -32,7 +33,7 @@ isEmpty(IDE_BUILD_TREE):IDE_BUILD_TREE=/home/drew/QtCreatorWorkBuild
 ###### <dirname>_dependencies.pri, where <dirname> is the name of the directory containing the
 ###### plugin's sources.
 
-QTC_PLUGIN_NAME = LPROJ4
+QTC_PLUGIN_NAME = libproj
 QTC_LIB_DEPENDS += \
     # nothing here at this time
 
@@ -46,10 +47,6 @@ QTC_PLUGIN_RECOMMENDS += \
 
 include($$QTCREATOR_SOURCES/src/qtcreatorplugin.pri)
 
-# my additions
-
-//LIBS += -lqjson
-
-QMAKE_CXXFLAGS += -std=c++11
-
 DEFINES -= QT_NO_CAST_FROM_ASCII
+
+#LIBS += -lqjson

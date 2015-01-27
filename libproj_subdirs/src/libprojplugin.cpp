@@ -1,5 +1,5 @@
-#include "lproj4plugin.h"
-#include "lproj4constants.h"
+#include "libprojplugin.h"
+#include "libprojconstants.h"
 
 #include <coreplugin/icore.h>
 #include <coreplugin/icontext.h>
@@ -16,15 +16,15 @@
 
 #include <QtPlugin>
 
-#include "tools/qt-json/json.h"
+#include "../tools/qt-json/json.h"
 
-using namespace LPROJ4::Internal;
+using namespace Libproj::Internal;
 
-LPROJ4Plugin::LPROJ4Plugin() { }
+LibprojPlugin::LibprojPlugin() { }
 
-LPROJ4Plugin::~LPROJ4Plugin() { }
+LibprojPlugin::~LibprojPlugin() { }
 
-bool LPROJ4Plugin::initialize(const QStringList &arguments, QString *errorString)
+bool LibprojPlugin::initialize(const QStringList &arguments, QString *errorString)
 {
     Q_UNUSED(arguments)
     Q_UNUSED(errorString)
@@ -36,24 +36,24 @@ bool LPROJ4Plugin::initialize(const QStringList &arguments, QString *errorString
     connect(action, SIGNAL(triggered()), this, SLOT(triggerAction()));
 
     Core::ActionContainer *menu = Core::ActionManager::createMenu(Constants::MENU_ID);
-    menu->menu()->setTitle(tr("LPROJ4"));
+    menu->menu()->setTitle(tr("Libproj"));
     menu->addAction(cmd);
     Core::ActionManager::actionContainer(Core::Constants::M_TOOLS)->addMenu(menu);
 
     return true;
 }
 
-void LPROJ4Plugin::extensionsInitialized()
+void LibprojPlugin::extensionsInitialized()
 {
 
 }
 
-ExtensionSystem::IPlugin::ShutdownFlag LPROJ4Plugin::aboutToShutdown()
+ExtensionSystem::IPlugin::ShutdownFlag LibprojPlugin::aboutToShutdown()
 {
     return SynchronousShutdown;
 }
 
-void LPROJ4Plugin::triggerAction()
+void LibprojPlugin::triggerAction()
 {
     QString pluginFilename = QFileDialog::getOpenFileName(0, QLatin1String("Open File"));
     QFile pluginFile(pluginFilename);
@@ -65,7 +65,7 @@ void LPROJ4Plugin::triggerAction()
 }
 
 //functions that works with Json format
-void LPROJ4Plugin::readJson(const QString & strJson)
+void LibprojPlugin::readJson(const QString & strJson)
 {
     /* TODO
      *

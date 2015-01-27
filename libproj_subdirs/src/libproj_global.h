@@ -1,0 +1,13 @@
+#ifndef LIBPROJ_GLOBAL_H
+#define LIBPROJ_GLOBAL_H
+
+#include <QtGlobal>
+
+#if defined(LIBPROJ_LIBRARY)
+#  define LIBPROJSHARED_EXPORT Q_DECL_EXPORT
+#else
+#  define LIBPROJSHARED_EXPORT Q_DECL_IMPORT
+#endif
+
+#endif // LIBPROJ_GLOBAL_H
+
