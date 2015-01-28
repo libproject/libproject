@@ -15,7 +15,6 @@ class libprojtestPlugin : public Libproj::Internal::LibprojPlugin
 //    Q_PLUGIN_METADATA(IID "org.qt-project.Qt.QtCreatorPlugin" FILE "libprojtest.json")
 
 public:
-    MOCK_METHOD0(initialize, bool());
 //    libprojtestPlugin();
 //    ~libprojtestPlugin();
 

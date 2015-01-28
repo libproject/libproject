@@ -3,8 +3,9 @@
 
 #include "libproj_global.h"
 #include <QJsonObject>
-
+#include <QFile> //WHY I CANT USE FORWARD DECLARATION OF QFILE????---------------------------------------------
 #include <extensionsystem/iplugin.h>
+#include <memory>
 
 namespace Libproj {
 namespace Internal {
@@ -29,8 +30,10 @@ private slots:
 
     //members
 private:
-
+    bool isRw; //1 - rw, 0 - ro
+    QVector<QFile *> defFiles;
     QVariantMap projectMetadata;
+    QStringList defFilesList;
 };
 
 }
