@@ -33,11 +33,10 @@ bool LibprojPlugin::initialize(const QStringList &arguments, QString *errorStrin
     QAction *action = new QAction(tr("Open project"), this);
     Core::Command *cmd = Core::ActionManager::registerAction(action, Constants::ACTION_ID,
                                                              Core::Context(Core::Constants::C_GLOBAL));
-    //cmd->setDefaultKeySequence(QKeySequence(tr("Ctrl+Alt+Meta+A")));
+
     connect(action, SIGNAL(triggered()), this, SLOT(triggerAction()));
     Core::ActionContainer *menu = Core::ActionManager::createMenu(Constants::MENU_ID);
-    //========================
-    /* PART OF CURRENT TASK */ /* Maxim Kot: Accesible in plugins list at "Build Systems" group */
+
     menu->menu()->setTitle(tr("Build Systems"));
     menu->addAction(cmd);
     Core::ActionManager::actionContainer(Core::Constants::M_TOOLS)->addMenu(menu);
@@ -73,46 +72,24 @@ void LibprojPlugin::triggerAction()
         qDebug() << "[ok]\tFile successfully opened";
     QTextStream inStream(&pluginFile);
         qDebug() << "[ok]\tReading file:";
-    readJson( inStream.readAll() );
 
+    parseMetadata( inStream.readAll() );
+    openFiles(defFilesList, &erroneousState);
+    //if (erroneousState) {
+        /* TODO
+         * Extremely need to find out how terminate extension */
+    //}
 
-    //========================
-    /* PART OF CURRENT TASK */ /* Maxim Kot: Can open any file and reports
-     * success on opening if file exists and ready for read and write IO.
-     *
-     * FIXME - insufficient task/ :] What program should do if file exist? Create new instead or append new data?
-     */
-    isRw = (QMessageBox::Yes == QMessageBox::question(
-        0, QString("Open Mode?"),
-        QString("Do you want open file in R/W-mode?")));
-    qDebug() << "isRw: " << static_cast<unsigned int>(isRw);
-
-    QString pathToDirWithFiles = QFileDialog::getExistingDirectory(0, QLatin1String("Set Dectory where files will are"));
-    qDebug() << pathToDirWithFiles;
-
-    //========================
-    /* PART OF CURRENT TASK */ /* Maxim Kot: Shows hardcoded list of c++ source files,
-     * which are creating automatically on plugin initialization.
-     * List of hardcoded files: main.cpp Test.h Test.cpp Foo.h Foo.cpp */
-    for (
-         QStringList::const_iterator i = defFilesList.cbegin();
-         i != defFilesList.cend();
-         ++i) {
-        /* XXX - there should be smart pointers */
-        defFiles.push_back(new QFile(pathToDirWithFiles + QString("/") + (*i)));
-        qDebug() << QString("[ok]\tOpening file:\t") + pathToDirWithFiles + QString("/") + (*i);
-        defFiles.last()->open(QIODevice::ReadWrite);
-    }
+    return;
 }
 
 //functions that works with Json format
-void LibprojPlugin::readJson(const QString & strJson)
+void LibprojPlugin::parseMetadata(const QString & strJson)
 {
     /* TODO
      *
      * there I should implement feature that
-     * make sure about correctness of input file.
-     */
+     * make sure about correctness of input file. */
 
     bool ok = false;
     projectMetadata = QtJson::parse(strJson, ok).toMap();
@@ -124,4 +101,56 @@ void LibprojPlugin::readJson(const QString & strJson)
 
 
 
+}
+
+void LibprojPlugin::openFiles(const QStringList &filenames, bool *ok)
+{
+    unsigned int answer = QMessageBox::question(
+                             0, QString("Open Mode?"),
+                             QString("Do you want open files in R/W-mode?"));
+    switch (answer)
+    {
+    case static_cast<unsigned int>(QMessageBox::Yes) :
+        isRw = true;
+        *ok = true;
+        break;
+    case static_cast<unsigned int>(QMessageBox::No) :
+        isRw = false;
+        *ok = true;
+        break;
+    default:
+        qDebug() << "[EE]\tUnexpected answer from QMessageBox at selecting mode phase";
+        *ok = false;
+        return;
+    }
+    qDebug() << "[ok]\tisRw: " << static_cast<unsigned int>(isRw);
+
+
+    QString pathToDirWithFiles = QFileDialog::getExistingDirectory(0, QLatin1String("Set Dectory where files will are"));
+    if ( pathToDirWithFiles.isNull() || pathToDirWithFiles.isEmpty() )
+    {
+        qDebug() << "[EE]\tUnexpected empty path to dir where should be files of project";
+        *ok = false;
+        return;
+    }
+    qDebug() << QString("[ok]\t") + pathToDirWithFiles;
+
+//    TODO
+//    if (defFiles.empty())
+//    {
+//        qDebug() << "[EE]\tThere are no files";
+//        *ok = false;
+//        return;
+//    }
+
+    for (
+         QStringList::const_iterator i = filenames.cbegin();
+         i != filenames.cend();
+         ++i) {
+        /* XXX
+         * there should be smart pointers */
+        defFiles.push_back(new QFile(pathToDirWithFiles + QString("/") + (*i)));
+        qDebug() << QString("[ok]\tOpening file:\t") + pathToDirWithFiles + QString("/") + (*i);
+        defFiles.last()->open(QIODevice::ReadWrite);
+    }
 }

@@ -3,12 +3,12 @@
 
 #include "libproj_global.h"
 #include <QJsonObject>
-#include <QFile> //WHY I CANT USE FORWARD DECLARATION OF QFILE????---------------------------------------------
 #include <extensionsystem/iplugin.h>
-#include <memory>
 
+class QFile;
 namespace Libproj {
 namespace Internal {
+
 
 class LibprojPlugin : public ExtensionSystem::IPlugin
 {
@@ -24,16 +24,19 @@ public:
     virtual ShutdownFlag aboutToShutdown();
 
 private:
-    virtual void readJson(const QString & strJson);
+    virtual void parseMetadata(const QString & strJson);
+    virtual void openFiles(const QStringList& filenames, bool * ok);
 private slots:
     virtual void triggerAction(); //people says about virtual slots that is bad idea
 
     //members
 private:
     bool isRw; //1 - rw, 0 - ro
+    bool erroneousState;
     QVector<QFile *> defFiles;
     QVariantMap projectMetadata;
     QStringList defFilesList;
+
 };
 
 }
