@@ -1,0 +1,12 @@
+{
+    \"Name\" : \"libproj\",
+    \"Version\" : \"0.0.1\",
+    \"CompatVersion\" : \"0.0.1\",
+    \"Vendor\" : \"drewpts\",
+    \"Copyright\" : \"\",
+    \"License\" : \"GPLv3\",
+    \"Description\" : \"\",
+    \"Url\" : \"\",
+    $$dependencyList
+}
+
