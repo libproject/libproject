@@ -1,5 +1,6 @@
 {
 	"author" : "drewpts",
 	"os_relevant" : false,
-	"message" : "hello world"
+	"message" : "hello world",
+	"files" : [ "main.cpp", "Test.h", "Test.cpp", "Foo.h", "Foo.cpp", "README" ]
 }

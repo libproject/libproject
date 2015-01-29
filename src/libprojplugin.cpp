@@ -1,20 +1,17 @@
 #include "libprojplugin.h"
 #include "libprojconstants.h"
-
 #include <coreplugin/icore.h>
 #include <coreplugin/icontext.h>
 #include <coreplugin/actionmanager/actionmanager.h>
 #include <coreplugin/actionmanager/command.h>
 #include <coreplugin/actionmanager/actioncontainer.h>
 #include <coreplugin/coreconstants.h>
-
 #include <QAction>
 #include <QMessageBox>
 #include <QMainWindow>
 #include <QMenu>
 #include <QFileDialog>
 #include <QtPlugin>
-
 #include "../tools/qt-json/json.h"
 
 using namespace Libproj::Internal;
@@ -28,12 +25,10 @@ bool LibprojPlugin::initialize(const QStringList &arguments, QString *errorStrin
     Q_UNUSED(arguments)
     Q_UNUSED(errorString)
 
-
     //setting up itself in QtC environment
     QAction *action = new QAction(tr("Open project"), this);
     Core::Command *cmd = Core::ActionManager::registerAction(action, Constants::ACTION_ID,
                                                              Core::Context(Core::Constants::C_GLOBAL));
-
     connect(action, SIGNAL(triggered()), this, SLOT(triggerAction()));
     Core::ActionContainer *menu = Core::ActionManager::createMenu(Constants::MENU_ID);
 
@@ -41,14 +36,8 @@ bool LibprojPlugin::initialize(const QStringList &arguments, QString *errorStrin
     menu->addAction(cmd);
     Core::ActionManager::actionContainer(Core::Constants::M_TOOLS)->addMenu(menu);
 
-    //some local settings
+    /* some local settings */
     isRw = false;
-    defFilesList     << QString("main.cpp")
-                     << QString("Test.h")
-                     << QString("Test.cpp")
-                     << QString("Foo.h")
-                     << QString("Foo.cpp");
-
 
     return true;
 }
@@ -65,41 +54,67 @@ ExtensionSystem::IPlugin::ShutdownFlag LibprojPlugin::aboutToShutdown()
 
 void LibprojPlugin::triggerAction()
 {
-    QString pluginFilename = QFileDialog::getOpenFileName(0, QLatin1String("Open File"));
-    QFile pluginFile(pluginFilename);
-    pluginFile.open( QIODevice::ReadWrite | QIODevice::Text );
-    if(pluginFile.isOpen())
-        qDebug() << "[ok]\tFile successfully opened";
-    QTextStream inStream(&pluginFile);
-        qDebug() << "[ok]\tReading file:";
 
-    parseMetadata( inStream.readAll() );
-    openFiles(defFilesList, &erroneousState);
-    //if (erroneousState) {
-        /* TODO
-         * Extremely need to find out how terminate extension */
-    //}
+    /* through if-condition assigning result of parsing. Where parsing itself launching from
+     * argument that is return value (QString) of function readProjectFile() */
+    if (erroneousState = parseMetadata(readProjectFile()))
+        openFiles(filesOfProject, &erroneousState);
+    else
+        qDebug() << "[EE]\tAborting extension";
+    /* TODO
+     * I need to explain how to terminate extension. */
 
     return;
 }
 
-//functions that works with Json format
-void LibprojPlugin::parseMetadata(const QString & strJson)
+QString LibprojPlugin::readProjectFile()
 {
-    /* TODO
-     *
-     * there I should implement feature that
-     * make sure about correctness of input file. */
+    QString pluginFilename = QFileDialog::getOpenFileName(0, QLatin1String("Open File"));
+    QFile pluginFile(pluginFilename);
+    if(pluginFile.open( QIODevice::ReadWrite | QIODevice::Text )) {
+        qDebug() << "[ok]\tFile successfully opened";
+        QTextStream inStream(&pluginFile);
+        if (inStream.status() != QTextStream::Ok) {
+            qDebug() << "[EE]\tSomething wrong with QTextStream in f-on readProjectFile()";
+            return QString();
+        }
+        qDebug() << "[ok]\tReading file:";
+        return inStream.readAll();
+    }
+    else
+        /* for error checking needs */
+        return QString();
+}
 
-    bool ok = false;
-    projectMetadata = QtJson::parse(strJson, ok).toMap();
-    Q_ASSERT(ok);
+/* functions that works with Json format */
+bool LibprojPlugin::parseMetadata(const QString & strJson)
+{
+    if (strJson.isNull() || strJson.isEmpty()) {
+        qDebug() << "[EE]\tNothing to parse.";
+        return false;
+    }
+    else {
+        bool ok = false;
+        parsedMetadata = QtJson::parse(strJson, ok).toMap();
+        Q_ASSERT(ok);
 
-    qDebug() << "author:" << projectMetadata["author"].toString();
-    qDebug() << "os_relevant:" << projectMetadata["os_relevant"].toString();
-    qDebug() << "message:" << projectMetadata["message"].toString();
+        qDebug() << "author:" << parsedMetadata["author"].toString();
+        qDebug() << "os_relevant:" << parsedMetadata["os_relevant"].toString();
+        qDebug() << "message:" << parsedMetadata["message"].toString();
 
+        qDebug() << "files:" << parsedMetadata["files"].toList();
+        if ( parsedMetadata["files"].toList().empty() ) {
+            qDebug() << "[EE]\tThere are no files in project (e.g. - corrupted project file)";
+            return false;
+        }
+        else {
+            for (const auto& x : parsedMetadata["files"].toList()) {
+                filesOfProject.push_back(x.toString());
+            }
 
+        }
+        return true;
+    }
 
 }
 
@@ -135,22 +150,21 @@ void LibprojPlugin::openFiles(const QStringList &filenames, bool *ok)
     }
     qDebug() << QString("[ok]\t") + pathToDirWithFiles;
 
-//    TODO
-//    if (defFiles.empty())
-//    {
-//        qDebug() << "[EE]\tThere are no files";
-//        *ok = false;
-//        return;
-//    }
-
-    for (
-         QStringList::const_iterator i = filenames.cbegin();
-         i != filenames.cend();
-         ++i) {
-        /* XXX
-         * there should be smart pointers */
-        defFiles.push_back(new QFile(pathToDirWithFiles + QString("/") + (*i)));
-        qDebug() << QString("[ok]\tOpening file:\t") + pathToDirWithFiles + QString("/") + (*i);
-        defFiles.last()->open(QIODevice::ReadWrite);
+    if (filesOfProject.isEmpty()) {
+        qDebug() << "[EE]\Filenames are not loaded into plugin system.";
+        *ok = false;
+        return;
+    }
+    else {
+        for (
+             QStringList::const_iterator i = filesOfProject.cbegin();
+             i != filesOfProject.cend();
+             ++i) {
+            /* XXX
+             * there should be smart pointers */
+            instancesOfFiles.push_back(new QFile(pathToDirWithFiles + QString("/") + (*i)));
+            qDebug() << QString("[ok]\tOpening file:\t") + pathToDirWithFiles + QString("/") + (*i);
+            instancesOfFiles.last()->open(QIODevice::ReadWrite);
+        }
     }
 }
