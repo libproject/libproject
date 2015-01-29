@@ -1,3 +1,0 @@
-[submodule "qt-json"]
-	path = tools/qt-json
-	url = https://github.com/gaudecker/qt-json.git
