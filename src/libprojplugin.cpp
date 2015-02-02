@@ -141,6 +141,7 @@ void LibprojPlugin::openFiles(const QStringList &filenames, bool *ok)
     qDebug() << "[ok]\tisRw: " << static_cast<unsigned int>(isRw);
 
 
+
     QString pathToDirWithFiles = QFileDialog::getExistingDirectory(0, QLatin1String("Set Dectory where files will are"));
     if ( pathToDirWithFiles.isNull() || pathToDirWithFiles.isEmpty() )
     {
