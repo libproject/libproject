@@ -120,16 +120,16 @@ bool LibprojPlugin::parseMetadata(const QString & strJson)
 
 void LibprojPlugin::openFiles(const QStringList &filenames, bool *ok)
 {
-    unsigned int answer = QMessageBox::question(
+    QMessageBox::StandardButton answer = QMessageBox::question(
                              0, QString("Open Mode?"),
                              QString("Do you want open files in R/W-mode?"));
     switch (answer)
     {
-    case static_cast<unsigned int>(QMessageBox::Yes) :
+    case QMessageBox::Yes :
         isRw = true;
         *ok = true;
         break;
-    case static_cast<unsigned int>(QMessageBox::No) :
+    case QMessageBox::No :
         isRw = false;
         *ok = true;
         break;
