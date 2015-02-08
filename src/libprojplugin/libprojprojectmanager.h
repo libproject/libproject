@@ -17,6 +17,9 @@ public:
     virtual QString mimeType() const;
     virtual ProjectExplorer::Project * openProject(const QString &Filename, QString *ErrorString);
 
+    void registerProject(std::shared_ptr<OwnProject> Project);
+    void unregisterProject(std::shared_ptr<OwnProject>& /*Project*/);
+
 };
 
 } // namespace Internal

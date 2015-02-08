@@ -18,9 +18,9 @@ class OwnProjectNode : public ProjectExplorer::ProjectNode
 public:
     OwnProjectNode(std::shared_ptr<OwnProject> Project, std::shared_ptr<OwnProjectFile> ProjectFile);
 public /*dummies*/:
-    virtual bool canAddSubProject(const QString &proFilePath) const { return false; }
-    virtual bool addSubProjects(const QStringList &proFilePaths) { return false; }
-    virtual bool removeSubProjects(const QStringList &proFilePaths) { return false; }
+    virtual bool canAddSubProject(const QString &proFilePath) const;
+    virtual bool addSubProjects(const QStringList &proFilePaths);
+    virtual bool removeSubProjects(const QStringList &proFilePaths);
 };
 
 } // namespace Internal

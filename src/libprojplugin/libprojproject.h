@@ -20,6 +20,12 @@ class OwnProject : public ProjectExplorer::Project
 
 public:
     OwnProject(std::shared_ptr<OwnManager> Manager, const QString & Filename);
+
+    QString displayName() const;
+    Core::IDocument *document() const;
+    ProjectExplorer::IProjectManager *projectManager() const;
+    ProjectExplorer::ProjectNode *rootProjectNode() const;
+    QStringList files(FilesMode fileMode) const;
 };
 
 } // namespace Internal

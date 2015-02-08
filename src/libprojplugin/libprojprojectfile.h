@@ -18,12 +18,12 @@ public:
     OwnProjectFile(std::shared_ptr<OwnProject> Parent, const QString & Filename);
 
 public /*dummies*/:
-    virtual bool save(QString *errorString, const QString &fileName, bool autoSave) {  return false; }
-    virtual QString defaultPath() const { return QString(); }
-    virtual QString suggestedFileName() const { return QString(); }
-    virtual bool isModified() const { return false; }
-    virtual bool isSaveAsAllowed() const { return false; }
-    virtual bool reload(QString *errorString, ReloadFlag flag, ChangeType type) { return false; }
+    virtual bool save(QString *errorString, const QString &fileName, bool autoSave);
+    virtual QString defaultPath() const;
+    virtual QString suggestedFileName() const;
+    virtual bool isModified() const;
+    virtual bool isSaveAsAllowed() const;
+    virtual bool reload(QString *errorString, ReloadFlag flag, ChangeType type);
 };
 
 } // namespace Internal
