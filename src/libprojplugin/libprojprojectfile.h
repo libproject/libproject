@@ -6,9 +6,9 @@
 #include <memory>
 
 namespace LibprojProjectManager{
-class OwnProject;
 namespace Internal {
 
+class OwnProject;
 class OwnProjectFile : public Core::IDocument
 {
     Q_OBJECT
@@ -16,6 +16,14 @@ class OwnProjectFile : public Core::IDocument
     std::shared_ptr<OwnProject> project;
 public:
     OwnProjectFile(std::shared_ptr<OwnProject> Parent, const QString & Filename);
+
+public /*dummies*/:
+    virtual bool save(QString *errorString, const QString &fileName, bool autoSave) {  return false; }
+    virtual QString defaultPath() const { return QString(); }
+    virtual QString suggestedFileName() const { return QString(); }
+    virtual bool isModified() const { return false; }
+    virtual bool isSaveAsAllowed() const { return false; }
+    virtual bool reload(QString *errorString, ReloadFlag flag, ChangeType type) { return false; }
 };
 
 } // namespace Internal
