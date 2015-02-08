@@ -3,7 +3,6 @@ DEFINES += LIBPROJ_LIBRARY
 # libproj files
 
 SOURCES += libprojplugin.cpp \
-        ../../tools/qt-json/json.cpp \
     libprojprojectmanager.cpp \
     libprojproject.cpp \
     libprojprojectnodes.cpp \
@@ -13,7 +12,6 @@ SOURCES += libprojplugin.cpp \
 HEADERS += libprojplugin.h \
         libproj_global.h \
         libprojconstants.h \
-        ../../tools/qt-json/json.h \
     libprojprojectmanager.h \
     libprojproject.h \
     libprojprojectnodes.h \
@@ -55,5 +53,5 @@ QTC_PLUGIN_RECOMMENDS += \
 ###### End _dependencies.pri contents ######
 
 include($$QTCREATOR_SOURCES/src/qtcreatorplugin.pri)
-
+include($$PWD/../../tools/qt-json/qt-json.pri)
 DEFINES -= QT_NO_CAST_FROM_ASCII
