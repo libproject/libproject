@@ -2,5 +2,5 @@ CONFIG += ordered
 
 TEMPLATE = subdirs
 
-SUBDIRS += test/libprojtest.pro src/libproj.pro
+SUBDIRS += test/libprojtest.pro src/libprojplugin/libproj.pro
 
