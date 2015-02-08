@@ -4,6 +4,8 @@
 #include "libproj_global.h"
 #include <QJsonObject>
 #include <extensionsystem/iplugin.h>
+#include <projectexplorer/project.h>
+#include "libprojproject.h"
 
 class QFile;
 namespace Libproj {
@@ -26,7 +28,6 @@ public:
 private:
     virtual QString readProjectFile();
     virtual bool parseMetadata(const QString & strJson);
-    virtual void openFiles(const QStringList& filenames, bool * ok);
 private slots:
     virtual void triggerAction(); //people says about virtual slots that is bad idea
 
@@ -34,13 +35,16 @@ private slots:
 private:
     bool isRw; //1 - rw, 0 - ro
     bool erroneousState;
-    QVector<QFile *> instancesOfFiles;
-    QVariantMap parsedMetadata;
+
+    static QVariantMap parsedMetadata;
     QStringList filesOfProject;
+    QString * projectFilename;
+    QString er;
+    ProjectExplorer::Project * project;
 
 };
 
-}
-}
+} // namespace Internal
+} // namespace Libproj
 
 #endif // LPROJ4_H

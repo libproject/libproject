@@ -12,9 +12,21 @@
 #include <QMenu>
 #include <QFileDialog>
 #include <QtPlugin>
-#include "../tools/qt-json/json.h"
+#include "../../tools/qt-json/json.h"
+
+#include <projectexplorer/projectexplorer.h>
+
+#include <extensionsystem/pluginmanager.h>
+
+#include <projectexplorer/iprojectmanager.h>
+#include <projectexplorer/session.h>
+#include <projectexplorer/projectnodes.h>
+
+#include "libprojprojectmanager.h"
 
 using namespace Libproj::Internal;
+
+QVariantMap LibprojPlugin::parsedMetadata = QVariantMap();
 
 LibprojPlugin::LibprojPlugin() { }
 
@@ -25,18 +37,21 @@ bool LibprojPlugin::initialize(const QStringList &arguments, QString *errorStrin
     Q_UNUSED(arguments)
     Q_UNUSED(errorString)
 
-    //setting up itself in QtC environment
+    /* setting up itself in QtC environment */
     QAction *action = new QAction(tr("Open project"), this);
     Core::Command *cmd = Core::ActionManager::registerAction(action, Constants::ACTION_ID,
                                                              Core::Context(Core::Constants::C_GLOBAL));
     connect(action, SIGNAL(triggered()), this, SLOT(triggerAction()));
     Core::ActionContainer *menu = Core::ActionManager::createMenu(Constants::MENU_ID);
-
     menu->menu()->setTitle(tr("Build Systems"));
     menu->addAction(cmd);
     Core::ActionManager::actionContainer(Core::Constants::M_TOOLS)->addMenu(menu);
 
-    /* some local settings */
+    /* initializing project manager system */
+    LibprojProjectManager::Internal::OwnManager * manager = new LibprojProjectManager::Internal::OwnManager();
+    IPlugin::addAutoReleasedObject(manager);
+
+    /* some plugin-wide settings */
     isRw = false;
 
     return true;
@@ -49,31 +64,31 @@ void LibprojPlugin::extensionsInitialized()
 
 ExtensionSystem::IPlugin::ShutdownFlag LibprojPlugin::aboutToShutdown()
 {
+    delete projectFilename;
     return SynchronousShutdown;
 }
 
 void LibprojPlugin::triggerAction()
 {
-
-    /* through if-condition assigning result of parsing. Where parsing itself launching from
-     * argument that is return value (QString) of function readProjectFile() */
     if (erroneousState = parseMetadata(readProjectFile()))
-        openFiles(filesOfProject, &erroneousState);
+    {
+        qDebug() << "[ok]\tOpening file:" + *projectFilename;
+        if (project = ProjectExplorer::ProjectExplorerPlugin::openProject(*projectFilename, &er))
+            qDebug() << "[debug]\tProject created";
+        /*ProjectExplorer::SessionManager::addProject(project); are we need this ?*/
+    }
     else
-        qDebug() << "[EE]\tAborting extension";
-    /* TODO
-     * I need to explain how to terminate extension. */
-
+        qDebug() << "[EE]\tError with opening project file.";
     return;
 }
 
 QString LibprojPlugin::readProjectFile()
 {
-    QString pluginFilename = QFileDialog::getOpenFileName(0, QLatin1String("Open File"));
-    QFile pluginFile(pluginFilename);
-    if(pluginFile.open( QIODevice::ReadWrite | QIODevice::Text )) {
+    projectFilename = new QString (QFileDialog::getOpenFileName(0, QLatin1String("Open File")));
+    QFile projectFile(*projectFilename);
+    if(projectFile.open( QIODevice::ReadWrite | QIODevice::Text )) {
         qDebug() << "[ok]\tFile successfully opened";
-        QTextStream inStream(&pluginFile);
+        QTextStream inStream(&projectFile);
         if (inStream.status() != QTextStream::Ok) {
             qDebug() << "[EE]\tSomething wrong with QTextStream in f-on readProjectFile()";
             return QString();
@@ -82,7 +97,6 @@ QString LibprojPlugin::readProjectFile()
         return inStream.readAll();
     }
     else
-        /* for error checking needs */
         return QString();
 }
 
@@ -111,61 +125,7 @@ bool LibprojPlugin::parseMetadata(const QString & strJson)
             for (const auto& x : parsedMetadata["files"].toList()) {
                 filesOfProject.push_back(x.toString());
             }
-
         }
         return true;
-    }
-
-}
-
-void LibprojPlugin::openFiles(const QStringList &filenames, bool *ok)
-{
-    QMessageBox::StandardButton answer = QMessageBox::question(
-                             0, QString("Open Mode?"),
-                             QString("Do you want open files in R/W-mode?"));
-    switch (answer)
-    {
-    case QMessageBox::Yes :
-        isRw = true;
-        *ok = true;
-        break;
-    case QMessageBox::No :
-        isRw = false;
-        *ok = true;
-        break;
-    default:
-        qDebug() << "[EE]\tUnexpected answer from QMessageBox at selecting mode phase";
-        *ok = false;
-        return;
-    }
-    qDebug() << "[ok]\tisRw: " << static_cast<unsigned int>(isRw);
-
-
-
-    QString pathToDirWithFiles = QFileDialog::getExistingDirectory(0, QLatin1String("Set Dectory where files will are"));
-    if ( pathToDirWithFiles.isNull() || pathToDirWithFiles.isEmpty() )
-    {
-        qDebug() << "[EE]\tUnexpected empty path to dir where should be files of project";
-        *ok = false;
-        return;
-    }
-    qDebug() << QString("[ok]\t") + pathToDirWithFiles;
-
-    if (filesOfProject.isEmpty()) {
-        qDebug() << "[EE]\Filenames are not loaded into plugin system.";
-        *ok = false;
-        return;
-    }
-    else {
-        for (
-             QStringList::const_iterator i = filesOfProject.cbegin();
-             i != filesOfProject.cend();
-             ++i) {
-            /* XXX
-             * there should be smart pointers */
-            instancesOfFiles.push_back(new QFile(pathToDirWithFiles + QString("/") + (*i)));
-            qDebug() << QString("[ok]\tOpening file:\t") + pathToDirWithFiles + QString("/") + (*i);
-            instancesOfFiles.last()->open(QIODevice::ReadWrite);
-        }
     }
 }
