@@ -15,14 +15,6 @@ OwnManager::OwnManager()
             qDebug() << "[dbg]\t\tCalling c-tor for OwnManager";
 }
 
-/*memory*/
-shared_ptr<OwnManager> OwnManager::get_shared_ptr()
-{
-    qDebug() << "[dbg]\t\tGetting shared_ptr from this of OwnManager instance";
-    return shared_from_this();
-}
-/*memory*/
-
 QString OwnManager::mimeType() const
 {
             qDebug() << "[dbg]\t\tComparing with own mime type";
@@ -37,19 +29,19 @@ ProjectExplorer::Project * OwnManager::openProject(const QString &Filename, QStr
             return nullptr;
     }
     qDebug() << "[dbg]\t\t\t"+Filename;
-    return /*nullptr*/ new OwnProject(get_shared_ptr(), Filename);
+    return new OwnProject(this, Filename);
 }
 
-void OwnManager::registerProject(std::shared_ptr<OwnProject> Project)
+void OwnManager::registerProject(OwnProject * Project)
 {
     qDebug() << "[dbg]\t\tRegistering project";
     project = Project;
 }
 
-void OwnManager::unregisterProject(std::shared_ptr<OwnProject>& /*Project*/)
+void OwnManager::unregisterProject(OwnProject * /*Project*/)
 {
     qDebug() << "[dbg]\t\tUnregistering project";
-    project.reset();
+    project = nullptr;
 }
 
 } // namespace Internal

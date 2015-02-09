@@ -27,6 +27,7 @@
 using namespace Libproj::Internal;
 
 QVariantMap LibprojPlugin::parsedMetadata = QVariantMap();
+QVector<QFile *> LibprojPlugin::files = QVector<QFile *>();
 
 LibprojPlugin::LibprojPlugin() { }
 
@@ -111,21 +112,6 @@ bool LibprojPlugin::parseMetadata(const QString & strJson)
         bool ok = false;
         parsedMetadata = QtJson::parse(strJson, ok).toMap();
         Q_ASSERT(ok);
-
-        qDebug() << "author:" << parsedMetadata["author"].toString();
-        qDebug() << "os_relevant:" << parsedMetadata["os_relevant"].toString();
-        qDebug() << "message:" << parsedMetadata["message"].toString();
-
-        qDebug() << "files:" << parsedMetadata["files"].toList();
-        if ( parsedMetadata["files"].toList().empty() ) {
-            qDebug() << "[EE]\tThere are no files in project (e.g. - corrupted project file)";
-            return false;
-        }
-        else {
-            for (const auto& x : parsedMetadata["files"].toList()) {
-                filesOfProject.push_back(x.toString());
-            }
-        }
         return true;
     }
 }

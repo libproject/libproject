@@ -3,7 +3,6 @@
 
 #include <QObject>
 #include <coreplugin/idocument.h>
-#include <memory>
 
 namespace LibprojProjectManager{
 namespace Internal {
@@ -13,9 +12,8 @@ class OwnProjectFile : public Core::IDocument
 {
     Q_OBJECT
 
-    std::shared_ptr<OwnProject> project;
+    OwnProject * project;
 public:
-    OwnProjectFile(std::shared_ptr<OwnProject> Parent, const QString & Filename); //1st
     OwnProjectFile(OwnProject * Parent, const QString & Filename); //2nd
 
 public /*dummies*/:

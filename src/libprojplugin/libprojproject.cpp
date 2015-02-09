@@ -4,34 +4,35 @@
 #include "libprojprojectnodes.h"
 #include <memory>
 #include <coreplugin/documentmanager.h>
+#include "libprojplugin.h"
 
-using std::make_shared;
 using Core::IDocument;
+using ProjectExplorer::FileNode;
+using Libproj::Internal::LibprojPlugin;
+
 namespace LibprojProjectManager {
 namespace Internal {
 
-OwnProject::OwnProject(std::shared_ptr<Internal::OwnManager> Manager, const QString & Filename)
-    : manager(Manager), filename(Filename)
+OwnProject::OwnProject(OwnManager * Manager, const QString & Filename)
+    : manager(Manager),
+      filename(Filename)
 {
-    qDebug() << "[dbg]\t\tCalling c-tor for OwnProject";
+    qDebug() << "[dbg]\t\tCalling c-tor for OwnProject (2nd)";
+    QFileInfo fileInfo(Filename);
+
     nameOfProject =
-            QFileInfo(filename).completeBaseName();
-    file =
-            make_shared<OwnProjectFile> (this, filename);
+            fileInfo.completeBaseName();
+        file =
+            new OwnProjectFile (this, filename);
     rootNode =
-            make_shared<OwnProjectNode> (this, file);
+            new OwnProjectNode (this, file);
 
-    Core::DocumentManager::addDocument(file.get(), false); //or true? or even - are we need this?
 
+    rootNode->addFileNodes(LibprojPlugin::parsedMetadata, fileInfo);
+    Core::DocumentManager::addDocument(file, false); //or true? or even - are we need this?
+
+    manager->registerProject(this);
 }
-
-/*memory*/
-std::shared_ptr<OwnProject> OwnProject::get_shared_ptr()
-{
-    qDebug() << "[dbg]\t\tGetting shared_ptr from this of OwnProject instance";
-    return shared_from_this();
-}
-/*memory*/
 
 QString OwnProject::displayName() const
 {
@@ -42,22 +43,22 @@ QString OwnProject::displayName() const
 IDocument * OwnProject::document() const
 {
     qDebug() << "[dbg]\t\tCalling OwnProject::document()";
-    return file.get();
+    return file;
 }
 
 ProjectExplorer::IProjectManager * OwnProject::projectManager() const
 {
     qDebug() << "[dbg]\t\tCalling OwnProject::projectManager()";
-    return manager.get();
+    return manager;
 }
 
 ProjectExplorer::ProjectNode * OwnProject::rootProjectNode() const
 {
     qDebug() << "[dbg]\t\tCalling OwnProject::rootProjectNode()";
-    return rootNode.get();
+    return rootNode;
 }
 
-QStringList OwnProject::files(FilesMode fileMode) const{
+QStringList OwnProject::files(FilesMode fileMode = AllFiles) const{
     /*must return list of absolute paths*/
     qDebug() << "[dbg]\t\tCalling OwnProject::files(FilesMode)";
     return QStringList() << QFileInfo(filename).absoluteFilePath();

@@ -6,6 +6,8 @@
 #include <extensionsystem/iplugin.h>
 #include <projectexplorer/project.h>
 #include "libprojproject.h"
+#include <QVector>
+#include "libprojprojectnodes.h"
 
 class QFile;
 namespace Libproj {
@@ -37,10 +39,13 @@ private:
     bool erroneousState;
 
     static QVariantMap parsedMetadata;
-    QStringList filesOfProject;
+    static QVector<QFile *> files;
     QString * projectFilename;
     QString er;
     ProjectExplorer::Project * project;
+
+    friend class LibprojProjectManager::Internal::OwnProject;
+    friend void LibprojProjectManager::Internal::OwnProjectNode::addFileNodes(const QVariantMap& Data, const QFileInfo &fileInfo);
 
 };
 

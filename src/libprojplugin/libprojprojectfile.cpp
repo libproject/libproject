@@ -1,21 +1,19 @@
 #include "libprojprojectfile.h"
 #include "libprojproject.h"
 #include <QDebug>
+#include "libprojconstants.h"
 
 namespace LibprojProjectManager{
 namespace Internal {
 
-OwnProjectFile::OwnProjectFile(std::shared_ptr<OwnProject> Parent, const QString & Filename)
-    : Core::IDocument(Parent.get()), project(Parent)
-{
-    qDebug() << "[dbg]\t\tCalling c-tor for OwnProjectFile (1st)";
-}
-
-OwnProjectFile::OwnProjectFile(OwnProject *Parent, const QString &Filename)
-    : Core::IDocument(Parent), project(Parent)
+OwnProjectFile::OwnProjectFile(OwnProject * Parent, const QString &Filename)
+    : Core::IDocument(Parent),
+      project(Parent)
 {
     qDebug() << "[dbg]\t\tCalling c-tor for OwnProjectFile (2nd)";
-
+    setId("Libproj.ProjectFile");
+    setMimeType(QLatin1String(Constants::LIBPROJPROJECTMIMETYPE));
+    setFilePath(Utils::FileName::fromString(Filename));
 }
 
 /*dummies*/
