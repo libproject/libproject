@@ -76,3 +76,7 @@
 //                             tr("This is an action from libprojtest."));
 //}
 
+int main()
+{
+    return 0;
+}

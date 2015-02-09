@@ -3,13 +3,19 @@ DEFINES += LIBPROJ_LIBRARY
 # libproj files
 
 SOURCES += libprojplugin.cpp \
-        ../tools/qt-json/json.cpp
+    libprojprojectmanager.cpp \
+    libprojproject.cpp \
+    libprojprojectnodes.cpp \
+    libprojprojectfile.cpp
 
 
 HEADERS += libprojplugin.h \
         libproj_global.h \
         libprojconstants.h \
-        ../tools/qt-json/json.h
+    libprojprojectmanager.h \
+    libprojproject.h \
+    libprojprojectnodes.h \
+    libprojprojectfile.h
 
 # Qt Creator linking
 
@@ -38,7 +44,8 @@ QTC_LIB_DEPENDS += \
     # nothing here at this time
 
 QTC_PLUGIN_DEPENDS += \
-    coreplugin
+    coreplugin \
+    projectexplorer
 
 QTC_PLUGIN_RECOMMENDS += \
     # optional plugin dependencies. nothing here at this time
@@ -46,7 +53,5 @@ QTC_PLUGIN_RECOMMENDS += \
 ###### End _dependencies.pri contents ######
 
 include($$QTCREATOR_SOURCES/src/qtcreatorplugin.pri)
-
+include($$PWD/../../tools/qt-json/qt-json.pri)
 DEFINES -= QT_NO_CAST_FROM_ASCII
-
-#LIBS += -lqjson
