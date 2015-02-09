@@ -8,7 +8,14 @@ namespace Internal {
 OwnProjectFile::OwnProjectFile(std::shared_ptr<OwnProject> Parent, const QString & Filename)
     : Core::IDocument(Parent.get()), project(Parent)
 {
-    qDebug() << "[dbg]\t\tCalling c-tor for OwnProjectFile";
+    qDebug() << "[dbg]\t\tCalling c-tor for OwnProjectFile (1st)";
+}
+
+OwnProjectFile::OwnProjectFile(OwnProject *Parent, const QString &Filename)
+    : Core::IDocument(Parent), project(Parent)
+{
+    qDebug() << "[dbg]\t\tCalling c-tor for OwnProjectFile (2nd)";
+
 }
 
 /*dummies*/

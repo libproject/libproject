@@ -17,9 +17,9 @@ OwnProject::OwnProject(std::shared_ptr<Internal::OwnManager> Manager, const QStr
     nameOfProject =
             QFileInfo(filename).completeBaseName();
     file =
-            make_shared<OwnProjectFile> (get_shared_ptr() , filename);
+            make_shared<OwnProjectFile> (this, filename);
     rootNode =
-            make_shared<OwnProjectNode> (get_shared_ptr(), file);
+            make_shared<OwnProjectNode> (this, file);
 
     Core::DocumentManager::addDocument(file.get(), false); //or true? or even - are we need this?
 

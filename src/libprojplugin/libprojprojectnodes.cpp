@@ -1,14 +1,25 @@
 #include "libprojprojectnodes.h"
 #include "libprojprojectfile.h"
+#include "libprojproject.h"
 using std::shared_ptr;
+using std::make_shared;
 namespace  LibprojProjectManager {
 namespace Internal {
 
 OwnProjectNode::OwnProjectNode(shared_ptr<OwnProject> Project, shared_ptr<OwnProjectFile> ProjectFile)
-    : ProjectExplorer::ProjectNode(ProjectFile->filePath().toString()), project(Project),
+    : ProjectExplorer::ProjectNode(ProjectFile->filePath().toString()),
+      project(Project),
       projectFile(ProjectFile)
 {
-    qDebug() << "[dbg]\t\tCalling c-tor for OwnProjectNode";
+    qDebug() << "[dbg]\t\tCalling c-tor for OwnProjectNode (1st)";
+}
+
+OwnProjectNode::OwnProjectNode(OwnProject * Project, shared_ptr<OwnProjectFile> ProjectFile)
+    : ProjectExplorer::ProjectNode(ProjectFile.get()->filePath().toString()),
+      project(Project->get_shared_ptr()),
+      projectFile(ProjectFile)
+{
+    qDebug() << "[dbg]\t\tCalling c-tor for OwnProjectNode (2nd)";
 }
 
 /*dummies*/

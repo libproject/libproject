@@ -15,7 +15,8 @@ class OwnProjectFile : public Core::IDocument
 
     std::shared_ptr<OwnProject> project;
 public:
-    OwnProjectFile(std::shared_ptr<OwnProject> Parent, const QString & Filename);
+    OwnProjectFile(std::shared_ptr<OwnProject> Parent, const QString & Filename); //1st
+    OwnProjectFile(OwnProject * Parent, const QString & Filename); //2nd
 
 public /*dummies*/:
     virtual bool save(QString *errorString, const QString &fileName, bool autoSave);

@@ -36,6 +36,7 @@ ProjectExplorer::Project * OwnManager::openProject(const QString &Filename, QStr
             qDebug() << " [EE]\tProject file isn\'t a file" ;
             return nullptr;
     }
+    qDebug() << "[dbg]\t\t\t"+Filename;
     return /*nullptr*/ new OwnProject(get_shared_ptr(), Filename);
 }
 
