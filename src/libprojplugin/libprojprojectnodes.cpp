@@ -11,21 +11,23 @@ OwnProjectNode::OwnProjectNode(shared_ptr<OwnProject> Project, shared_ptr<OwnPro
     qDebug() << "[dbg]\t\tCalling c-tor for OwnProjectNode";
 }
 
-virtual bool OwnProjectNode::canAddSubProject(const QString &proFilePath) const
+/*dummies*/
+bool OwnProjectNode::canAddSubProject(const QString &proFilePath) const
 {
     qDebug() << "[dbg]\t\tCalling dummy OwnProjectNode::canAddSubProject()";
     return false;
 }
-virtual bool OwnProjectNode::addSubProjects(const QStringList &proFilePaths)
+bool OwnProjectNode::addSubProjects(const QStringList &proFilePaths)
 {
     qDebug() << "[dbg]\t\tCalling dummy OwnProjectNode::addSubProjects()";
     return false;
 }
-virtual bool OwnProjectNode::removeSubProjects(const QStringList &proFilePaths)
+bool OwnProjectNode::removeSubProjects(const QStringList &proFilePaths)
 {
     qDebug() << "[dbg]\t\tCalling dummy OwnProjectNode::removeSubProjects()";
     return false;
 }
+/*dummies*/
 
 } // namespace Internal
 } // namespace LibprojProjectManager

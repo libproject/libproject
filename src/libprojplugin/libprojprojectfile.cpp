@@ -1,6 +1,6 @@
 #include "libprojprojectfile.h"
 #include "libprojproject.h"
-
+#include <QDebug>
 
 namespace LibprojProjectManager{
 namespace Internal {
@@ -11,36 +11,38 @@ OwnProjectFile::OwnProjectFile(std::shared_ptr<OwnProject> Parent, const QString
     qDebug() << "[dbg]\t\tCalling c-tor for OwnProjectFile";
 }
 
-virtual bool OwnProjectFile::save(QString *errorString, const QString &fileName, bool autoSave)
+/*dummies*/
+bool OwnProjectFile::save(QString *errorString, const QString &fileName, bool autoSave)
 {
     qDebug() << "[dbg]\t\tCalling dummy OwnProjectFile::save()";
     return false;
 }
-virtual QString OwnProjectFile::defaultPath() const
+QString OwnProjectFile::defaultPath() const
 {
     qDebug() << "[dbg]\t\tCalling dummy OwnProjectFile::defaultPath()";
     return QString();
 }
-virtual QString OwnProjectFile::suggestedFileName() const
+QString OwnProjectFile::suggestedFileName() const
 {
     qDebug() << "[dbg]\t\tCalling dummy OwnProjectFile::suggestedFileName()";
     return QString();
 }
-virtual bool OwnProjectFile::isModified() const
+bool OwnProjectFile::isModified() const
 {
     qDebug() << "[dbg]\t\tCalling dummy OwnProjectFile::isModified()";
     return false;
 }
-virtual bool OwnProjectFile::isSaveAsAllowed() const
+bool OwnProjectFile::isSaveAsAllowed() const
 {
     qDebug() << "[dbg]\t\tCalling dummy OwnProjectFile::isSaveAsAllowed()";
     return false;
 }
-virtual bool OwnProjectFile::reload(QString *errorString, ReloadFlag flag, ChangeType type)
+bool OwnProjectFile::reload(QString *errorString, ReloadFlag flag, ChangeType type)
 {
     qDebug() << "[dbg]\t\tCalling dummy OwnProjectFile::reload()";
     return false;
 }
+/*dummies*/
 
 } // namespace Internal
 } // namespace LibprojProjectManager

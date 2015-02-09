@@ -17,13 +17,21 @@ OwnProject::OwnProject(std::shared_ptr<Internal::OwnManager> Manager, const QStr
     nameOfProject =
             QFileInfo(filename).completeBaseName();
     file =
-            make_shared<OwnProjectFile> (make_shared<OwnProject>(*this), filename);
+            make_shared<OwnProjectFile> (get_shared_ptr() , filename);
     rootNode =
-            make_shared<OwnProjectNode> (make_shared<OwnProject>(*this), file);
+            make_shared<OwnProjectNode> (get_shared_ptr(), file);
 
     Core::DocumentManager::addDocument(file.get(), false); //or true? or even - are we need this?
 
 }
+
+/*memory*/
+std::shared_ptr<OwnProject> OwnProject::get_shared_ptr()
+{
+    qDebug() << "[dbg]\t\tGetting shared_ptr from this of OwnProject instance";
+    return shared_from_this();
+}
+/*memory*/
 
 QString OwnProject::displayName() const
 {
@@ -35,6 +43,24 @@ IDocument * OwnProject::document() const
 {
     qDebug() << "[dbg]\t\tCalling OwnProject::document()";
     return file.get();
+}
+
+ProjectExplorer::IProjectManager * OwnProject::projectManager() const
+{
+    qDebug() << "[dbg]\t\tCalling OwnProject::projectManager()";
+    return manager.get();
+}
+
+ProjectExplorer::ProjectNode * OwnProject::rootProjectNode() const
+{
+    qDebug() << "[dbg]\t\tCalling OwnProject::rootProjectNode()";
+    return rootNode.get();
+}
+
+QStringList OwnProject::files(FilesMode fileMode) const{
+    /*must return list of absolute paths*/
+    qDebug() << "[dbg]\t\tCalling OwnProject::files(FilesMode)";
+    return QStringList() << QFileInfo(filename).absoluteFilePath();
 }
 
 } // namespace Internal

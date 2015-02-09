@@ -6,6 +6,7 @@
 #include <memory>
 
 using std::make_shared;
+using std::shared_ptr;
 namespace LibprojProjectManager {
 namespace Internal {
 
@@ -13,6 +14,14 @@ OwnManager::OwnManager()
 {
             qDebug() << "[dbg]\t\tCalling c-tor for OwnManager";
 }
+
+/*memory*/
+shared_ptr<OwnManager> OwnManager::get_shared_ptr()
+{
+    qDebug() << "[dbg]\t\tGetting shared_ptr from this of OwnManager instance";
+    return shared_from_this();
+}
+/*memory*/
 
 QString OwnManager::mimeType() const
 {
@@ -27,7 +36,7 @@ ProjectExplorer::Project * OwnManager::openProject(const QString &Filename, QStr
             qDebug() << " [EE]\tProject file isn\'t a file" ;
             return nullptr;
     }
-    return /*nullptr*/ new OwnProject(make_shared<OwnManager>(*this), Filename);
+    return /*nullptr*/ new OwnProject(get_shared_ptr(), Filename);
 }
 
 void OwnManager::registerProject(std::shared_ptr<OwnProject> Project)

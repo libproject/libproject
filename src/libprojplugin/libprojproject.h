@@ -10,12 +10,12 @@ class OwnManager;
 class OwnProjectFile;
 class OwnProjectNode;
 
-class OwnProject : public ProjectExplorer::Project
+class OwnProject : public ProjectExplorer::Project, public std::enable_shared_from_this<OwnProject>
 {
     Q_OBJECT
     std::shared_ptr<OwnManager> manager;
     QString filename, nameOfProject;
-    std::shared_ptr<OwnProjectFile> file;
+    /*std::list<*/std::shared_ptr<OwnProjectFile> /*>*/file/*s*/;
     std::shared_ptr<OwnProjectNode> rootNode;
 
 public:
@@ -26,6 +26,8 @@ public:
     ProjectExplorer::IProjectManager *projectManager() const;
     ProjectExplorer::ProjectNode *rootProjectNode() const;
     QStringList files(FilesMode fileMode) const;
+public /*memory*/:
+    std::shared_ptr<OwnProject> get_shared_ptr();
 };
 
 } // namespace Internal
