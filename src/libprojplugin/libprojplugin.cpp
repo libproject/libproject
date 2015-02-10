@@ -39,22 +39,34 @@ bool LibprojPlugin::initialize(const QStringList &arguments, QString *errorStrin
     Q_UNUSED(errorString)
 
     /* setting up itself in QtC environment */
-    QAction *action = new QAction(tr("Open project"), this);
-    Core::Command *cmd = Core::ActionManager::registerAction(action, Constants::ACTION_ID,
-                                                             Core::Context(Core::Constants::C_GLOBAL));
-    connect(action, SIGNAL(triggered()), this, SLOT(triggerAction()));
-    Core::ActionContainer *menu = Core::ActionManager::createMenu(Constants::MENU_ID);
-    menu->menu()->setTitle(tr("Build Systems"));
-    menu->addAction(cmd);
-    Core::ActionManager::actionContainer(Core::Constants::M_TOOLS)->addMenu(menu);
+    QAction
+            * openProjectAction = new QAction(tr("Open project..."), this),
+            * addNewFileAction = new QAction(tr("Add New File..."), this);
+
+    Core::Command
+            * openProjectCommand = Core::ActionManager::registerAction(openProjectAction, Constants::OPEN_ACTION_ID, Core::Context(Core::Constants::C_GLOBAL)),
+            * addNewFileCommand = Core::ActionManager::registerAction(addNewFileAction, Constants::ADDNEW_ACTION_ID, Core::Context(Core::Constants::C_GLOBAL));
+
+    /*TODO
+     * addNewFileCommand must be inactive before opening project*/
+
+    connect(openProjectAction, SIGNAL(triggered()), SLOT(triggerOpenProjectAction()));
+    connect(addNewFileAction, SIGNAL(triggered()), SLOT(triggerAddNewFileAction()));
+
+    Core::ActionContainer
+            * libprojMenu = Core::ActionManager::createMenu(Constants::MENU_ID);
+    libprojMenu->menu()->setTitle(tr("Libproj System"));
+    libprojMenu->addAction(openProjectCommand);
+    libprojMenu->addAction(addNewFileCommand);
+    Core::ActionManager::actionContainer(Core::Constants::M_TOOLS)->addMenu(libprojMenu);
 
     /* initializing project manager system */
-    LibprojProjectManager::Internal::OwnManager * manager = new LibprojProjectManager::Internal::OwnManager();
+    LibprojProjectManager::Internal::OwnManager
+            * manager = new LibprojProjectManager::Internal::OwnManager();
     IPlugin::addAutoReleasedObject(manager);
 
     /* some plugin-wide settings */
     isReadOnly = true;
-
     return true;
 }
 
@@ -68,17 +80,20 @@ ExtensionSystem::IPlugin::ShutdownFlag LibprojPlugin::aboutToShutdown()
     return SynchronousShutdown;
 }
 
-void LibprojPlugin::triggerAction()
+void LibprojPlugin::triggerOpenProjectAction()
 {
+    qDebug() << "Triggering openProjectAction";
     if (erroneousState = parseMetadata(readProjectFile()))
     {
-        qDebug() << "Opening file:\t" + projectFilename;
         if (project = ProjectExplorer::ProjectExplorerPlugin::openProject(projectFilename, &er))
-            qDebug() << "Project created";
-        /*ProjectExplorer::SessionManager::addProject(project); are we need this ?*/
+            qDebug() << "Project opened";
+        else
+            qWarning() << "OwnManager can not open project";
     }
     else
-        qWarning() << "Error with opening project file.";
+    {
+        qWarning() << "Error with opening project file";
+    }
     return;
 }
 
@@ -104,13 +119,31 @@ QString LibprojPlugin::readProjectFile()
 bool LibprojPlugin::parseMetadata(const QString & strJson)
 {
     if (strJson.isNull() || strJson.isEmpty()) {
-        qWarning() << "Nothing to parse.";
+        qWarning() << "Nothing to parse";
         return false;
     }
     else {
         bool ok = false;
+        qDebug() << "About to start parsing";
         parsedMetadata = QtJson::parse(strJson, ok).toMap();
         Q_ASSERT(ok);
         return true;
     }
+}
+
+void LibprojPlugin::triggerAddNewFileAction()
+{
+   switch(QMessageBox::question(nullptr, tr("File exists?"),tr("Are you want to add existing file (Yes) or create new (No)?"),
+                                QMessageBox::Yes, QMessageBox::No))
+   {
+   case QMessageBox::StandardButton::Yes:
+
+        break;
+   case QMessageBox::StandardButton::No:
+       //project->rootProjectNode()->addFiles() START HERE
+        break;
+   default:
+       qWarning() << "Something wrong with answer of message box in triggerAddNewFileAction()";
+        break;
+   }
 }

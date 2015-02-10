@@ -30,11 +30,12 @@ private:
     virtual QString readProjectFile();
     virtual bool parseMetadata(const QString & strJson);
 private slots:
-    virtual void triggerAction(); //people says about virtual slots that is bad idea
+    virtual void triggerOpenProjectAction();
+    virtual void triggerAddNewFileAction();
 
     //members
 private:
-    bool isReadOnly; //1 - rw, 0 - ro
+    bool isReadOnly;
     bool erroneousState;
 
     static QVariantMap parsedMetadata;
