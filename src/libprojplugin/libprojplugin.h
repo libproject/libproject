@@ -1,5 +1,4 @@
-#ifndef LPROJ4_H
-#define LPROJ4_H
+#pragma once
 
 #include "libproj_global.h"
 #include <QJsonObject>
@@ -35,12 +34,12 @@ private slots:
 
     //members
 private:
-    bool isRw; //1 - rw, 0 - ro
+    bool isReadOnly; //1 - rw, 0 - ro
     bool erroneousState;
 
     static QVariantMap parsedMetadata;
     static QVector<QFile *> files;
-    QString * projectFilename;
+    QString projectFilename;
     QString er;
     ProjectExplorer::Project * project;
 
@@ -51,5 +50,3 @@ private:
 
 } // namespace Internal
 } // namespace Libproj
-
-#endif // LPROJ4_H

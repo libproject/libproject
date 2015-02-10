@@ -1,5 +1,4 @@
-#ifndef LIBPROJCONSTANTS_H
-#define LIBPROJCONSTANTS_H
+#pragma once
 
 namespace  Libproj {
 namespace Constants {
@@ -22,5 +21,3 @@ const char LIBPROJPROJECT_ID[] = "LibprojProjectManager.LibprojProject";
 
 } // namespace Constants
 } // namespace LibprojProjectManager
-
-#endif // LIBPROJCONSTANTS_H

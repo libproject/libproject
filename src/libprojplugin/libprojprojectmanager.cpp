@@ -3,7 +3,6 @@
 #include <QDebug>
 #include <QFileInfo>
 #include "libprojproject.h"
-#include <memory>
 
 using std::make_shared;
 using std::shared_ptr;
@@ -12,35 +11,36 @@ namespace Internal {
 
 OwnManager::OwnManager()
 {
-            qDebug() << "[dbg]\t\tCalling c-tor for OwnManager";
+            qDebug() << "Calling c-tor for OwnManager";
 }
 
 QString OwnManager::mimeType() const
 {
-            qDebug() << "[dbg]\t\tComparing with own mime type";
+            qDebug() << "Comparing with own mime type";
             return QString(Constants::LIBPROJPROJECTMIMETYPE);
 }
 
 ProjectExplorer::Project * OwnManager::openProject(const QString &Filename, QString *ErrorString)
 {
-    qDebug() << "[dbg]\t\tOpening project";
+    qDebug() << "Opening project";
     if(!QFileInfo(Filename).isFile()) {
-            qDebug() << " [EE]\tProject file isn\'t a file" ;
+            qWarning() << "Project file isn\'t a file" ;
             return nullptr;
     }
-    qDebug() << "[dbg]\t\t\t"+Filename;
     return new OwnProject(this, Filename);
 }
 
 void OwnManager::registerProject(OwnProject * Project)
 {
-    qDebug() << "[dbg]\t\tRegistering project";
+    /* TODO
+     * project will be projectS there must be function which appends projects to array*/
+    qDebug() << "Registering project";
     project = Project;
 }
 
 void OwnManager::unregisterProject(OwnProject * /*Project*/)
 {
-    qDebug() << "[dbg]\t\tUnregistering project";
+    qDebug() << "Unregistering project";
     project = nullptr;
 }
 

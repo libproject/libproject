@@ -10,7 +10,7 @@ OwnProjectFile::OwnProjectFile(OwnProject * Parent, const QString &Filename)
     : Core::IDocument(Parent),
       project(Parent)
 {
-    qDebug() << "[dbg]\t\tCalling c-tor for OwnProjectFile (2nd)";
+    qDebug() << "Calling c-tor for OwnProjectFile";
     setId("Libproj.ProjectFile");
     setMimeType(QLatin1String(Constants::LIBPROJPROJECTMIMETYPE));
     setFilePath(Utils::FileName::fromString(Filename));
@@ -19,32 +19,32 @@ OwnProjectFile::OwnProjectFile(OwnProject * Parent, const QString &Filename)
 /*dummies*/
 bool OwnProjectFile::save(QString *errorString, const QString &fileName, bool autoSave)
 {
-    qDebug() << "[dbg]\t\tCalling dummy OwnProjectFile::save()";
+    qDebug() << "Calling dummy OwnProjectFile::save()";
     return false;
 }
 QString OwnProjectFile::defaultPath() const
 {
-    qDebug() << "[dbg]\t\tCalling dummy OwnProjectFile::defaultPath()";
+    qDebug() << "Calling dummy OwnProjectFile::defaultPath()";
     return QString();
 }
 QString OwnProjectFile::suggestedFileName() const
 {
-    qDebug() << "[dbg]\t\tCalling dummy OwnProjectFile::suggestedFileName()";
+    qDebug() << "Calling dummy OwnProjectFile::suggestedFileName()";
     return QString();
 }
 bool OwnProjectFile::isModified() const
 {
-    qDebug() << "[dbg]\t\tCalling dummy OwnProjectFile::isModified()";
+    qDebug() << "Calling dummy OwnProjectFile::isModified()";
     return false;
 }
 bool OwnProjectFile::isSaveAsAllowed() const
 {
-    qDebug() << "[dbg]\t\tCalling dummy OwnProjectFile::isSaveAsAllowed()";
+    qDebug() << "Calling dummy OwnProjectFile::isSaveAsAllowed()";
     return false;
 }
 bool OwnProjectFile::reload(QString *errorString, ReloadFlag flag, ChangeType type)
 {
-    qDebug() << "[dbg]\t\tCalling dummy OwnProjectFile::reload()";
+    qDebug() << "Calling dummy OwnProjectFile::reload()";
     return false;
 }
 /*dummies*/

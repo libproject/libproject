@@ -2,7 +2,6 @@
 #include "libprojprojectmanager.h"
 #include "libprojprojectfile.h"
 #include "libprojprojectnodes.h"
-#include <memory>
 #include <coreplugin/documentmanager.h>
 #include "libprojplugin.h"
 
@@ -17,7 +16,7 @@ OwnProject::OwnProject(OwnManager * Manager, const QString & Filename)
     : manager(Manager),
       filename(Filename)
 {
-    qDebug() << "[dbg]\t\tCalling c-tor for OwnProject (2nd)";
+    qDebug() << "Calling c-tor for OwnProject";
     QFileInfo fileInfo(Filename);
 
     nameOfProject =
@@ -36,31 +35,32 @@ OwnProject::OwnProject(OwnManager * Manager, const QString & Filename)
 
 QString OwnProject::displayName() const
 {
-    qDebug() << "[dbg]\t\tCalling OwnProject::displayName()";
+    qDebug() << "Calling OwnProject::displayName()";
     return nameOfProject;
 }
 
 IDocument * OwnProject::document() const
 {
-    qDebug() << "[dbg]\t\tCalling OwnProject::document()";
+    qDebug() << "Calling OwnProject::document()";
     return file;
 }
 
 ProjectExplorer::IProjectManager * OwnProject::projectManager() const
 {
-    qDebug() << "[dbg]\t\tCalling OwnProject::projectManager()";
+    qDebug() << "Calling OwnProject::projectManager()";
     return manager;
 }
 
 ProjectExplorer::ProjectNode * OwnProject::rootProjectNode() const
 {
-    qDebug() << "[dbg]\t\tCalling OwnProject::rootProjectNode()";
+    qDebug() << "Calling OwnProject::rootProjectNode()";
     return rootNode;
 }
 
 QStringList OwnProject::files(FilesMode fileMode = AllFiles) const{
-    /*must return list of absolute paths*/
-    qDebug() << "[dbg]\t\tCalling OwnProject::files(FilesMode)";
+    /* TODO
+     * must return list of absolute paths*/
+    qDebug() << "Calling OwnProject::files(FilesMode)";
     return QStringList() << QFileInfo(filename).absoluteFilePath();
 }
 

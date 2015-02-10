@@ -1,5 +1,4 @@
-#ifndef LIBPROJPROJECTNODE_H
-#define LIBPROJPROJECTNODE_H
+#pragma once
 
 #include <projectexplorer/projectnodes.h>
 
@@ -27,5 +26,3 @@ public /*my*/:
 
 } // namespace Internal
 } // namespace LibprojProjectManager
-
-#endif // LIBPROJPROJECTNODE_H

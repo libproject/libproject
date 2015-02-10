@@ -1,5 +1,4 @@
-#ifndef LIBPROJ_GLOBAL_H
-#define LIBPROJ_GLOBAL_H
+#pragma once
 
 #include <QtGlobal>
 
@@ -8,6 +7,4 @@
 #else
 #  define LIBPROJSHARED_EXPORT Q_DECL_IMPORT
 #endif
-
-#endif // LIBPROJ_GLOBAL_H
 
