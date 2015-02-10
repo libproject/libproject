@@ -18,24 +18,24 @@ OwnProjectNode::OwnProjectNode(OwnProject * Project, OwnProjectFile * ProjectFil
       project(Project),
       projectFile(ProjectFile)
 {
-    qDebug() << "[dbg]\t\tCalling c-tor for OwnProjectNode (2nd)";
+    qDebug() << "Calling c-tor for OwnProjectNode";
     setDisplayName(projectFile->filePath().toFileInfo().completeBaseName());
 }
 
 /*dummies*/
 bool OwnProjectNode::canAddSubProject(const QString &proFilePath) const
 {
-    qDebug() << "[dbg]\t\tCalling dummy OwnProjectNode::canAddSubProject()";
+    qDebug() << "Calling dummy OwnProjectNode::canAddSubProject()";
     return false;
 }
 bool OwnProjectNode::addSubProjects(const QStringList &proFilePaths)
 {
-    qDebug() << "[dbg]\t\tCalling dummy OwnProjectNode::addSubProjects()";
+    qDebug() << "Calling dummy OwnProjectNode::addSubProjects()";
     return false;
 }
 bool OwnProjectNode::removeSubProjects(const QStringList &proFilePaths)
 {
-    qDebug() << "[dbg]\t\tCalling dummy OwnProjectNode::removeSubProjects()";
+    qDebug() << "Calling dummy OwnProjectNode::removeSubProjects()";
     return false;
 }
 /*dummies*/

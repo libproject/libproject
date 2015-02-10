@@ -1,5 +1,5 @@
-#ifndef LIBPROJPROJECT_H
-#define LIBPROJPROJECT_H
+#pragma once
+
 #include <projectexplorer/project.h>
 
 namespace LibprojProjectManager {
@@ -30,5 +30,3 @@ public:
 
 } // namespace Internal
 } // namespace LibprojProjectManager
-
-#endif // LIBPROJPROJECT_H

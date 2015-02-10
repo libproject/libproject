@@ -1,5 +1,4 @@
-#ifndef LIBPROJPROJECTFILE_H
-#define LIBPROJPROJECTFILE_H
+#pragma once
 
 #include <QObject>
 #include <coreplugin/idocument.h>
@@ -27,5 +26,3 @@ public /*dummies*/:
 
 } // namespace Internal
 } // namespace LibprojProjectManager
-
-#endif // LIBPROJPROJECTFILE_H

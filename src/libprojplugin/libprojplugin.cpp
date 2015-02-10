@@ -53,7 +53,7 @@ bool LibprojPlugin::initialize(const QStringList &arguments, QString *errorStrin
     IPlugin::addAutoReleasedObject(manager);
 
     /* some plugin-wide settings */
-    isRw = false;
+    isReadOnly = true;
 
     return true;
 }
@@ -65,7 +65,6 @@ void LibprojPlugin::extensionsInitialized()
 
 ExtensionSystem::IPlugin::ShutdownFlag LibprojPlugin::aboutToShutdown()
 {
-    delete projectFilename;
     return SynchronousShutdown;
 }
 
@@ -73,28 +72,28 @@ void LibprojPlugin::triggerAction()
 {
     if (erroneousState = parseMetadata(readProjectFile()))
     {
-        qDebug() << "[ok]\tOpening file:" + *projectFilename;
-        if (project = ProjectExplorer::ProjectExplorerPlugin::openProject(*projectFilename, &er))
-            qDebug() << "[debug]\tProject created";
+        qDebug() << "Opening file:\t" + projectFilename;
+        if (project = ProjectExplorer::ProjectExplorerPlugin::openProject(projectFilename, &er))
+            qDebug() << "Project created";
         /*ProjectExplorer::SessionManager::addProject(project); are we need this ?*/
     }
     else
-        qDebug() << "[EE]\tError with opening project file.";
+        qWarning() << "Error with opening project file.";
     return;
 }
 
 QString LibprojPlugin::readProjectFile()
 {
-    projectFilename = new QString (QFileDialog::getOpenFileName(0, QLatin1String("Open File")));
-    QFile projectFile(*projectFilename);
+    projectFilename = QFileDialog::getOpenFileName(0, QLatin1String("Open File"));
+    QFile projectFile(projectFilename);
     if(projectFile.open( QIODevice::ReadWrite | QIODevice::Text )) {
-        qDebug() << "[ok]\tFile successfully opened";
+        qDebug() << "File successfully opened";
         QTextStream inStream(&projectFile);
         if (inStream.status() != QTextStream::Ok) {
-            qDebug() << "[EE]\tSomething wrong with QTextStream in f-on readProjectFile()";
+            qWarning() << "Something wrong with QTextStream in f-on readProjectFile()";
             return QString();
         }
-        qDebug() << "[ok]\tReading file:";
+        qDebug() << "Reading file:";
         return inStream.readAll();
     }
     else
@@ -105,7 +104,7 @@ QString LibprojPlugin::readProjectFile()
 bool LibprojPlugin::parseMetadata(const QString & strJson)
 {
     if (strJson.isNull() || strJson.isEmpty()) {
-        qDebug() << "[EE]\tNothing to parse.";
+        qWarning() << "Nothing to parse.";
         return false;
     }
     else {
