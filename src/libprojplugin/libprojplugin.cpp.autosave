@@ -28,7 +28,7 @@ using ProjectExplorer::FileNode;
 using namespace Libproj::Internal;
 using json11::Json;
 
-Json LibprojPlugin::parsedMetadata = Json();
+Json LibprojPlugin::projectData = Json();
 QVector<QFile *> LibprojPlugin::files = QVector<QFile *>();
 
 LibprojPlugin::LibprojPlugin() { }
@@ -127,7 +127,7 @@ bool LibprojPlugin::parseMetadata(const QString & strJson)
     else {
         std::string err;
         qDebug() << "About to start parsing";
-        parsedMetadata = Json::parse(strJson.toStdString(), err);
+        projectData = Json::parse(strJson.toStdString(), err);
         if (!err.empty())
             qWarning() << "Something wrong with parsing:\n" + QString(err.c_str());
         return err.empty() ? true : false;

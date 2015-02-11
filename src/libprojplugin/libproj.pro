@@ -53,5 +53,5 @@ QTC_PLUGIN_RECOMMENDS += \
 ###### End _dependencies.pri contents ######
 
 include($$QTCREATOR_SOURCES/src/qtcreatorplugin.pri)
-include($$PWD/../../tools/qt-json/qt-json.pri)
+include($$PWD/../../tools/json11/json11.pri)
 DEFINES -= QT_NO_CAST_FROM_ASCII

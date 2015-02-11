@@ -6,6 +6,7 @@
 #include "libprojproject.h"
 #include <QVector>
 #include "libprojprojectnodes.h"
+#include "../../tools/json11/json11.hpp"
 
 class QFile;
 namespace Libproj {
@@ -37,11 +38,13 @@ private:
     bool isReadOnly;
     bool erroneousState;
 
-    static QVariantMap parsedMetadata;
+    static json11::Json projectData;
     static QVector<QFile *> files;
     QString projectFilename;
     QString er;
     ProjectExplorer::Project * project;
+
+    void saveProjectData(const json11::Json & changedProjectData);
 
     friend class LibprojProjectManager::Internal::OwnProject;
     friend void LibprojProjectManager::Internal::OwnProjectNode::addFileNodes(const QVariantMap& Data, const QFileInfo &fileInfo);
