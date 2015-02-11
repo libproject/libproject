@@ -13,17 +13,17 @@
 #include <QFileDialog>
 #include <QtPlugin>
 #include "../../tools/qt-json/json.h"
-
 #include <projectexplorer/projectexplorer.h>
-
 #include <extensionsystem/pluginmanager.h>
-
 #include <projectexplorer/iprojectmanager.h>
 #include <projectexplorer/session.h>
 #include <projectexplorer/projectnodes.h>
-
 #include "libprojprojectmanager.h"
+#include "coreplugin/idocument.h"
+#include "libprojprojectnodes.h"
 
+using ProjectExplorer::FileType;
+using ProjectExplorer::FileNode;
 using namespace Libproj::Internal;
 
 QVariantMap LibprojPlugin::parsedMetadata = QVariantMap();
@@ -137,13 +137,26 @@ void LibprojPlugin::triggerAddNewFileAction()
                                 QMessageBox::Yes, QMessageBox::No))
    {
    case QMessageBox::StandardButton::Yes:
-
-        break;
+   {
+       break;
+   }
    case QMessageBox::StandardButton::No:
-       //project->rootProjectNode()->addFiles() START HERE
+   {
+       QString newFilename (QFileDialog::getSaveFileName(nullptr, tr("Where you want to save new file?"), project->document()->filePath().toFileInfo().dir().path()));
+       QFile newFile (newFilename);
+       if (!newFile.exists())
+           newFile.open(QIODevice::ReadWrite | QIODevice::Text);
+       else
+           qWarning() << "File already exists!";
+           /* TODO
+            *  i need more secure way than just showing debugging message*/
+       project->rootProjectNode()->ProjectNode::addFileNodes(QList<FileNode *>() << new FileNode(newFilename,  FileType::SourceType, false));
         break;
+   }
    default:
+   {
        qWarning() << "Something wrong with answer of message box in triggerAddNewFileAction()";
-        break;
+       break;
+   }
    }
 }

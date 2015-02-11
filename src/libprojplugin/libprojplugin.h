@@ -1,7 +1,6 @@
 #pragma once
 
 #include "libproj_global.h"
-#include <QJsonObject>
 #include <extensionsystem/iplugin.h>
 #include <projectexplorer/project.h>
 #include "libprojproject.h"

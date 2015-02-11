@@ -45,7 +45,7 @@ void OwnProjectNode::addFileNodes(const QVariantMap & Data, const QFileInfo & fi
 {
    for (const auto& x : Data["files"].toStringList())
    {
-       LibprojPlugin::files.push_back(new QFile(fileInfo.dir().path() + QString("\\") + x));
+       LibprojPlugin::files.push_back(new QFile(fileInfo.dir().path() + QString("/") + x));
        LibprojPlugin::files.last()->open( QIODevice::ReadWrite | QIODevice::Text );
    }
    QList<FileNode*> listOfFileNodes;

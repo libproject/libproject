@@ -14,7 +14,7 @@ class OwnProject : public ProjectExplorer::Project
     Q_OBJECT
     OwnManager * manager;
     QString filename, nameOfProject;
-    /*std::list<*/OwnProjectFile * /*>*/file/*s*/;
+    OwnProjectFile * file;
     OwnProjectNode * rootNode;
 
 public:
