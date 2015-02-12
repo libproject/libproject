@@ -19,7 +19,6 @@ QVariantMap jsonToQVariantMap(const Json& json)
     QVariantMap data = QVariantMap();
     const int size = 2;
     array<string, size> toCheck = { /*0: */"author",  /*1: */ "files"  };
-    int i = 0;
     /*first key*/
     if (!json[toCheck[0]].string_value().empty())
         data.insert(QString(toCheck[0].c_str()), QVariant(json[toCheck[0]].string_value().c_str()));
@@ -60,7 +59,7 @@ OwnProject::OwnProject(OwnManager * Manager, const QString & Filename)
             new OwnProjectNode (this, file);
 
 
-    rootNode->addFileNodes(jsonToQVariantMap(LibprojPlugin::parsedMetadata), fileInfo);
+    rootNode->addFileNodes(jsonToQVariantMap(LibprojPlugin::projectData), fileInfo);
     Core::DocumentManager::addDocument(file, false); //or true? or even - are we need this?
 
     manager->registerProject(this);

@@ -12,7 +12,7 @@
 #include <QMenu>
 #include <QFileDialog>
 #include <QtPlugin>
-#include "../../tools/json11/json11.hpp"
+#include "json11.hpp"
 #include <projectexplorer/projectexplorer.h>
 #include <extensionsystem/pluginmanager.h>
 #include <projectexplorer/iprojectmanager.h>
@@ -27,9 +27,40 @@ using ProjectExplorer::FileType;
 using ProjectExplorer::FileNode;
 using namespace Libproj::Internal;
 using json11::Json;
+using std::string;
 
-Json LibprojPlugin::parsedMetadata = Json();
+Json LibprojPlugin::projectData = Json();
 QVector<QFile *> LibprojPlugin::files = QVector<QFile *>();
+
+namespace {
+    template <typename T>
+    bool appendToJsonInTextRepresentation(const T& valToAppend, const char * whereToAppend, std::string& str)
+    {
+        int positionOfFilesKey = str.find(whereToAppend);
+
+        int positionOfClosingBracket = str.find (string("]"), positionOfFilesKey);
+
+        switch (str.at(positionOfClosingBracket - 1))
+        {
+            case ' ':
+            {
+                str.insert(positionOfClosingBracket - 1, (string(", \"") + valToAppend).append("\""));
+            }
+            break;
+            case '\"':
+            {
+                str.insert(positionOfClosingBracket, (string(", \"") + valToAppend).append("\""));
+            }
+            break;
+            default:
+            {
+                return false;
+            }
+            break;
+        }
+        return true;
+    }
+}
 
 LibprojPlugin::LibprojPlugin() { }
 
@@ -103,10 +134,12 @@ QString LibprojPlugin::readProjectFile()
 {
     projectFilename = QFileDialog::getOpenFileName(0, QLatin1String("Open File"));
     QFile projectFile(projectFilename);
-    if(projectFile.open( QIODevice::ReadWrite | QIODevice::Text )) {
+    if(projectFile.open( QIODevice::ReadWrite | QIODevice::Text ))
+    {
         qDebug() << "File successfully opened";
         QTextStream inStream(&projectFile);
-        if (inStream.status() != QTextStream::Ok) {
+        if (inStream.status() != QTextStream::Ok)
+        {
             qWarning() << "Something wrong with QTextStream in f-on readProjectFile()";
             return QString();
         }
@@ -127,7 +160,7 @@ bool LibprojPlugin::parseMetadata(const QString & strJson)
     else {
         std::string err;
         qDebug() << "About to start parsing";
-        parsedMetadata = Json::parse(strJson.toStdString(), err);
+        projectData = Json::parse(strJson.toStdString(), err);
         if (!err.empty())
             qWarning() << "Something wrong with parsing:\n" + QString(err.c_str());
         return err.empty() ? true : false;
@@ -147,7 +180,6 @@ void LibprojPlugin::triggerAddNewFileAction()
    {
        QString newFilename (QFileDialog::getSaveFileName(nullptr, tr("Where you want to save new file?"), project->document()->filePath().toFileInfo().dir().path()));
        QFile newFile (newFilename);
-      //Json projectData(parsedMetadata.toStdMap());
        if (!newFile.exists())
            newFile.open(QIODevice::ReadWrite | QIODevice::Text);
        else
@@ -155,7 +187,11 @@ void LibprojPlugin::triggerAddNewFileAction()
            /* TODO
             *  i need more secure way than just showing debugging message*/
        project->rootProjectNode()->ProjectNode::addFileNodes(QList<FileNode *>() << new FileNode(newFilename,  FileType::SourceType, false));
-        break;
+
+       /* just for testing purposes:
+         * saving file */
+        saveProjectData( QFileInfo(newFile).fileName().toStdString() , string("files") );
+       break;
    }
    default:
    {
@@ -165,7 +201,26 @@ void LibprojPlugin::triggerAddNewFileAction()
    }
 }
 
-void LibprojPlugin::saveProjectData(const Json &changedProjectData)
+void LibprojPlugin::saveProjectData(const string & WhatToAppend, const string & WhereToAppend)
 {
+    qDebug() << QString(WhatToAppend.c_str());
+    string
+            dumpedData = projectData.dump(),
+            errors;
+    bool result = appendToJsonInTextRepresentation<string>(WhatToAppend, WhereToAppend.c_str(), dumpedData);
+    if (result)
+        projectData = Json::parse(dumpedData, errors);
+    else
+        qWarning() << "Error when modifying json representation";
+    qDebug() << QString(errors.c_str());
 
+    /*writing to file*/
+    QFile projectFile(projectFilename);
+    if(!projectFile.open( QIODevice::ReadWrite | QIODevice::Text ))
+        qDebug() << "File unsuccessfully opened";
+    else
+        qDebug() << "File successfully opened";
+    QTextStream outStream(&projectFile);
+    outStream << dumpedData.c_str();
+    projectFile.close();
 }
