@@ -60,7 +60,7 @@ OwnProject::OwnProject(OwnManager * Manager, const QString & Filename)
             new OwnProjectNode (this, file);
 
 
-    rootNode->addFileNodes(jsonToQVariantMap(LibprojPlugin::parsedMetadata), fileInfo);
+    rootNode->addFileNodes(jsonToQVariantMap(LibprojPlugin::projectData), fileInfo);
     Core::DocumentManager::addDocument(file, false); //or true? or even - are we need this?
 
     manager->registerProject(this);

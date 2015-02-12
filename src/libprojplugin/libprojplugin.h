@@ -7,6 +7,7 @@
 #include <QVector>
 #include "libprojprojectnodes.h"
 #include "../../tools/json11/json11.hpp"
+#include <string>
 
 class QFile;
 namespace Libproj {
@@ -44,7 +45,7 @@ private:
     QString er;
     ProjectExplorer::Project * project;
 
-    void saveProjectData(const json11::Json & changedProjectData);
+    void saveProjectData(const std::string & WhatToAppend, const std::string & WhereToAppend);
 
     friend class LibprojProjectManager::Internal::OwnProject;
     friend void LibprojProjectManager::Internal::OwnProjectNode::addFileNodes(const QVariantMap& Data, const QFileInfo &fileInfo);
