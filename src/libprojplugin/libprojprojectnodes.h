@@ -14,7 +14,7 @@ class OwnProjectNode : public ProjectExplorer::ProjectNode
     OwnProject * project;
     OwnProjectFile * projectFile; //unique?
 public:
-    OwnProjectNode(OwnProject * Project, OwnProjectFile * ProjectFile); //2nd
+    OwnProjectNode(OwnProject * Project, OwnProjectFile * ProjectFile);
 public /*dummies*/:
     virtual bool canAddSubProject(const QString &proFilePath) const;
     virtual bool addSubProjects(const QStringList &proFilePaths);

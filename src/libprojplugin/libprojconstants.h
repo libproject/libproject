@@ -3,8 +3,9 @@
 namespace  Libproj {
 namespace Constants {
 
-const char ACTION_ID[] = "libproj.Action";
-const char MENU_ID[] = "libproj.Menu";
+const char OPEN_ACTION_ID[] = "Libproj.Open.Action";
+const char ADDNEW_ACTION_ID[] = "Libproj.AddNew.Action";
+const char MENU_ID[] = "Libproj.Menu";
 
 } // namespace Constants
 } //namespace Libproj
@@ -17,6 +18,8 @@ const char PROJECTCONTEXT[] = "LibprojProject.ProjectContext";
 const char LIBPROJPROJECTMIMETYPE[]  = "application/json";
 
 // Project
+/* TODO
+ * OwnManager.OwnProject?*/
 const char LIBPROJPROJECT_ID[] = "LibprojProjectManager.LibprojProject";
 
 } // namespace Constants
