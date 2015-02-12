@@ -1,5 +1,3 @@
-#pragma once
-
 #include "libprojprojectnodes.h"
 #include "libprojprojectfile.h"
 #include "libprojproject.h"

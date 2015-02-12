@@ -6,7 +6,7 @@
 #include "libprojproject.h"
 #include <QVector>
 #include "libprojprojectnodes.h"
-#include "../../tools/json11/json11.hpp"
+#include "json11.hpp"
 #include <string>
 
 class QFile;

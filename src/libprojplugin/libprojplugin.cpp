@@ -12,7 +12,7 @@
 #include <QMenu>
 #include <QFileDialog>
 #include <QtPlugin>
-#include "../../tools/json11/json11.hpp"
+#include "json11.hpp"
 #include <projectexplorer/projectexplorer.h>
 #include <extensionsystem/pluginmanager.h>
 #include <projectexplorer/iprojectmanager.h>
