@@ -1,9 +1,7 @@
 #pragma once
-
 #include <projectexplorer/projectnodes.h>
 
 namespace Core { class IDocument; }
-
 namespace  LibprojProjectManager {
 namespace Internal {
 
@@ -15,6 +13,7 @@ class OwnProjectNode : public ProjectExplorer::ProjectNode
     OwnProjectFile * projectFile; //unique?
 public:
     OwnProjectNode(OwnProject * Project, OwnProjectFile * ProjectFile);
+    QList<ProjectExplorer::ProjectAction> supportedActions(Node * node) const;
 public /*dummies*/:
     virtual bool canAddSubProject(const QString &proFilePath) const;
     virtual bool addSubProjects(const QStringList &proFilePaths);
@@ -22,6 +21,9 @@ public /*dummies*/:
 
 public /*my*/:
     void addFileNodes(const QVariantMap& Data, const QFileInfo &fileInfo);
+
+    /*LPROJ-8*/
+    bool addFiles(const QStringList &filePaths, QStringList *notAdded);
 };
 
 } // namespace Internal

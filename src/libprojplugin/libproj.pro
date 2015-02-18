@@ -19,13 +19,27 @@ HEADERS += libprojplugin.h \
 
 # Qt Creator linking
 
+# my gcc build
 ## set the QTC_SOURCE environment variable to override the setting here
+linux-g++ {
 QTCREATOR_SOURCES = $$(QTC_SOURCE)
 isEmpty(QTCREATOR_SOURCES):QTCREATOR_SOURCES=/home/drew/Git/qt-creator
 
 ## set the QTC_BUILD environment variable to override the setting here
 IDE_BUILD_TREE = $$(QTC_BUILD)
-isEmpty(IDE_BUILD_TREE):IDE_BUILD_TREE=/home/drew/QtCreatorWorkBuild
+isEmpty(IDE_BUILD_TREE):IDE_BUILD_TREE=/home/drew/QtCreatorProjects/QTC-GCC-BUILD
+}
+
+linux-clang {
+# my clang build
+## set the QTC_SOURCE environment variable to override the setting here
+QTCREATOR_SOURCES = $$(QTC_SOURCE)
+isEmpty(QTCREATOR_SOURCES):QTCREATOR_SOURCES=/home/drew/Git/qt-creator-new
+
+## set the QTC_BUILD environment variable to override the setting here
+IDE_BUILD_TREE = $$(QTC_BUILD)
+isEmpty(IDE_BUILD_TREE):IDE_BUILD_TREE=/home/drew/QtCreatorProjects/QTC-LLVM-BUILD
+}
 
 ## uncomment to build plugin into user config directory
 ## <localappdata>/plugins/<ideversion>
@@ -51,7 +65,6 @@ QTC_PLUGIN_RECOMMENDS += \
     # optional plugin dependencies. nothing here at this time
 
 ###### End _dependencies.pri contents ######
-
 include($$QTCREATOR_SOURCES/src/qtcreatorplugin.pri)
 include($$PWD/../../tools/json11.pri)
 DEFINES -= QT_NO_CAST_FROM_ASCII

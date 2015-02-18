@@ -1,33 +1,25 @@
 #include "libprojplugin.h"
 #include "libprojconstants.h"
-#include <coreplugin/icore.h>
-#include <coreplugin/icontext.h>
 #include <coreplugin/actionmanager/actionmanager.h>
-#include <coreplugin/actionmanager/command.h>
 #include <coreplugin/actionmanager/actioncontainer.h>
 #include <coreplugin/coreconstants.h>
-#include <QAction>
 #include <QMessageBox>
-#include <QMainWindow>
 #include <QMenu>
 #include <QFileDialog>
-#include <QtPlugin>
 #include "json11.hpp"
 #include <projectexplorer/projectexplorer.h>
-#include <extensionsystem/pluginmanager.h>
-#include <projectexplorer/iprojectmanager.h>
-#include <projectexplorer/session.h>
-#include <projectexplorer/projectnodes.h>
 #include "libprojprojectmanager.h"
 #include "coreplugin/idocument.h"
 #include "libprojprojectnodes.h"
-
+#include "libproj_global.h"
+#include "libprojproject.h"
 
 using ProjectExplorer::FileType;
 using ProjectExplorer::FileNode;
 using namespace Libproj::Internal;
 using json11::Json;
 using std::string;
+using LibprojProjectManager::Internal::OwnProject;
 
 Json LibprojPlugin::projectData = Json();
 QVector<QFile *> LibprojPlugin::files = QVector<QFile *>();
@@ -118,7 +110,7 @@ void LibprojPlugin::triggerOpenProjectAction()
     qDebug() << "Triggering openProjectAction";
     if (erroneousState = parseMetadata(readProjectFile()))
     {
-        if (project = ProjectExplorer::ProjectExplorerPlugin::openProject(projectFilename, &er))
+        if (project = qobject_cast<OwnProject*> (ProjectExplorer::ProjectExplorerPlugin::openProject(projectFilename, &er)))
             qDebug() << "Project opened";
         else
             qWarning() << "OwnManager can not open project";
@@ -174,6 +166,9 @@ void LibprojPlugin::triggerAddNewFileAction()
    {
    case QMessageBox::StandardButton::Yes:
    {
+       /* TODO
+        * ...
+        */
        break;
    }
    case QMessageBox::StandardButton::No:
@@ -182,15 +177,14 @@ void LibprojPlugin::triggerAddNewFileAction()
        QFile newFile (newFilename);
        if (!newFile.exists())
            newFile.open(QIODevice::ReadWrite | QIODevice::Text);
-       else
+       else {
            qWarning() << "File already exists!";
            /* TODO
             *  i need more secure way than just showing debugging message*/
-       project->rootProjectNode()->ProjectNode::addFileNodes(QList<FileNode *>() << new FileNode(newFilename,  FileType::SourceType, false));
+       }
+       project->addFiles(QStringList() << QFileInfo(newFile).absoluteFilePath() );
 
-       /* just for testing purposes:
-         * saving file */
-        saveProjectData( QFileInfo(newFile).fileName().toStdString() , string("files") );
+       // saveProjectData( QFileInfo(newFile).fileName().toStdString() , string("files") );
        break;
    }
    default:

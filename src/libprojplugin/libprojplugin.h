@@ -1,18 +1,16 @@
 #pragma once
-
-#include "libproj_global.h"
 #include <extensionsystem/iplugin.h>
-#include <projectexplorer/project.h>
 #include "libprojproject.h"
 #include <QVector>
 #include "libprojprojectnodes.h"
 #include "json11.hpp"
 #include <string>
 
+
 class QFile;
+namespace LibprojProjectManager { namespace Internal { class OwnProject; } }
 namespace Libproj {
 namespace Internal {
-
 
 class LibprojPlugin : public ExtensionSystem::IPlugin
 {
@@ -43,7 +41,7 @@ private:
     static QVector<QFile *> files;
     QString projectFilename;
     QString er;
-    ProjectExplorer::Project * project;
+    LibprojProjectManager::Internal::OwnProject * project;
 
     void saveProjectData(const std::string & WhatToAppend, const std::string & WhereToAppend);
 
