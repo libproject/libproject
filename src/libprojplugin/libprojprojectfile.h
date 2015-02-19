@@ -11,7 +11,7 @@ class OwnProjectFile : public Core::IDocument
 
     OwnProject * project;
 public:
-    OwnProjectFile(OwnProject * Parent, const QString & Filename); //2nd
+    OwnProjectFile(OwnProject * Parent, const QString & Filename);
 
 public /*dummies*/:
     virtual bool save(QString *errorString, const QString &fileName, bool autoSave);

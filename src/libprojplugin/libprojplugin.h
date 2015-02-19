@@ -32,7 +32,6 @@ private slots:
     virtual void triggerOpenProjectAction();
     virtual void triggerAddNewFileAction();
 
-    //members
 private:
     bool isReadOnly;
     bool erroneousState;

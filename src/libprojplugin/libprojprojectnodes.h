@@ -19,10 +19,8 @@ public /*dummies*/:
     virtual bool addSubProjects(const QStringList &proFilePaths);
     virtual bool removeSubProjects(const QStringList &proFilePaths);
 
-public /*my*/:
+public:
     void addFileNodes(const QVariantMap& Data, const QFileInfo &fileInfo);
-
-    /*LPROJ-8*/
     bool addFiles(const QStringList &filePaths, QStringList *notAdded);
 };
 

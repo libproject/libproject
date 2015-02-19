@@ -26,11 +26,7 @@ QList<ProjectExplorer::ProjectAction> OwnProjectNode::supportedActions(Node *nod
     qDebug() << "Calling OwnProjectNode::supportedActions(Node *node) const";
     Q_UNUSED(node);
     return QList<ProjectAction>()
-        << ProjectExplorer::ProjectAction::AddNewFile
-        /*<< AddExistingFile
-        << AddExistingDirectory
-        << RemoveFile
-        << Rename*/;
+        << ProjectExplorer::ProjectAction::AddNewFile;
 }
 
 /*dummies*/
@@ -51,7 +47,6 @@ bool OwnProjectNode::removeSubProjects(const QStringList &proFilePaths)
 }
 /*dummies*/
 
-/*my*/
 void OwnProjectNode::addFileNodes(const QVariantMap & Data, const QFileInfo & fileInfo)
 {
     qDebug() << "Calling OwnProjectNode::addFileNodes(const QVariantMap & Data, const QFileInfo & fileInfo)";
@@ -67,7 +62,6 @@ void OwnProjectNode::addFileNodes(const QVariantMap & Data, const QFileInfo & fi
    this->ProjectNode::addFileNodes(listOfFileNodes);
 }
 
-/*LPROJ-8*/
 bool OwnProjectNode::addFiles(const QStringList &filePaths, QStringList *notAdded)
 {
     qDebug() << "Calling OwnProjectNode::addFiles(const QStringList &filePaths, QStringList *notAdded)";

@@ -16,7 +16,7 @@ class OwnProject : public ProjectExplorer::Project
     OwnProjectNode * rootNode;
 
 public:
-    OwnProject(OwnManager * Manager, const QString & Filename); //2nd
+    OwnProject(OwnManager * Manager, const QString & Filename);
 
     QString displayName() const;
     Core::IDocument *document() const;
