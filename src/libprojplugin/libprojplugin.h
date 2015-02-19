@@ -1,17 +1,16 @@
 #pragma once
-
-#include "libproj_global.h"
-#include <QJsonObject>
 #include <extensionsystem/iplugin.h>
-#include <projectexplorer/project.h>
 #include "libprojproject.h"
 #include <QVector>
 #include "libprojprojectnodes.h"
+#include "json11.hpp"
+#include <string>
+
 
 class QFile;
+namespace LibprojProjectManager { namespace Internal { class OwnProject; } }
 namespace Libproj {
 namespace Internal {
-
 
 class LibprojPlugin : public ExtensionSystem::IPlugin
 {
@@ -30,18 +29,20 @@ private:
     virtual QString readProjectFile();
     virtual bool parseMetadata(const QString & strJson);
 private slots:
-    virtual void triggerAction(); //people says about virtual slots that is bad idea
+    virtual void triggerOpenProjectAction();
+    virtual void triggerAddNewFileAction();
 
-    //members
 private:
-    bool isReadOnly; //1 - rw, 0 - ro
+    bool isReadOnly;
     bool erroneousState;
 
-    static QVariantMap parsedMetadata;
+    static json11::Json projectData;
     static QVector<QFile *> files;
     QString projectFilename;
     QString er;
-    ProjectExplorer::Project * project;
+    LibprojProjectManager::Internal::OwnProject * project;
+
+    void saveProjectData(const std::string & WhatToAppend, const std::string & WhereToAppend);
 
     friend class LibprojProjectManager::Internal::OwnProject;
     friend void LibprojProjectManager::Internal::OwnProjectNode::addFileNodes(const QVariantMap& Data, const QFileInfo &fileInfo);

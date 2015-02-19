@@ -1,5 +1,4 @@
 #pragma once
-
 #include <QtGlobal>
 
 #if defined(LIBPROJ_LIBRARY)

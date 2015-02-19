@@ -4,8 +4,6 @@
 #include <QFileInfo>
 #include "libprojproject.h"
 
-using std::make_shared;
-using std::shared_ptr;
 namespace LibprojProjectManager {
 namespace Internal {
 
