@@ -1,6 +1,4 @@
 #pragma once
-
-#include <QObject>
 #include <coreplugin/idocument.h>
 
 namespace LibprojProjectManager{
