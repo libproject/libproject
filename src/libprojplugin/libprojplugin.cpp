@@ -13,6 +13,7 @@
 #include "libprojprojectnodes.h"
 #include "libproj_global.h"
 #include "libprojproject.h"
+#include <coreplugin/mimedatabase.h>
 
 using ProjectExplorer::FileType;
 using ProjectExplorer::FileNode;
@@ -62,6 +63,19 @@ bool LibprojPlugin::initialize(const QStringList &arguments, QString *errorStrin
 {
     Q_UNUSED(arguments)
     Q_UNUSED(errorString)
+
+    /* registering own mime-type */
+    const QLatin1String mimeTypes(":libprojplugin/libprojplugin.mimetypes.xml");
+
+    /*
+    прочитать http://doc.qt.digia.com/qtcreator-extending/core-mimetype.html#details
+    попробовать addMimeType
+*/
+    if (!Core::MimeDatabase::addMimeTypes(mimeTypes, &er))
+    {
+        qWarning() << ("Error with registering MIME-type");
+        return false;
+    }
 
     /* setting up itself in QtC environment */
     QAction
@@ -126,7 +140,15 @@ QString LibprojPlugin::readProjectFile()
 {
     projectFilename = QFileDialog::getOpenFileName(0, QLatin1String("Open File"));
     QFile projectFile(projectFilename);
-    if(projectFile.open( QIODevice::ReadWrite | QIODevice::Text ))
+
+    /* checking for extension of file */
+    if (QFileInfo(projectFile).suffix() != "libproject")
+    {
+        qWarning() << "Incorrect file (extension)!";
+        return QString();
+    }
+
+    if (projectFile.open( QIODevice::ReadWrite | QIODevice::Text ))
     {
         qDebug() << "File successfully opened";
         QTextStream inStream(&projectFile);

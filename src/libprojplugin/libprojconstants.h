@@ -15,7 +15,7 @@ namespace LibprojProjectManager {
 namespace Constants {
 
 const char PROJECTCONTEXT[] = "LibprojProject.ProjectContext";
-const char LIBPROJPROJECTMIMETYPE[]  = "application/json";
+const char LIBPROJPROJECTMIMETYPE[]  = "application/libproj-project";
 
 // Project
 /* TODO

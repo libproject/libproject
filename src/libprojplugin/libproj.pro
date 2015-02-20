@@ -53,3 +53,6 @@ QTC_PLUGIN_RECOMMENDS += \
 include($$QTCREATOR_SOURCES/src/qtcreatorplugin.pri)
 include($$PWD/../../tools/json11.pri)
 DEFINES -= QT_NO_CAST_FROM_ASCII
+
+RESOURCES += \
+    libprojplugin.qrc
