@@ -12,10 +12,10 @@ SOURCES += libprojplugin.cpp \
 HEADERS += libprojplugin.h \
         libproj_global.h \
         libprojconstants.h \
-    libprojprojectmanager.h \
     libprojproject.h \
     libprojprojectnodes.h \
-    libprojprojectfile.h
+    libprojprojectfile.h \
+    libprojprojectmanager.h
 
 # Qt Creator linking
 ## set the QTC_SOURCE environment variable to override the setting here
@@ -53,3 +53,6 @@ QTC_PLUGIN_RECOMMENDS += \
 include($$QTCREATOR_SOURCES/src/qtcreatorplugin.pri)
 include($$PWD/../../tools/json11.pri)
 DEFINES -= QT_NO_CAST_FROM_ASCII
+
+RESOURCES += \
+    libprojplugin.qrc

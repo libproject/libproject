@@ -4,43 +4,77 @@
 #include <QFileInfo>
 #include "libprojproject.h"
 
-namespace LibprojProjectManager {
+namespace LibprojManager {
 namespace Internal {
 
-OwnManager::OwnManager()
+Manager::Manager()
 {
-            qDebug() << "Calling c-tor for OwnManager";
+            qDebug() << "Calling c-tor for Manager";
 }
 
-QString OwnManager::mimeType() const
+QString Manager::mimeType() const
 {
             qDebug() << "Comparing with own mime type";
             return QString(Constants::LIBPROJPROJECTMIMETYPE);
 }
 
-ProjectExplorer::Project * OwnManager::openProject(const QString &Filename, QString *ErrorString)
+ProjectExplorer::Project * Manager::openProject(const QString &Filename, QString *ErrorString)
 {
     qDebug() << "Opening project";
     if(!QFileInfo(Filename).isFile()) {
             qWarning() << "Project file isn\'t a file" ;
             return nullptr;
     }
-    return new OwnProject(this, Filename);
+
+    QString contentOfProjectFile = readProjectFile(Filename);
+    if (contentOfProjectFile.isEmpty() || contentOfProjectFile.isNull())
+        return nullptr;
+    else return new Project(this, Filename, contentOfProjectFile);
 }
 
-void OwnManager::registerProject(OwnProject * Project)
+void Manager::registerProject(Project * Project)
 {
     /* TODO
      * project will be projectS there must be function which appends projects to array*/
     qDebug() << "Registering project";
     project = Project;
+
+    /*Also project must have been registered in plugin's variable*/
+    Libproj::Internal::Plugin::setProject(Project);
 }
 
-void OwnManager::unregisterProject(OwnProject * /*Project*/)
+void Manager::unregisterProject(Project * /*Project*/)
 {
     qDebug() << "Unregistering project";
     project = nullptr;
 }
 
+QString Manager::readProjectFile(const QString &Filename) const
+{
+    if (QFileInfo(Filename).suffix() != "libproject")
+    {
+        qWarning() << "Incorrect file (extension)!";
+        return QString();
+    }
+
+    QFile projectFile(Filename);
+    if (projectFile.open( QIODevice::ReadWrite | QIODevice::Text ))
+    {
+        qDebug() << "File successfully opened";
+        QTextStream input(&projectFile);
+        if (input.status() != QTextStream::Ok)
+        {
+            qWarning() << "Something wrong with QTextStream in f-on readProjectFile()";
+            return QString();
+        }
+        qDebug() << "About to read file";
+        return input.readAll();
+    }
+    else {
+        qWarning() << "File opened unsuccesfully";
+        return QString();
+    }
+}
+
 } // namespace Internal
-} // namespace LibprojProjectManager
+} // namespace LibprojManager

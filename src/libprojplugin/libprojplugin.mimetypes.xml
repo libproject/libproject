@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">
+    <mime-type type="application/libproj-project">
+        <sub-class-of type="application/json"/>
+        <comment>Libproj Project file</comment>
+	<glob pattern="*.libproject"/>
+    </mime-type>
+</mime-info>

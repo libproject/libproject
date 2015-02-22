@@ -3,54 +3,54 @@
 #include <QDebug>
 #include "libprojconstants.h"
 
-namespace LibprojProjectManager{
+namespace LibprojManager{
 namespace Internal {
 
-OwnProjectFile::OwnProjectFile(OwnProject * Parent, const QString &Filename)
+ProjectFile::ProjectFile(Project * Parent, const QString &Filename)
     : Core::IDocument(Parent),
       project(Parent)
 {
-    qDebug() << "Calling c-tor for OwnProjectFile";
+    qDebug() << "Calling c-tor for ProjectFile";
     setId("Libproj.ProjectFile");
     setMimeType(QLatin1String(Constants::LIBPROJPROJECTMIMETYPE));
     setFilePath(Utils::FileName::fromString(Filename));
 }
 
 /*dummies*/
-bool OwnProjectFile::save(QString *errorString, const QString &fileName, bool autoSave)
+bool ProjectFile::save(QString *errorString, const QString &fileName, bool autoSave)
 {
-    qDebug() << "Calling dummy OwnProjectFile::save()";
+    qDebug() << "Calling dummy ProjectFile::save()";
     return false;
 }
-QString OwnProjectFile::defaultPath() const
+QString ProjectFile::defaultPath() const
 {
-    qDebug() << "Calling dummy OwnProjectFile::defaultPath()";
+    qDebug() << "Calling dummy ProjectFile::defaultPath()";
     return QString();
 }
-QString OwnProjectFile::suggestedFileName() const
+QString ProjectFile::suggestedFileName() const
 {
-    qDebug() << "Calling dummy OwnProjectFile::suggestedFileName()";
+    qDebug() << "Calling dummy ProjectFile::suggestedFileName()";
     return QString();
 }
-bool OwnProjectFile::isModified() const
+bool ProjectFile::isModified() const
 {
-    qDebug() << "Calling dummy OwnProjectFile::isModified()";
+    qDebug() << "Calling dummy ProjectFile::isModified()";
     return false;
 }
-bool OwnProjectFile::isSaveAsAllowed() const
+bool ProjectFile::isSaveAsAllowed() const
 {
-    qDebug() << "Calling dummy OwnProjectFile::isSaveAsAllowed()";
+    qDebug() << "Calling dummy ProjectFile::isSaveAsAllowed()";
     return false;
 }
-bool OwnProjectFile::reload(QString *errorString, ReloadFlag flag, ChangeType type)
+bool ProjectFile::reload(QString *errorString, ReloadFlag flag, ChangeType type)
 {
-    qDebug() << "Calling dummy OwnProjectFile::reload()";
+    qDebug() << "Calling dummy ProjectFile::reload()";
     return false;
 }
 /*dummies*/
 
 } // namespace Internal
-} // namespace LibprojProjectManager
+} // namespace LibprojManager
 
 
 

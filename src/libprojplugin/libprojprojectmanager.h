@@ -1,23 +1,26 @@
 #pragma once
 #include <projectexplorer/iprojectmanager.h>
 
-namespace LibprojProjectManager {
+namespace LibprojManager {
 namespace Internal {
 
-class OwnProject;
-class OwnManager : public ProjectExplorer::IProjectManager
+class Project;
+class Manager : public ProjectExplorer::IProjectManager
 {
     Q_OBJECT
-    OwnProject * project;
+    Project * project;
 public:
-    OwnManager();
+    Manager();
 
     virtual QString mimeType() const;
     virtual ProjectExplorer::Project * openProject(const QString &Filename, QString *ErrorString);
 
-    void registerProject(OwnProject * Project);
-    void unregisterProject(OwnProject * /*Project*/);
+    void registerProject(Project * Project);
+    void unregisterProject(Project * /*Project*/);
+
+private:
+    QString readProjectFile(const QString& Filename) const;
 };
 
 } // namespace Internal
-} // namespace LibprojProjectManager
+} // namespace LibprojManager
