@@ -1,13 +1,14 @@
 #pragma once
 #include <extensionsystem/iplugin.h>
-#include "libprojproject.h"
 #include <QVector>
 #include "libprojprojectnodes.h"
 #include "json11.hpp"
 #include <string>
 
 
+
 class QFile;
+namespace ProjectExplorer { class Project; }
 namespace LibprojProjectManager { namespace Internal { class OwnProject; } }
 namespace Libproj {
 namespace Internal {
@@ -20,33 +21,20 @@ class LibprojPlugin : public ExtensionSystem::IPlugin
 public:
     LibprojPlugin();
     virtual ~LibprojPlugin();
-
-    virtual bool initialize(const QStringList &arguments, QString *errorString);
+    virtual bool initialize(const QStringList &Arguments, QString *ErrorString);
     virtual void extensionsInitialized();
     virtual ShutdownFlag aboutToShutdown();
-
 private:
-    virtual QString readProjectFile();
-    virtual bool parseMetadata(const QString & strJson);
+   // void saveProjectData(const std::string & WhatToAppend, const std::string & WhereToAppend);
 private slots:
     virtual void triggerOpenProjectAction();
     virtual void triggerAddNewFileAction();
-
-private:
+private /*members*/:
     bool isReadOnly;
-    bool erroneousState;
-
-    static json11::Json projectData;
     static QVector<QFile *> files;
     QString projectFilename;
-    QString er;
-    LibprojProjectManager::Internal::OwnProject * project;
-
-    void saveProjectData(const std::string & WhatToAppend, const std::string & WhereToAppend);
-
-    friend class LibprojProjectManager::Internal::OwnProject;
-    friend void LibprojProjectManager::Internal::OwnProjectNode::addFileNodes(const QVariantMap& Data, const QFileInfo &fileInfo);
-
+    QString  errorString;
+    ProjectExplorer::Project * project;
 };
 
 } // namespace Internal

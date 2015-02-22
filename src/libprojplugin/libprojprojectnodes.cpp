@@ -47,21 +47,6 @@ bool OwnProjectNode::removeSubProjects(const QStringList &proFilePaths)
 }
 /*dummies*/
 
-void OwnProjectNode::addFileNodes(const QVariantMap & Data, const QFileInfo & fileInfo)
-{
-    qDebug() << "Calling OwnProjectNode::addFileNodes(const QVariantMap & Data, const QFileInfo & fileInfo)";
-    QList<FileNode*> listOfFileNodes;
-    listOfFileNodes.push_back(new FileNode(fileInfo.absoluteFilePath(), FileType::ProjectFileType,  false/**/));
-   for (const auto& x : Data["files"].toStringList())
-   {
-       LibprojPlugin::files.push_back(new QFile(fileInfo.dir().path() + QString("/") + x));
-       LibprojPlugin::files.last()->open( QIODevice::ReadWrite | QIODevice::Text );
-   }
-   for (const auto& x : LibprojPlugin::files)
-       listOfFileNodes.push_back(new FileNode(QFileInfo(*x).absoluteFilePath(), FileType::SourceType, false));
-   this->ProjectNode::addFileNodes(listOfFileNodes);
-}
-
 bool OwnProjectNode::addFiles(const QStringList &filePaths, QStringList *notAdded)
 {
     qDebug() << "Calling OwnProjectNode::addFiles(const QStringList &filePaths, QStringList *notAdded)";

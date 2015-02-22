@@ -20,6 +20,8 @@ public /*dummies*/:
     virtual bool isModified() const;
     virtual bool isSaveAsAllowed() const;
     virtual bool reload(QString *errorString, ReloadFlag flag, ChangeType type);
+
+    //QString mimeType() const;
 };
 
 } // namespace Internal

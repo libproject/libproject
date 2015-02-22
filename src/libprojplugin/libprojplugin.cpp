@@ -1,19 +1,22 @@
-#include "libprojplugin.h"
-#include "libprojconstants.h"
-#include <coreplugin/actionmanager/actionmanager.h>
-#include <coreplugin/actionmanager/actioncontainer.h>
-#include <coreplugin/coreconstants.h>
 #include <QMessageBox>
 #include <QMenu>
 #include <QFileDialog>
-#include "json11.hpp"
+#include <coreplugin/actionmanager/actionmanager.h>
+#include <coreplugin/actionmanager/actioncontainer.h>
+#include <coreplugin/coreconstants.h>
+#include <coreplugin/mimedatabase.h>
+#include <coreplugin/idocument.h>
 #include <projectexplorer/projectexplorer.h>
 #include "libprojprojectmanager.h"
-#include "coreplugin/idocument.h"
+#include "libprojplugin.h"
+#include "libprojconstants.h"
 #include "libprojprojectnodes.h"
 #include "libproj_global.h"
 #include "libprojproject.h"
+#include "json11.hpp"
 #include <coreplugin/mimedatabase.h>
+#include <extensionsystem/pluginmanager.h>
+#include <projectexplorer/iprojectmanager.h>
 
 using ProjectExplorer::FileType;
 using ProjectExplorer::FileNode;
@@ -22,7 +25,6 @@ using json11::Json;
 using std::string;
 using LibprojProjectManager::Internal::OwnProject;
 
-Json LibprojPlugin::projectData = Json();
 QVector<QFile *> LibprojPlugin::files = QVector<QFile *>();
 
 namespace {
@@ -55,23 +57,19 @@ namespace {
     }
 }
 
-LibprojPlugin::LibprojPlugin() { }
+LibprojPlugin::LibprojPlugin() {
+}
 
-LibprojPlugin::~LibprojPlugin() { }
+LibprojPlugin::~LibprojPlugin() {
+}
 
-bool LibprojPlugin::initialize(const QStringList &arguments, QString *errorString)
+bool LibprojPlugin::initialize(const QStringList &Arguments, QString *ErrorString)
 {
-    Q_UNUSED(arguments)
-    Q_UNUSED(errorString)
+    Q_UNUSED(Arguments)
 
     /* registering own mime-type */
     const QLatin1String mimeTypes(":libprojplugin/libprojplugin.mimetypes.xml");
-
-    /*
-    прочитать http://doc.qt.digia.com/qtcreator-extending/core-mimetype.html#details
-    попробовать addMimeType
-*/
-    if (!Core::MimeDatabase::addMimeTypes(mimeTypes, &er))
+    if (!Core::MimeDatabase::addMimeTypes(mimeTypes, ErrorString))
     {
         qWarning() << ("Error with registering MIME-type");
         return false;
@@ -99,13 +97,6 @@ bool LibprojPlugin::initialize(const QStringList &arguments, QString *errorStrin
     libprojMenu->addAction(addNewFileCommand);
     Core::ActionManager::actionContainer(Core::Constants::M_TOOLS)->addMenu(libprojMenu);
 
-    /* initializing project manager system */
-    LibprojProjectManager::Internal::OwnManager
-            * manager = new LibprojProjectManager::Internal::OwnManager();
-    IPlugin::addAutoReleasedObject(manager);
-
-    /* some plugin-wide settings */
-    isReadOnly = true;
     return true;
 }
 
@@ -122,63 +113,20 @@ ExtensionSystem::IPlugin::ShutdownFlag LibprojPlugin::aboutToShutdown()
 void LibprojPlugin::triggerOpenProjectAction()
 {
     qDebug() << "Triggering openProjectAction";
-    if (erroneousState = parseMetadata(readProjectFile()))
-    {
-        if (project = qobject_cast<OwnProject*> (ProjectExplorer::ProjectExplorerPlugin::openProject(projectFilename, &er)))
-            qDebug() << "Project opened";
-        else
+
+    //debug
+    QString fileName = QFileDialog::getOpenFileName(0, QString("Open File"));
+    Core::MimeType mt = Core::MimeDatabase::findByFile(QFileInfo(fileName));
+    QList<ProjectExplorer::IProjectManager*> projectManagers = ExtensionSystem::PluginManager::getObjects<ProjectExplorer::IProjectManager>();
+    for(const auto& x : projectManagers)
+        qDebug() << x->mimeType();
+    qDebug() << mt.type();
+
+
+    if (project = ProjectExplorer::ProjectExplorerPlugin::openProject(fileName, &errorString))
+                 qDebug() << "Project opened";
+    else
             qWarning() << "OwnManager can not open project";
-    }
-    else
-    {
-        qWarning() << "Error with opening project file";
-    }
-    return;
-}
-
-QString LibprojPlugin::readProjectFile()
-{
-    projectFilename = QFileDialog::getOpenFileName(0, QLatin1String("Open File"));
-    QFile projectFile(projectFilename);
-
-    /* checking for extension of file */
-    if (QFileInfo(projectFile).suffix() != "libproject")
-    {
-        qWarning() << "Incorrect file (extension)!";
-        return QString();
-    }
-
-    if (projectFile.open( QIODevice::ReadWrite | QIODevice::Text ))
-    {
-        qDebug() << "File successfully opened";
-        QTextStream inStream(&projectFile);
-        if (inStream.status() != QTextStream::Ok)
-        {
-            qWarning() << "Something wrong with QTextStream in f-on readProjectFile()";
-            return QString();
-        }
-        qDebug() << "Reading file:";
-        return inStream.readAll();
-    }
-    else
-        return QString();
-}
-
-/* functions that works with Json format */
-bool LibprojPlugin::parseMetadata(const QString & strJson)
-{
-    if (strJson.isNull() || strJson.isEmpty()) {
-        qWarning() << "Nothing to parse";
-        return false;
-    }
-    else {
-        std::string err;
-        qDebug() << "About to start parsing";
-        projectData = Json::parse(strJson.toStdString(), err);
-        if (!err.empty())
-            qWarning() << "Something wrong with parsing:\n" + QString(err.c_str());
-        return err.empty() ? true : false;
-    }
 }
 
 void LibprojPlugin::triggerAddNewFileAction()
@@ -188,9 +136,7 @@ void LibprojPlugin::triggerAddNewFileAction()
    {
    case QMessageBox::StandardButton::Yes:
    {
-       /* TODO
-        * ...
-        */
+       /* TODO  */
        break;
    }
    case QMessageBox::StandardButton::No:
@@ -199,11 +145,9 @@ void LibprojPlugin::triggerAddNewFileAction()
        QFile newFile (newFilename);
        if (!newFile.exists())
            newFile.open(QIODevice::ReadWrite | QIODevice::Text);
-       else {
+       else
            qWarning() << "File already exists!";
-           /* TODO
-            *  i need more secure way than just showing debugging message*/
-       }
+           /* TODO  I need more secure way than just showing debugging message*/
        project->addFiles(QStringList() << QFileInfo(newFile).absoluteFilePath() );
 
        // saveProjectData( QFileInfo(newFile).fileName().toStdString() , string("files") );
@@ -217,20 +161,21 @@ void LibprojPlugin::triggerAddNewFileAction()
    }
 }
 
-void LibprojPlugin::saveProjectData(const string & WhatToAppend, const string & WhereToAppend)
+/*void LibprojPlugin::saveProjectData(const string & WhatToAppend, const string & WhereToAppend)
 {
     qDebug() << QString(WhatToAppend.c_str());
     string
-            dumpedData = projectData.dump(),
+            dumpedData = project->getProjectData().dump(),
             errors;
     bool result = appendToJsonInTextRepresentation<string>(WhatToAppend, WhereToAppend.c_str(), dumpedData);
-    if (result)
-        projectData = Json::parse(dumpedData, errors);
+    if (result) {
+       project->setProjectData(Json::parse(dumpedData, errors));
+    }
     else
         qWarning() << "Error when modifying json representation";
     qDebug() << QString(errors.c_str());
 
-    /*writing to file*/
+
     QFile projectFile(projectFilename);
     if(!projectFile.open( QIODevice::ReadWrite | QIODevice::Text ))
         qDebug() << "File unsuccessfully opened";
@@ -239,4 +184,4 @@ void LibprojPlugin::saveProjectData(const string & WhatToAppend, const string & 
     QTextStream outStream(&projectFile);
     outStream << dumpedData.c_str();
     projectFile.close();
-}
+} */

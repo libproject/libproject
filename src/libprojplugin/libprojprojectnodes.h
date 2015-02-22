@@ -20,7 +20,6 @@ public /*dummies*/:
     virtual bool removeSubProjects(const QStringList &proFilePaths);
 
 public:
-    void addFileNodes(const QVariantMap& Data, const QFileInfo &fileInfo);
     bool addFiles(const QStringList &filePaths, QStringList *notAdded);
 };
 

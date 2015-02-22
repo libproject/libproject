@@ -17,6 +17,9 @@ public:
 
     void registerProject(OwnProject * Project);
     void unregisterProject(OwnProject * /*Project*/);
+
+private:
+    QString readProjectFile(const QString& Filename) const;
 };
 
 } // namespace Internal

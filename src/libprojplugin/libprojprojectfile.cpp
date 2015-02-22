@@ -49,6 +49,11 @@ bool OwnProjectFile::reload(QString *errorString, ReloadFlag flag, ChangeType ty
 }
 /*dummies*/
 
+/*QString OwnProjectFile::mimeType() const
+{
+    qDebug() << "Calling OwnProjectFile::mimeType()";
+    return QString (Constants::LIBPROJPROJECTMIMETYPE);
+}*/
 } // namespace Internal
 } // namespace LibprojProjectManager
 
