@@ -23,47 +23,17 @@ using ProjectExplorer::FileNode;
 using namespace Libproj::Internal;
 using json11::Json;
 using std::string;
-using LibprojProjectManager::Internal::OwnProject;
+using LibprojManager::Internal::Project;
 
-LibprojProjectManager::Internal::OwnProject * LibprojPlugin::project = nullptr;
+LibprojManager::Internal::Project * Plugin::project = nullptr;
 
-namespace {
-    template <typename T>
-    bool appendToJsonInTextRepresentation(const T& valToAppend, const char * whereToAppend, std::string& str)
-    {
-        int positionOfFilesKey = str.find(whereToAppend);
-
-        int positionOfClosingBracket = str.find (string("]"), positionOfFilesKey);
-
-        switch (str.at(positionOfClosingBracket - 1))
-        {
-            case ' ':
-            {
-                str.insert(positionOfClosingBracket - 1, (string(", \"") + valToAppend).append("\""));
-            }
-            break;
-            case '\"':
-            {
-                str.insert(positionOfClosingBracket, (string(", \"") + valToAppend).append("\""));
-            }
-            break;
-            default:
-            {
-                return false;
-            }
-            break;
-        }
-        return true;
-    }
+Plugin::Plugin() {
 }
 
-LibprojPlugin::LibprojPlugin() {
+Plugin::~Plugin() {
 }
 
-LibprojPlugin::~LibprojPlugin() {
-}
-
-bool LibprojPlugin::initialize(const QStringList &Arguments, QString *ErrorString)
+bool Plugin::initialize(const QStringList &Arguments, QString *ErrorString)
 {
     Q_UNUSED(Arguments)
 
@@ -75,8 +45,8 @@ bool LibprojPlugin::initialize(const QStringList &Arguments, QString *ErrorStrin
         return false;
     }
 
-    /* Adding OwnManager to managers pool */
-    LibprojProjectManager::Internal::OwnManager * manager = new LibprojProjectManager::Internal::OwnManager();
+    /* Adding Manager to managers pool */
+    LibprojManager::Internal::Manager * manager = new LibprojManager::Internal::Manager();
     IPlugin::addAutoReleasedObject(manager);
 
     /* Setting up itself in QtC environment */
@@ -104,31 +74,31 @@ bool LibprojPlugin::initialize(const QStringList &Arguments, QString *ErrorStrin
     return true;
 }
 
-void LibprojPlugin::extensionsInitialized()
+void Plugin::extensionsInitialized()
 {
 
 }
 
-ExtensionSystem::IPlugin::ShutdownFlag LibprojPlugin::aboutToShutdown()
+ExtensionSystem::IPlugin::ShutdownFlag Plugin::aboutToShutdown()
 {
     return SynchronousShutdown;
 }
 
-void LibprojPlugin::setProject(LibprojProjectManager::Internal::OwnProject *ProjectToSet)
+void Plugin::setProject(LibprojManager::Internal::Project *ProjectToSet)
 {
     if(project)
         qWarning() << "Plugin already have associated project";
     project = ProjectToSet;
 }
 
-void LibprojPlugin::triggerOpenProjectAction()
+void Plugin::triggerOpenProjectAction()
 {
     QString fileName = QFileDialog::getOpenFileName(0, QString("Open File"));
-    if (!(project = qobject_cast<OwnProject*>(ProjectExplorer::ProjectExplorerPlugin::openProject(fileName, &errorString))))
-            qWarning() << "OwnManager can not open project";
+    if (!(project = qobject_cast<Project*>(ProjectExplorer::ProjectExplorerPlugin::openProject(fileName, &errorString))))
+            qWarning() << "Manager can not open project";
 }
 
-void LibprojPlugin::triggerAddNewFileAction()
+void Plugin::triggerAddNewFileAction()
 {
    switch(QMessageBox::question(nullptr, tr("File exists?"),tr("Are you want to add existing file (Yes) or create new (No)?"),
                                 QMessageBox::Yes, QMessageBox::No))
@@ -157,29 +127,3 @@ void LibprojPlugin::triggerAddNewFileAction()
    }
    }
 }
-
-
-/* this function isn't needed for now */
-/*void LibprojPlugin::saveProjectData(const string & WhatToAppend, const string & WhereToAppend)
-{
-    qDebug() << QString(WhatToAppend.c_str());
-    string
-            dumpedData = project->getProjectData().dump(),
-            errors;
-    bool result = appendToJsonInTextRepresentation<string>(WhatToAppend, WhereToAppend.c_str(), dumpedData);
-    if (result) {
-       project->setProjectData(Json::parse(dumpedData, errors));
-    }
-    else
-        qWarning() << "Error when modifying json representation";
-    qDebug() << QString(errors.c_str());
-
-    QFile projectFile(projectFilename);
-    if(!projectFile.open( QIODevice::ReadWrite | QIODevice::Text ))
-        qDebug() << "File unsuccessfully opened";
-    else
-        qDebug() << "File successfully opened";
-    QTextStream outStream(&projectFile);
-    outStream << dumpedData.c_str();
-    projectFile.close();
-} */

@@ -12,10 +12,10 @@ SOURCES += libprojplugin.cpp \
 HEADERS += libprojplugin.h \
         libproj_global.h \
         libprojconstants.h \
-    libprojprojectmanager.h \
     libprojproject.h \
     libprojprojectnodes.h \
-    libprojprojectfile.h
+    libprojprojectfile.h \
+    libprojprojectmanager.h
 
 # Qt Creator linking
 ## set the QTC_SOURCE environment variable to override the setting here

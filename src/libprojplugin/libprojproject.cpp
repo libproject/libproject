@@ -12,22 +12,22 @@
 using Core::IDocument;
 using ProjectExplorer::FileNode;
 using ProjectExplorer::FileType;
-using Libproj::Internal::LibprojPlugin;
+using Libproj::Internal::Plugin;
 using json11::Json;
 using std::string;
 using std::array;
 
-namespace LibprojProjectManager {
+namespace LibprojManager {
 namespace Internal {
 
-OwnProject::OwnProject(OwnManager * Manager, const QString & Filename, const QString &ContentOfProjectFile)
+Project::Project(Manager * Manager, const QString & Filename, const QString &ContentOfProjectFile)
     : manager(Manager),
       filename(Filename)
 {
-    qDebug() << "Calling c-tor for OwnProject";
+    qDebug() << "Calling c-tor for Project";
 
-    setId(LibprojProjectManager::Constants::LIBPROJPROJECT_ID);
-    setProjectContext(Core::Context(LibprojProjectManager::Constants::PROJECTCONTEXT));
+    setId(LibprojManager::Constants::LIBPROJPROJECT_ID);
+    setProjectContext(Core::Context(LibprojManager::Constants::PROJECTCONTEXT));
     setProjectLanguages(Core::Context(ProjectExplorer::Constants::LANG_CXX));
 
     std::string errorString;
@@ -39,8 +39,8 @@ OwnProject::OwnProject(OwnManager * Manager, const QString & Filename, const QSt
     else {
         QFileInfo fileInfo(Filename);
         nameOfProject =  fileInfo.completeBaseName();
-        file = new OwnProjectFile (this, filename);
-        rootNode = new OwnProjectNode (this, file);
+        file = new ProjectFile (this, filename);
+        rootNode = new ProjectNode (this, file);
         qDebug() << "Starting to add files to root node";
         QList<FileNode*> listOfFileNodes;
 
@@ -56,38 +56,38 @@ OwnProject::OwnProject(OwnManager * Manager, const QString & Filename, const QSt
     }
 }
 
-QString OwnProject::displayName() const
+QString Project::displayName() const
 {
-    qDebug() << "Calling OwnProject::displayName()";
+    qDebug() << "Calling Project::displayName()";
     return nameOfProject;
 }
 
-IDocument * OwnProject::document() const
+IDocument * Project::document() const
 {
-    qDebug() << "Calling OwnProject::document()";
+    qDebug() << "Calling Project::document()";
     return file;
 }
 
-ProjectExplorer::IProjectManager * OwnProject::projectManager() const
+ProjectExplorer::IProjectManager * Project::projectManager() const
 {
-    qDebug() << "Calling OwnProject::projectManager()";
+    qDebug() << "Calling Project::projectManager()";
     return manager;
 }
 
-ProjectExplorer::ProjectNode * OwnProject::rootProjectNode() const
+ProjectExplorer::ProjectNode * Project::rootProjectNode() const
 {
-    qDebug() << "Calling OwnProject::rootProjectNode()";
+    qDebug() << "Calling Project::rootProjectNode()";
     return rootNode;
 }
 
-QStringList OwnProject::files(FilesMode fileMode) const{
+QStringList Project::files(FilesMode fileMode) const{
     /* TODO
      * must return list of absolute paths*/
-    qDebug() << "Calling OwnProject::files(FilesMode)";
-    return OwnProject::files();
+    qDebug() << "Calling Project::files(FilesMode)";
+    return Project::files();
 }
 
-QStringList OwnProject::files() const
+QStringList Project::files() const
 {
     QStringList files;
     for (const auto& x : rootNode->fileNodes())
@@ -95,9 +95,9 @@ QStringList OwnProject::files() const
     return files;
 }
 
-bool OwnProject::addFiles(const QStringList &filePaths)
+bool Project::addFiles(const QStringList &filePaths)
 {
-    qDebug() << "Calling OwnProject::addFiles(const QStringList &filePaths)";
+    qDebug() << "Calling Project::addFiles(const QStringList &filePaths)";
     QList<FileNode *> fileNodes;
     for (const auto& x : filePaths) {
         if (QFileInfo(x).suffix() != QString("h") && QFileInfo(x).suffix() != QString("cpp"))
@@ -114,7 +114,7 @@ bool OwnProject::addFiles(const QStringList &filePaths)
     return true;
 }
 
-QVariantMap OwnProject::jsonToQVariantMap(const Json& json) const
+QVariantMap Project::jsonToQVariantMap(const Json& json) const
 {
     /* TODO
      * there must be recursive function for parsing more complex files*/
@@ -143,4 +143,4 @@ QVariantMap OwnProject::jsonToQVariantMap(const Json& json) const
 }
 
 } // namespace Internal
-} // namespace LibprojProjectManager
+} // namespace LibprojManager

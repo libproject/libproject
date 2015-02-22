@@ -11,7 +11,7 @@ const char MENU_ID[] = "Libproj.Menu";
 } //namespace Libproj
 
 
-namespace LibprojProjectManager {
+namespace LibprojManager {
 namespace Constants {
 
 const char PROJECTCONTEXT[] = "LibprojProject.ProjectContext";
@@ -19,8 +19,8 @@ const char LIBPROJPROJECTMIMETYPE[]  = "application/libproj-project";
 
 // Project
 /* TODO
- * OwnManager.OwnProject?*/
-const char LIBPROJPROJECT_ID[] = "LibprojProjectManager.LibprojProject";
+ * Manager.Project?*/
+const char LIBPROJPROJECT_ID[] = "LibprojManager.LibprojProject";
 
 } // namespace Constants
-} // namespace LibprojProjectManager
+} // namespace LibprojManager

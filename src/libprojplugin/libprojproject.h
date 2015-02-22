@@ -3,23 +3,23 @@
 #include <projectexplorer/project.h>
 #include "json11.hpp"
 
-namespace LibprojProjectManager {
+namespace LibprojManager {
 namespace Internal {
 
-class OwnManager;
-class OwnProjectFile;
-class OwnProjectNode;
-class OwnProject : public ProjectExplorer::Project
+class Manager;
+class ProjectFile;
+class ProjectNode;
+class Project : public ProjectExplorer::Project
 {
     Q_OBJECT
-    OwnManager * manager;
+    Manager * manager;
     QString filename, nameOfProject;
-    OwnProjectFile * file;
-    OwnProjectNode * rootNode;
+    ProjectFile * file;
+    ProjectNode * rootNode;
     json11::Json projectData;
 
 public:
-    OwnProject(OwnManager * Manager, const QString & Filename, const QString & ContentOfProjectFile);
+    Project(Manager * Manager, const QString & Filename, const QString & ContentOfProjectFile);
 
     QString displayName() const;
     Core::IDocument *document() const;
@@ -34,9 +34,8 @@ private:
     json11::Json setProjectData(const json11::Json& NewProjectData)  { projectData = NewProjectData; }
     QVariantMap jsonToQVariantMap(const json11::Json& json) const;
 
-    friend class Libproj::Internal::LibprojPlugin; /*::
-    saveProjectData(const std::string &, const std::string &);*/
+    friend class Libproj::Internal::Plugin;
 };
 
 } // namespace Internal
-} // namespace LibprojProjectManager
+} // namespace LibprojManager

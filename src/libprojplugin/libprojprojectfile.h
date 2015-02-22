@@ -1,17 +1,17 @@
 #pragma once
 #include <coreplugin/idocument.h>
 
-namespace LibprojProjectManager{
+namespace LibprojManager{
 namespace Internal {
 
-class OwnProject;
-class OwnProjectFile : public Core::IDocument
+class Project;
+class ProjectFile : public Core::IDocument
 {
     Q_OBJECT
 
-    OwnProject * project;
+    Project * project;
 public:
-    OwnProjectFile(OwnProject * Parent, const QString & Filename);
+    ProjectFile(Project * Parent, const QString & Filename);
 
 public /*dummies*/:
     virtual bool save(QString *errorString, const QString &fileName, bool autoSave);
@@ -24,4 +24,4 @@ public /*dummies*/:
 };
 
 } // namespace Internal
-} // namespace LibprojProjectManager
+} // namespace LibprojManager

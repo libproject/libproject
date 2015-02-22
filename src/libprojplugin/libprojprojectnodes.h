@@ -2,17 +2,17 @@
 #include <projectexplorer/projectnodes.h>
 
 namespace Core { class IDocument; }
-namespace  LibprojProjectManager {
+namespace  LibprojManager {
 namespace Internal {
 
-class OwnProject;
-class OwnProjectFile;
-class OwnProjectNode : public ProjectExplorer::ProjectNode
+class Project;
+class ProjectFile;
+class ProjectNode : public ProjectExplorer::ProjectNode
 {
-    OwnProject * project;
-    OwnProjectFile * projectFile;
+    Project * project;
+    ProjectFile * projectFile;
 public:
-    OwnProjectNode(OwnProject * Project, OwnProjectFile * ProjectFile);
+    ProjectNode(Project * Project, ProjectFile * ProjectFile);
     QList<ProjectExplorer::ProjectAction> supportedActions(Node * node) const;
 public /*dummies*/:
     virtual bool canAddSubProject(const QString &proFilePath) const;
@@ -24,4 +24,4 @@ public:
 };
 
 } // namespace Internal
-} // namespace LibprojProjectManager
+} // namespace LibprojManager
