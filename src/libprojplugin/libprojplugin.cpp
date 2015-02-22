@@ -25,7 +25,7 @@ using json11::Json;
 using std::string;
 using LibprojProjectManager::Internal::OwnProject;
 
-QVector<QFile *> LibprojPlugin::files = QVector<QFile *>();
+LibprojProjectManager::Internal::OwnProject * LibprojPlugin::project = nullptr;
 
 namespace {
     template <typename T>
@@ -67,7 +67,7 @@ bool LibprojPlugin::initialize(const QStringList &Arguments, QString *ErrorStrin
 {
     Q_UNUSED(Arguments)
 
-    /* registering own mime-type */
+    /* Registering own mime-type */
     const QLatin1String mimeTypes(":libprojplugin/libprojplugin.mimetypes.xml");
     if (!Core::MimeDatabase::addMimeTypes(mimeTypes, ErrorString))
     {
@@ -75,7 +75,11 @@ bool LibprojPlugin::initialize(const QStringList &Arguments, QString *ErrorStrin
         return false;
     }
 
-    /* setting up itself in QtC environment */
+    /* Adding OwnManager to managers pool */
+    LibprojProjectManager::Internal::OwnManager * manager = new LibprojProjectManager::Internal::OwnManager();
+    IPlugin::addAutoReleasedObject(manager);
+
+    /* Setting up itself in QtC environment */
     QAction
             * openProjectAction = new QAction(tr("Open project..."), this),
             * addNewFileAction = new QAction(tr("Add New File..."), this);
@@ -110,22 +114,17 @@ ExtensionSystem::IPlugin::ShutdownFlag LibprojPlugin::aboutToShutdown()
     return SynchronousShutdown;
 }
 
+void LibprojPlugin::setProject(LibprojProjectManager::Internal::OwnProject *ProjectToSet)
+{
+    if(project)
+        qWarning() << "Plugin already have associated project";
+    project = ProjectToSet;
+}
+
 void LibprojPlugin::triggerOpenProjectAction()
 {
-    qDebug() << "Triggering openProjectAction";
-
-    //debug
     QString fileName = QFileDialog::getOpenFileName(0, QString("Open File"));
-    Core::MimeType mt = Core::MimeDatabase::findByFile(QFileInfo(fileName));
-    QList<ProjectExplorer::IProjectManager*> projectManagers = ExtensionSystem::PluginManager::getObjects<ProjectExplorer::IProjectManager>();
-    for(const auto& x : projectManagers)
-        qDebug() << x->mimeType();
-    qDebug() << mt.type();
-
-
-    if (project = ProjectExplorer::ProjectExplorerPlugin::openProject(fileName, &errorString))
-                 qDebug() << "Project opened";
-    else
+    if (!(project = qobject_cast<OwnProject*>(ProjectExplorer::ProjectExplorerPlugin::openProject(fileName, &errorString))))
             qWarning() << "OwnManager can not open project";
 }
 
@@ -149,8 +148,6 @@ void LibprojPlugin::triggerAddNewFileAction()
            qWarning() << "File already exists!";
            /* TODO  I need more secure way than just showing debugging message*/
        project->addFiles(QStringList() << QFileInfo(newFile).absoluteFilePath() );
-
-       // saveProjectData( QFileInfo(newFile).fileName().toStdString() , string("files") );
        break;
    }
    default:
@@ -161,6 +158,8 @@ void LibprojPlugin::triggerAddNewFileAction()
    }
 }
 
+
+/* this function isn't needed for now */
 /*void LibprojPlugin::saveProjectData(const string & WhatToAppend, const string & WhereToAppend)
 {
     qDebug() << QString(WhatToAppend.c_str());
@@ -174,7 +173,6 @@ void LibprojPlugin::triggerAddNewFileAction()
     else
         qWarning() << "Error when modifying json representation";
     qDebug() << QString(errors.c_str());
-
 
     QFile projectFile(projectFilename);
     if(!projectFile.open( QIODevice::ReadWrite | QIODevice::Text ))

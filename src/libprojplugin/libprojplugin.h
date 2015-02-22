@@ -24,17 +24,17 @@ public:
     virtual bool initialize(const QStringList &Arguments, QString *ErrorString);
     virtual void extensionsInitialized();
     virtual ShutdownFlag aboutToShutdown();
+    static void setProject(LibprojProjectManager::Internal::OwnProject * ProjectToSet);
 private:
    // void saveProjectData(const std::string & WhatToAppend, const std::string & WhereToAppend);
 private slots:
     virtual void triggerOpenProjectAction();
     virtual void triggerAddNewFileAction();
-private /*members*/:
+private:
     bool isReadOnly;
-    static QVector<QFile *> files;
     QString projectFilename;
     QString  errorString;
-    ProjectExplorer::Project * project;
+    static LibprojProjectManager::Internal::OwnProject * project;
 };
 
 } // namespace Internal

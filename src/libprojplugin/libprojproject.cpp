@@ -17,10 +17,6 @@ using json11::Json;
 using std::string;
 using std::array;
 
-namespace {
-
-}
-
 namespace LibprojProjectManager {
 namespace Internal {
 
@@ -130,8 +126,8 @@ QVariantMap OwnProject::jsonToQVariantMap(const Json& json) const
         data.insert(QString(toCheck[0].c_str()), QVariant(json[toCheck[0]].string_value().c_str()));
     else
         return QVariantMap(); /*TODO: I'm not controlling it*/
-/*END_ first key*/
-/*second key*/
+    /*END_ first key*/
+    /*second key*/
     if (!json[toCheck[1]].array_items().empty())
     {
         QStringList files;
@@ -142,9 +138,7 @@ QVariantMap OwnProject::jsonToQVariantMap(const Json& json) const
     }
     else
         return QVariantMap();
- /*END_ second key*/
-    qDebug() << "::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::";
-    qDebug() << data["files"].toStringList().size();
+    /*END_ second key*/
     return data;
 }
 
