@@ -10,7 +10,7 @@ class OwnProjectFile;
 class OwnProjectNode : public ProjectExplorer::ProjectNode
 {
     OwnProject * project;
-    OwnProjectFile * projectFile; //unique?
+    OwnProjectFile * projectFile;
 public:
     OwnProjectNode(OwnProject * Project, OwnProjectFile * ProjectFile);
     QList<ProjectExplorer::ProjectAction> supportedActions(Node * node) const;

@@ -26,7 +26,7 @@ ProjectExplorer::Project * OwnManager::openProject(const QString &Filename, QStr
             return nullptr;
     }
 
-    QString contentOfProjectFile = readProjectFile(Filename/*?*/);
+    QString contentOfProjectFile = readProjectFile(Filename);
     if (contentOfProjectFile.isEmpty() || contentOfProjectFile.isNull())
         return nullptr;
     else return new OwnProject(this, Filename, contentOfProjectFile);
@@ -38,6 +38,9 @@ void OwnManager::registerProject(OwnProject * Project)
      * project will be projectS there must be function which appends projects to array*/
     qDebug() << "Registering project";
     project = Project;
+
+    /*Also project must have been registered in plugin's variable*/
+    Libproj::Internal::LibprojPlugin::setProject(Project);
 }
 
 void OwnManager::unregisterProject(OwnProject * /*Project*/)
