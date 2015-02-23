@@ -1,0 +1,90 @@
+{
+    "version": 1,
+    "kind": "project",
+    "id": "A.Libproject",
+    "category": "I.Projects",
+    "trDescription": "There must be some text.",
+    "trDisplayName": "Libproject project",
+    "trDisplayCategory": "Non-Qt Project",
+    "icon": "../../global/genericfilewizard.png",
+    "featuresRequired": [ "Plugin.CppEditor", "Plugin.libproj" ],
+
+    "options":
+    [
+        { "key": "TargetPath", "value": "%{Path}" },
+        { "key": "PrfPath", "value": "%{Path}/%{PrfFileName}" },
+        { "key": "SrcPath", "value": "%{Path}/%{SrcFileName}" },
+        { "key": "CN", "value": "%{JS: Cpp.className('%{Class}')}" }
+    ],
+
+    "pages":
+    [
+        {
+            "trDisplayName": "Set name to a project",
+            "trShortTitle": "Details",
+            "typeId": "Fields",
+            "data" :
+            [
+                {
+                    "name": "ProjectName",
+                    "trDisplayName": "Project name:",
+                    "mandatory": true,
+                    "type": "LineEdit",
+                    "data": { "validator": "(?:(?:[a-zA-Z_][a-zA-Z_0-9]*::)+[a-zA-Z_][a-zA-Z_0-9]*|)" }
+                },
+
+                {
+                    "name": "PrfFileName",
+                    "type": "LineEdit",
+                    "trDisplayName": "Project file:",
+                    "mandatory": true,
+                    "data": { "trText": "%{JS: Cpp.classToFileName('%{ProjectName}', '%{JS: Util.preferredSuffix('application/libproj-project')}')}" }
+                },
+                {
+                    "name": "SrcFileName",
+                    "type": "LineEdit",
+                    "trDisplayName": "Source file:",
+                    "mandatory": true,
+                    "data": { "trText": "%{JS: Cpp.classToFileName('main', '%{JS: Util.preferredSuffix('text/x-c++src')}')}" }
+                },
+                {
+                    "name": "Path",
+                    "type": "PathChooser",
+                    "trDisplayName": "Path:",
+                    "mandatory": true,
+                    "data":
+                    {
+                        "kind": "existingDirectory",
+                        "basePath": "%{InitialPath}",
+                        "path": "%{InitialPath}"
+                    }
+                }
+            ]
+        },
+        {
+            "trDisplayName": "Project Management",
+            "trShortTitle": "Summary",
+            "typeId": "Summary"
+        }
+    ],
+
+    "generators":
+    [
+        {
+            "typeId": "File",
+            "data":
+            [
+                {
+                    "source": "file.libproject",
+                    "target": "%{PrfPath}",
+                    "openAsProject": true
+                },
+                {
+                    "source": "file.cpp",
+                    "target": "%{SrcPath}",
+                    "openInEditor": false
+                }
+            ]
+        }
+    ]
+}
