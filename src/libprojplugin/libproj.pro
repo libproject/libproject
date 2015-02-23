@@ -17,6 +17,8 @@ HEADERS += libprojplugin.h \
     libprojprojectfile.h \
     libprojprojectmanager.h
 
+
+
 # Qt Creator linking
 ## set the QTC_SOURCE environment variable to override the setting here
 QTCREATOR_SOURCES = $$(QTC_SOURCE)
@@ -56,3 +58,11 @@ DEFINES -= QT_NO_CAST_FROM_ASCII
 
 RESOURCES += \
     libprojplugin.qrc
+
+OTHER_FILES += \
+    ../install_wizard.sh \
+    ../libprojw/wizard.json \
+    ../libprojw/file.libproject \
+    ../libprojw/file.cpp
+
+system(sh ../install_wizard.sh):message(Error in installing wizard process)
