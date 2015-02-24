@@ -61,8 +61,9 @@ RESOURCES += \
 
 OTHER_FILES += \
     ../libprojw/wizard.json \
-    ../libprojw/file.libproject \
-    ../libprojw/file.cpp
+#    ../libprojw/file.libproject \
+#    ../libprojw/file.h \
+#    ../libprojw/main.cpp
 
 #Copying wizard file
 copydata.commands = $(COPY_DIR) $$PWD/../libprojw $$IDE_BUILD_TREE/share/qtcreator/templates/wizards/projects/
