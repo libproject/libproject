@@ -60,9 +60,13 @@ RESOURCES += \
     libprojplugin.qrc
 
 OTHER_FILES += \
-    ../install_wizard.sh \
     ../libprojw/wizard.json \
     ../libprojw/file.libproject \
     ../libprojw/file.cpp
 
-system(sh ../install_wizard.sh):message(Error in installing wizard process)
+#Copying wizard file
+copydata.commands = $(COPY_DIR) $$PWD/../libprojw $$IDE_BUILD_TREE/share/qtcreator/templates/wizards/projects/
+first.depends = $(first) copydata
+export(first.depends)
+export(copydata.commands)
+QMAKE_EXTRA_TARGETS += first copydata
