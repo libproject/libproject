@@ -17,6 +17,8 @@ HEADERS += libprojplugin.h \
     libprojprojectfile.h \
     libprojprojectmanager.h
 
+
+
 # Qt Creator linking
 ## set the QTC_SOURCE environment variable to override the setting here
 QTCREATOR_SOURCES = $$(QTC_SOURCE)
@@ -56,3 +58,16 @@ DEFINES -= QT_NO_CAST_FROM_ASCII
 
 RESOURCES += \
     libprojplugin.qrc
+
+OTHER_FILES += \
+    ../libprojw/wizard.json \
+#    ../libprojw/file.libproject \
+#    ../libprojw/file.h \
+#    ../libprojw/main.cpp
+
+#Copying wizard file
+copydata.commands = $(COPY_DIR) $$PWD/../libprojw $$IDE_BUILD_TREE/share/qtcreator/templates/wizards/projects/
+first.depends = $(first) copydata
+export(first.depends)
+export(copydata.commands)
+QMAKE_EXTRA_TARGETS += first copydata
