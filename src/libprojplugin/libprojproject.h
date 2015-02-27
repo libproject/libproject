@@ -1,7 +1,8 @@
 #pragma once
 #include "libprojplugin.h"
 #include <projectexplorer/project.h>
-#include "json11.hpp"
+#include "libprojinterface.h"
+
 
 namespace LibprojManager {
 namespace Internal {
@@ -9,17 +10,17 @@ namespace Internal {
 class Manager;
 class ProjectFile;
 class ProjectNode;
-class Project : public ProjectExplorer::Project
+class Project : public ProjectExplorer::Project, protected Interface::InputInterface
 {
     Q_OBJECT
     Manager * manager;
-    QString filename, nameOfProject;
-    ProjectFile * file;
+    QString nameOfProject;
+    QStringList projectFiles;
+    ProjectFile * projectFile;
     ProjectNode * rootNode;
-    json11::Json projectData;
 
 public:
-    Project(Manager * Manager, const QString & Filename, const QString & ContentOfProjectFile);
+    Project(Manager * Manager, const QFileInfo &FileInfo);
 
     QString displayName() const;
     Core::IDocument *document() const;
@@ -29,10 +30,12 @@ public:
     QStringList files() const;
     bool addFiles(const QStringList &filePaths);
 
-private:
-    json11::Json getProjectData() const { return projectData; }
-    json11::Json setProjectData(const json11::Json& NewProjectData)  { projectData = NewProjectData; }
+protected /*interface*/:
+    virtual bool readFile(QFile &ProjectFile);
+    virtual const QStringList & getFileNames() const;
+    virtual const QString & getProjectName() const;
     QVariantMap jsonToQVariantMap(const json11::Json& json) const;
+    json11::Json contentOfProjectFile;
 
     friend class Libproj::Internal::Plugin;
 };

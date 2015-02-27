@@ -6,7 +6,8 @@ SOURCES += libprojplugin.cpp \
     libprojprojectmanager.cpp \
     libprojproject.cpp \
     libprojprojectnodes.cpp \
-    libprojprojectfile.cpp
+    libprojprojectfile.cpp \
+    libprojinterface.cpp
 
 
 HEADERS += libprojplugin.h \
@@ -15,7 +16,8 @@ HEADERS += libprojplugin.h \
     libprojproject.h \
     libprojprojectnodes.h \
     libprojprojectfile.h \
-    libprojprojectmanager.h
+    libprojprojectmanager.h \
+    libprojinterface.h
 
 
 

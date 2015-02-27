@@ -22,14 +22,26 @@ ProjectExplorer::Project * Manager::openProject(const QString &Filename, QString
 {
     qDebug() << "Opening project";
     if(!QFileInfo(Filename).isFile()) {
-            qWarning() << "Project file isn\'t a file" ;
-            return nullptr;
+        qWarning() << "Project file isn\'t a file" ;
+         return nullptr;
+    }
+    if (QFileInfo(Filename).suffix() != "libproject")
+    {
+        qWarning() << "Incorrect file (extension)!";
+        return nullptr;
     }
 
-    QString contentOfProjectFile = readProjectFile(Filename);
-    if (contentOfProjectFile.isEmpty() || contentOfProjectFile.isNull())
+    QFile projectFile(Filename);
+    if (projectFile.open( QIODevice::ReadWrite | QIODevice::Text ))
+    {
+        qDebug() << "File successfully opened";
+        return new Project(this, projectFile);
+    }
+    else
+    {
+        qWarning() << "File opened unsuccesfully";
         return nullptr;
-    else return new Project(this, Filename, contentOfProjectFile);
+    }
 }
 
 void Manager::registerProject(Project * Project)
@@ -47,33 +59,6 @@ void Manager::unregisterProject(Project * /*Project*/)
 {
     qDebug() << "Unregistering project";
     project = nullptr;
-}
-
-QString Manager::readProjectFile(const QString &Filename) const
-{
-    if (QFileInfo(Filename).suffix() != "libproject")
-    {
-        qWarning() << "Incorrect file (extension)!";
-        return QString();
-    }
-
-    QFile projectFile(Filename);
-    if (projectFile.open( QIODevice::ReadWrite | QIODevice::Text ))
-    {
-        qDebug() << "File successfully opened";
-        QTextStream input(&projectFile);
-        if (input.status() != QTextStream::Ok)
-        {
-            qWarning() << "Something wrong with QTextStream in f-on readProjectFile()";
-            return QString();
-        }
-        qDebug() << "About to read file";
-        return input.readAll();
-    }
-    else {
-        qWarning() << "File opened unsuccesfully";
-        return QString();
-    }
 }
 
 } // namespace Internal
