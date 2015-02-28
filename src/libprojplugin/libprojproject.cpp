@@ -7,7 +7,7 @@
 #include "libprojplugin.h"
 #include "libprojprojectfile.h"
 #include "libprojconstants.h"
-#include "json11.hpp"
+
 
 using Core::IDocument;
 using ProjectExplorer::FileNode;
@@ -30,12 +30,10 @@ Project::Project(Manager * Manager, QFile& MainFile)
     setProjectContext(Core::Context(LibprojManager::Constants::PROJECTCONTEXT));
     setProjectLanguages(Core::Context(ProjectExplorer::Constants::LANG_CXX));
 
-    if (readFile(MainFile))
+    if (readProjectFile(MainFile))
     {
-        nameOfProject = QFileInfo(MainFile).fileName();
-
+        nameOfProject = getProjectName();
         projectFiles = getFileNames();
-
         projectFile = new ProjectFile (this, QFileInfo(MainFile).absoluteFilePath());
         rootNode = new ProjectNode (this, projectFile);
 
@@ -109,7 +107,7 @@ bool Project::addFiles(const QStringList &filePaths)
     return true;
 }
 
-bool Project::readFile(QFile &ProjectFile)
+bool Project::readProjectFile(QFile &ProjectFile)
 {
     QTextStream input(&ProjectFile);
     if (input.status() != QTextStream::Ok)
@@ -135,35 +133,16 @@ bool Project::readFile(QFile &ProjectFile)
 
 const QStringList  Project::getFileNames() const
 {
-   return jsonToQVariantMap(contentOfProjectFile)["files"].toStringList();
+    jsonToQVM convert(contentOfProjectFile, std::initializer_list<std::string>({"files"}));
+    QVariantMap m;
+   return convert(m) ["files"].toStringList();
 }
 
-QVariantMap Project::jsonToQVariantMap(const Json& json) const
+const QString  Project::getProjectName() const
 {
-    /* TODO
-     * there must be recursive function for parsing more complex files*/
-    QVariantMap data = QVariantMap();
-    const int size = 2;
-    array<string, size> toCheck = { /*0: */"author",  /*1: */ "files"  };
-    /*first key*/
-    if (!json[toCheck[0]].string_value().empty())
-        data.insert(QString(toCheck[0].c_str()), QVariant(json[toCheck[0]].string_value().c_str()));
-    else
-        return QVariantMap(); /*TODO: I'm not controlling it*/
-    /*END_ first key*/
-    /*second key*/
-    if (!json[toCheck[1]].array_items().empty())
-    {
-        QStringList files;
-        int cnt = 0;
-        while (cnt < json[toCheck[1]].array_items().size() )
-           files << QString(json[toCheck[1]].array_items().at(cnt++).string_value().c_str());
-        data.insert(QString(toCheck[1].c_str()), files);
-    }
-    else
-        return QVariantMap();
-    /*END_ second key*/
-    return data;
+    jsonToQVM convert(contentOfProjectFile, std::initializer_list<std::string>({"project"}));
+    QVariantMap m;
+   return convert(m) ["project"].toString();
 }
 
 } // namespace Internal
