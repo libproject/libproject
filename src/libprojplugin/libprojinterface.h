@@ -13,8 +13,7 @@ public:
     virtual ~InputInterface() { }
 protected:
     virtual bool readFile(QFile&) = 0;
-    virtual const QStringList & getFileNames() const = 0;
-    virtual const QString & getProjectName() const = 0;
+    virtual const QStringList getFileNames() const = 0;
 };
 
 } // namespace Interface

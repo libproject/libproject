@@ -20,7 +20,7 @@ class Project : public ProjectExplorer::Project, protected Interface::InputInter
     ProjectNode * rootNode;
 
 public:
-    Project(Manager * Manager, const QFileInfo &FileInfo);
+    Project(Manager * Manager, QFile &MainFile);
 
     QString displayName() const;
     Core::IDocument *document() const;
@@ -32,8 +32,7 @@ public:
 
 protected /*interface*/:
     virtual bool readFile(QFile &ProjectFile);
-    virtual const QStringList & getFileNames() const;
-    virtual const QString & getProjectName() const;
+    virtual const QStringList getFileNames() const;
     QVariantMap jsonToQVariantMap(const json11::Json& json) const;
     json11::Json contentOfProjectFile;
 
