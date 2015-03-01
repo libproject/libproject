@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 #include "json11.hpp"
+#include <array>
 
 namespace LibprojManager {
 namespace Internal {
@@ -12,7 +13,7 @@ namespace Internal {
 class Manager;
 class ProjectFile;
 class ProjectNode;
-class Project : public ProjectExplorer::Project, protected Interface::InputInterface
+class Project : public ProjectExplorer::Project, protected Interface::FileSetLoader
 {
     Q_OBJECT
     Manager * manager;
@@ -22,7 +23,8 @@ class Project : public ProjectExplorer::Project, protected Interface::InputInter
     ProjectNode * rootNode;
 
 public:
-    Project(Manager * Manager, QFile &MainFile);
+    Project(Manager * Manager, const std::string & ContentOfProjectFile,
+            const std::array<QString, 2> &Paths);
 
     QString displayName() const;
     Core::IDocument *document() const;
@@ -35,7 +37,7 @@ public:
 protected /*interface*/:
     json11::Json contentOfProjectFile;
 
-    virtual bool readProjectFile(QFile &ProjectFile);
+    virtual bool readProjectFile(const std::string & ContentOfProjectFile_);
     virtual const QStringList getFileNames() const;
     virtual const QString getProjectName() const;
 
@@ -99,7 +101,7 @@ protected /*interface*/:
         }
     };
 
-    friend class Libproj::Internal::Plugin;
+   // friend class Libproj::Internal::Plugin;
 };
 
 } // namespace Internal

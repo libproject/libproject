@@ -16,12 +16,12 @@ using Libproj::Internal::Plugin;
 using json11::Json;
 using std::string;
 using std::array;
-
+typedef array<QString, 2> paths;
 
 namespace LibprojManager {
 namespace Internal {
 
-Project::Project(Manager * Manager, QFile& MainFile)
+Project::Project(Manager * Manager, const string & ContentOfProjectFile, const paths& Paths)
     : manager(Manager)
 {
     qDebug() << "Calling c-tor for Project";
@@ -30,21 +30,27 @@ Project::Project(Manager * Manager, QFile& MainFile)
     setProjectContext(Core::Context(LibprojManager::Constants::PROJECTCONTEXT));
     setProjectLanguages(Core::Context(ProjectExplorer::Constants::LANG_CXX));
 
-    if (readProjectFile(MainFile))
+    if (readProjectFile(ContentOfProjectFile))
     {
+        enum { WithFile = 0, WithoutFile = 1 };
+
         nameOfProject = getProjectName();
         projectFiles = getFileNames();
-        projectFile = new ProjectFile (this, QFileInfo(MainFile).absoluteFilePath());
+        projectFile = new ProjectFile (this, Paths.at(WithFile));
         rootNode = new ProjectNode (this, projectFile);
 
        QList<FileNode*> listOfFileNodes;
         //project file itself:
-        listOfFileNodes.push_back(new FileNode(QFileInfo(MainFile).absoluteFilePath(), FileType::ProjectFileType,  false));
+        listOfFileNodes.push_back(new FileNode(Paths.at(WithFile), FileType::ProjectFileType,  false));
         for (const auto& x: projectFiles)
-            listOfFileNodes.push_back(new FileNode(QFileInfo(MainFile).absolutePath()+QString("/")+x, FileType::ProjectFileType, false));
+            listOfFileNodes.push_back(new FileNode(Paths.at(WithoutFile)+QString("/")+x, FileType::ProjectFileType, false));
         rootNode->addFileNodes(listOfFileNodes);
         Core::DocumentManager::addDocument(projectFile, false);
         manager->registerProject(this);
+    }
+    else
+    {
+        /*drop exc when PM will be extracted*/
     }
 }
 
@@ -107,24 +113,11 @@ bool Project::addFiles(const QStringList &filePaths)
     return true;
 }
 
-bool Project::readProjectFile(QFile &ProjectFile)
+bool Project::readProjectFile(const string & ContentOfProjectFile_)
 {
-    QTextStream input(&ProjectFile);
-    if (input.status() != QTextStream::Ok)
-    {
-        qWarning() << "Something wrong with QTextStream in f-on readProjectFile()";
-        return false;
-    }
-    qDebug() << "About to read file";
-    QString qstrContentOfProjectFile = input.readAll();
-    qDebug() << qstrContentOfProjectFile;
-    if(qstrContentOfProjectFile.isEmpty())
-    {
-        qWarning() << "File is empty!";
-        return false;
-    }
+
     string err;
-    contentOfProjectFile = Json::parse(qstrContentOfProjectFile.toStdString(), err);
+    contentOfProjectFile = Json::parse(ContentOfProjectFile_, err);
     if (err.empty())
         return true;
     else

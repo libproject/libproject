@@ -4,6 +4,8 @@
 #include <QFileInfo>
 #include "libprojproject.h"
 
+using std::array;
+using std::string;
 namespace LibprojManager {
 namespace Internal {
 
@@ -35,7 +37,26 @@ ProjectExplorer::Project * Manager::openProject(const QString &Filename, QString
     if (projectFile.open( QIODevice::ReadWrite | QIODevice::Text ))
     {
         qDebug() << "File successfully opened";
-        return new Project(this, projectFile);
+        QTextStream input(&projectFile);
+        if (input.status() != QTextStream::Ok)
+        {
+            qWarning() << "Something wrong with QTextStream in f-on readProjectFile()";
+            return nullptr;
+        }
+        qDebug() << "About to read file";
+        QString qstrContentOfProjectFile = input.readAll();
+        qDebug() << qstrContentOfProjectFile;
+        if(qstrContentOfProjectFile.isEmpty())
+        {
+            qWarning() << "File is empty!";
+            return nullptr;
+        }
+        const int numberOfPaths = 2;
+        array<QString, numberOfPaths> pathsOfProjectFile = {
+            QFileInfo(projectFile).absoluteFilePath(),
+            QFileInfo(projectFile).absolutePath() };
+
+        return new Project(this, qstrContentOfProjectFile.toStdString(), pathsOfProjectFile);
     }
     else
     {

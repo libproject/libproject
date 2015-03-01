@@ -6,13 +6,13 @@ namespace LibprojManager {
 namespace Interface {
 
 
-class InputInterface
+class FileSetLoader
 {
 public:
-    InputInterface() { }
-    virtual ~InputInterface() { }
+    FileSetLoader() { }
+    virtual ~FileSetLoader() { }
 protected:
-    virtual bool readProjectFile(QFile&) = 0;
+    virtual bool readProjectFile(const std::string &) = 0;
     virtual const QStringList getFileNames() const = 0;
     virtual const QString getProjectName() const = 0;
 };
