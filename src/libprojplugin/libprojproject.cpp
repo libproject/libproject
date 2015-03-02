@@ -21,6 +21,31 @@ typedef array<QString, 2> paths;
 namespace LibprojManager {
 namespace Internal {
 
+const QStringList  Project::getFileNames() const
+{
+    jsonToQVM convert(contentOfProjectFile, std::initializer_list<std::string>({"files"}));
+    QVariantMap m;
+   return convert(m) ["files"].toStringList();
+}
+
+const QString  Project::getProjectName() const
+{
+    jsonToQVM convert(contentOfProjectFile, std::initializer_list<std::string>({"project"}));
+    QVariantMap m;
+   return convert(m) ["project"].toString();
+}
+
+bool Project::readProjectFile(const string & ContentOfProjectFile_)
+{
+
+    string err;
+    contentOfProjectFile = Json::parse(ContentOfProjectFile_, err);
+    if (err.empty())
+        return true;
+    else
+        return false;
+}
+
 Project::Project(Manager * Manager, const string & ContentOfProjectFile, const paths& Paths)
     : manager(Manager)
 {
@@ -53,7 +78,6 @@ Project::Project(Manager * Manager, const string & ContentOfProjectFile, const p
         /*drop exc when PM will be extracted*/
     }
 }
-
 
 QString Project::displayName() const
 {
@@ -113,30 +137,6 @@ bool Project::addFiles(const QStringList &filePaths)
     return true;
 }
 
-bool Project::readProjectFile(const string & ContentOfProjectFile_)
-{
-
-    string err;
-    contentOfProjectFile = Json::parse(ContentOfProjectFile_, err);
-    if (err.empty())
-        return true;
-    else
-        return false;
-}
-
-const QStringList  Project::getFileNames() const
-{
-    jsonToQVM convert(contentOfProjectFile, std::initializer_list<std::string>({"files"}));
-    QVariantMap m;
-   return convert(m) ["files"].toStringList();
-}
-
-const QString  Project::getProjectName() const
-{
-    jsonToQVM convert(contentOfProjectFile, std::initializer_list<std::string>({"project"}));
-    QVariantMap m;
-   return convert(m) ["project"].toString();
-}
 
 } // namespace Internal
 } // namespace LibprojManager

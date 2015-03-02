@@ -6,6 +6,7 @@
 #include <vector>
 #include "json11.hpp"
 #include <array>
+#include "libprojconstants.h"
 
 namespace LibprojManager {
 namespace Internal {
@@ -13,6 +14,7 @@ namespace Internal {
 class Manager;
 class ProjectFile;
 class ProjectNode;
+
 class Project : public ProjectExplorer::Project, protected Interface::FileSetLoader
 {
     Q_OBJECT
@@ -100,8 +102,6 @@ protected /*interface*/:
             }
         }
     };
-
-   // friend class Libproj::Internal::Plugin;
 };
 
 } // namespace Internal

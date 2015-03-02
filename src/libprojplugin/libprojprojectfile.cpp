@@ -3,10 +3,12 @@
 #include <QDebug>
 #include "libprojconstants.h"
 
+typedef ProjectExplorer::Project AbstractProject;
+
 namespace LibprojManager{
 namespace Internal {
 
-ProjectFile::ProjectFile(Project * Parent, const QString &Filename)
+ProjectFile::ProjectFile(AbstractProject * Parent, const QString &Filename)
     : Core::IDocument(Parent),
       project(Parent)
 {

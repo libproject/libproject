@@ -3,7 +3,9 @@
 #include <QDebug>
 #include <QFileInfo>
 #include "libprojproject.h"
+#include "libprojprojectfactory.h"
 
+typedef ProjectExplorer::Project AbstractProject;
 using std::array;
 using std::string;
 namespace LibprojManager {
@@ -56,7 +58,13 @@ ProjectExplorer::Project * Manager::openProject(const QString &Filename, QString
             QFileInfo(projectFile).absoluteFilePath(),
             QFileInfo(projectFile).absolutePath() };
 
-        return new Project(this, qstrContentOfProjectFile.toStdString(), pathsOfProjectFile);
+        //return new Project(this, qstrContentOfProjectFile.toStdString(), pathsOfProjectFile);
+
+        return
+                LibprojManager::
+                Interface::
+                ProjectFactory::createProject(this, qstrContentOfProjectFile.toStdString(), pathsOfProjectFile);
+
     }
     else
     {
@@ -65,7 +73,7 @@ ProjectExplorer::Project * Manager::openProject(const QString &Filename, QString
     }
 }
 
-void Manager::registerProject(Project * Project)
+void Manager::registerProject(AbstractProject * Project)
 {
     /* TODO
      * project will be projectS there must be function which appends projects to array*/
@@ -76,7 +84,7 @@ void Manager::registerProject(Project * Project)
     Libproj::Internal::Plugin::setProject(Project);
 }
 
-void Manager::unregisterProject(Project * /*Project*/)
+void Manager::unregisterProject(AbstractProject * /*Project*/)
 {
     qDebug() << "Unregistering project";
     project = nullptr;

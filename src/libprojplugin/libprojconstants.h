@@ -10,7 +10,6 @@ const char MENU_ID[] = "Libproj.Menu";
 } // namespace Constants
 } //namespace Libproj
 
-
 namespace LibprojManager {
 namespace Constants {
 

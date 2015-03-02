@@ -18,6 +18,7 @@
 #include <extensionsystem/pluginmanager.h>
 #include <projectexplorer/iprojectmanager.h>
 
+typedef ProjectExplorer::Project AbstractProject;
 using ProjectExplorer::FileType;
 using ProjectExplorer::FileNode;
 using namespace Libproj::Internal;
@@ -25,7 +26,7 @@ using json11::Json;
 using std::string;
 using LibprojManager::Internal::Project;
 
-LibprojManager::Internal::Project * Plugin::project = nullptr;
+AbstractProject * Plugin::project = nullptr;
 
 Plugin::Plugin() {
 }
@@ -61,8 +62,8 @@ bool Plugin::initialize(const QStringList &Arguments, QString *ErrorString)
     /*TODO
      * addNewFileCommand must be inactive before opening project*/
 
-    connect(openProjectAction, SIGNAL(triggered()), SLOT(triggerOpenProjectAction()));
-    connect(addNewFileAction, SIGNAL(triggered()), SLOT(triggerAddNewFileAction()));
+    connect(openProjectAction, SIGNAL(triggered()), SLOT(triggerOpenProjectAction(1)));
+    connect(addNewFileAction, SIGNAL(triggered()), SLOT(triggerAddNewFileAction(1)));
 
     Core::ActionContainer
             * libprojMenu = Core::ActionManager::createMenu(Constants::MENU_ID);
@@ -84,7 +85,7 @@ ExtensionSystem::IPlugin::ShutdownFlag Plugin::aboutToShutdown()
     return SynchronousShutdown;
 }
 
-void Plugin::setProject(LibprojManager::Internal::Project *ProjectToSet)
+void Plugin::setProject(AbstractProject * ProjectToSet)
 {
     if(project)
         qWarning() << "Plugin already have associated project";
@@ -93,8 +94,10 @@ void Plugin::setProject(LibprojManager::Internal::Project *ProjectToSet)
 
 void Plugin::triggerOpenProjectAction()
 {
-    QString fileName = QFileDialog::getOpenFileName(0, QString("Open File"));
-    if (!(project = qobject_cast<Project*>(ProjectExplorer::ProjectExplorerPlugin::openProject(fileName, &errorString))))
+    QString fileName =
+            QFileDialog::getOpenFileName(0, QString("Open File"));
+    if (!(project =
+          qobject_cast<Project*>(ProjectExplorer::ProjectExplorerPlugin::openProject(fileName, &errorString))))
             qWarning() << "Manager can not open project";
 }
 
@@ -117,7 +120,7 @@ void Plugin::triggerAddNewFileAction()
        else
            qWarning() << "File already exists!";
            /* TODO  I need more secure way than just showing debugging message*/
-       project->addFiles(QStringList() << QFileInfo(newFile).absoluteFilePath() );
+       qobject_cast<Project*>(project)->addFiles(QStringList() << QFileInfo(newFile).absoluteFilePath() );
        break;
    }
    default:

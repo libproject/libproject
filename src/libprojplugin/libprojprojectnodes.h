@@ -1,18 +1,18 @@
 #pragma once
 #include <projectexplorer/projectnodes.h>
 
+namespace ProjectExplorer { class Project; }
 namespace Core { class IDocument; }
 namespace  LibprojManager {
 namespace Internal {
 
-class Project;
 class ProjectFile;
 class ProjectNode : public ProjectExplorer::ProjectNode
 {
-    Project * project;
+    ProjectExplorer::Project * project;
     ProjectFile * projectFile;
 public:
-    ProjectNode(Project * Project, ProjectFile * ProjectFile);
+    ProjectNode(ProjectExplorer::Project * Project, ProjectFile * ProjectFile);
     QList<ProjectExplorer::ProjectAction> supportedActions(Node * node) const;
 public /*dummies*/:
     virtual bool canAddSubProject(const QString &proFilePath) const;
