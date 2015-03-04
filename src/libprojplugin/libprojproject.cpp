@@ -13,9 +13,7 @@ using Core::IDocument;
 using ProjectExplorer::FileNode;
 using ProjectExplorer::FileType;
 using Libproj::Internal::Plugin;
-using json11::Json;
 using std::string;
-using std::array;
 using LibprojManager::Interface::FileSetLoader;
 
 namespace LibprojManager {

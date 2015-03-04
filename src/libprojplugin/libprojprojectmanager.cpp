@@ -7,7 +7,6 @@
 #include "libprojfilesetloaders.h"
 
 typedef ProjectExplorer::Project AbstractProject;
-using std::array;
 using std::string;
 using LibprojManager::Interface::FileSetLoader;
 using LibprojManager::Interface::FileSetFactory;
@@ -29,7 +28,6 @@ ProjectExplorer::Project * Manager::openProject(const QString &Filename, QString
 {
 
     FileSetLoader * loader = FileSetFactory::createFileSet(Filename.toStdString());
-    qDebug()<<"SSSSSSSSdsdSSSS";
     if (loader->open())
 
         return new LibprojManager::Internal::Project(this, loader);

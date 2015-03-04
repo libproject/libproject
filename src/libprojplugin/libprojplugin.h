@@ -2,7 +2,6 @@
 #include <extensionsystem/iplugin.h>
 #include <QVector>
 #include "libprojprojectnodes.h"
-#include "json11.hpp"
 #include <string>
 #include "libprojconstants.h"
 

@@ -2,7 +2,7 @@
 #include <list>
 #include <string>
 #include "json11.hpp"
-#include <QDebug>
+
 namespace LibprojManager {
 namespace Interface {
 
@@ -35,7 +35,6 @@ public:
     virtual const std::list<std::string> getFileNames() const;
     virtual const std::string getProjectName() const;
     virtual const std::string getPathToRootNode() const { return loaded ? pathToProjectFile : std::string(); }
-private:
 
 };
 
@@ -60,17 +59,32 @@ public:
 class FileSetFactory
 {
 protected:
-    static AbstractFileSetCreator * creator;
-public:
+    class AbstractFileSetCreatorSingleton
+    {
+    private:
+        AbstractFileSetCreatorSingleton() { }
+    public:
 
-    ~FileSetFactory() { delete creator; }
+        AbstractFileSetCreatorSingleton
+        (const AbstractFileSetCreatorSingleton&) = delete;
+        AbstractFileSetCreatorSingleton&
+        operator=(AbstractFileSetCreatorSingleton&) = delete;
+
+        static AbstractFileSetCreator& getCreator() {
+            static FileSetCreator creator;
+            return creator;
+        }
+    };
+
+public:
 
     static FileSetLoader * createFileSet(const std::string & pathToRootNode_)
     {
-        return creator->create(pathToRootNode_);
+        return AbstractFileSetCreatorSingleton::getCreator().create(pathToRootNode_);
     }
-
 };
+
+
 
 } // namespace Interface
 } // namespace LibprojManager

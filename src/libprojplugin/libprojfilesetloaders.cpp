@@ -2,7 +2,6 @@
 #include <fstream>
 #include <sstream>
 #include <list>
-#include <assert.h>
 #include "json11.hpp"
 #include <QDebug> //for first time
 
@@ -14,9 +13,6 @@ using json11::Json;
 
 namespace LibprojManager {
 namespace Interface {
-
-    AbstractFileSetCreator * FileSetFactory::creator = new FileSetCreator;
-
 
     bool
     JsonFileSetLoader::open()
@@ -53,7 +49,7 @@ namespace Interface {
         return false;
     }
 
-    const list<string>
+    const std::list<std::string>
     JsonFileSetLoader::getFileNames() const
     {
         if (!loaded)
