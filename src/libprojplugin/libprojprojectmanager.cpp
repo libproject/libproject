@@ -4,10 +4,13 @@
 #include <QFileInfo>
 #include "libprojproject.h"
 #include "libprojprojectfactory.h"
+#include "libprojfilesetloaders.h"
 
 typedef ProjectExplorer::Project AbstractProject;
 using std::array;
 using std::string;
+using LibprojManager::Interface::FileSetLoader;
+using LibprojManager::Interface::FileSetFactory;
 namespace LibprojManager {
 namespace Internal {
 
@@ -24,48 +27,13 @@ QString Manager::mimeType() const
 
 ProjectExplorer::Project * Manager::openProject(const QString &Filename, QString *ErrorString)
 {
-    qDebug() << "Opening project";
-    if(!QFileInfo(Filename).isFile()) {
-        qWarning() << "Project file isn\'t a file" ;
-         return nullptr;
-    }
-    if (QFileInfo(Filename).suffix() != "libproject")
-    {
-        qWarning() << "Incorrect file (extension)!";
-        return nullptr;
-    }
 
-    QFile projectFile(Filename);
-    if (projectFile.open( QIODevice::ReadWrite | QIODevice::Text ))
-    {
-        qDebug() << "File successfully opened";
-        QTextStream input(&projectFile);
-        if (input.status() != QTextStream::Ok)
-        {
-            qWarning() << "Something wrong with QTextStream in f-on readProjectFile()";
-            return nullptr;
-        }
-        qDebug() << "About to read file";
-        QString qstrContentOfProjectFile = input.readAll();
-        qDebug() << qstrContentOfProjectFile;
-        if(qstrContentOfProjectFile.isEmpty())
-        {
-            qWarning() << "File is empty!";
-            return nullptr;
-        }
-        const int numberOfPaths = 2;
-        array<QString, numberOfPaths> pathsOfProjectFile = {
-            QFileInfo(projectFile).absoluteFilePath(),
-            QFileInfo(projectFile).absolutePath() };
+    FileSetLoader * loader = FileSetFactory::createFileSet(Filename.toStdString());
+    qDebug()<<"SSSSSSSSdsdSSSS";
+    if (loader->open())
 
-        //return new Project(this, qstrContentOfProjectFile.toStdString(), pathsOfProjectFile);
+        return new LibprojManager::Internal::Project(this, loader);
 
-        return
-                LibprojManager::
-                Interface::
-                ProjectFactory::createProject(this, qstrContentOfProjectFile.toStdString(), pathsOfProjectFile);
-
-    }
     else
     {
         qWarning() << "File opened unsuccesfully";

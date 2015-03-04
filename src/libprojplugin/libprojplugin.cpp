@@ -62,8 +62,8 @@ bool Plugin::initialize(const QStringList &Arguments, QString *ErrorString)
     /*TODO
      * addNewFileCommand must be inactive before opening project*/
 
-    connect(openProjectAction, SIGNAL(triggered()), SLOT(triggerOpenProjectAction(1)));
-    connect(addNewFileAction, SIGNAL(triggered()), SLOT(triggerAddNewFileAction(1)));
+    connect(openProjectAction, SIGNAL(triggered()), SLOT(triggerOpenProjectAction()));
+    connect(addNewFileAction, SIGNAL(triggered()), SLOT(triggerAddNewFileAction()));
 
     Core::ActionContainer
             * libprojMenu = Core::ActionManager::createMenu(Constants::MENU_ID);

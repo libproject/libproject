@@ -1,4 +1,3 @@
-#include <array>
 #include <coreplugin/documentmanager.h>
 #include <projectexplorer/projectexplorerconstants.h>
 #include <coreplugin/icontext.h>
@@ -7,6 +6,7 @@
 #include "libprojplugin.h"
 #include "libprojprojectfile.h"
 #include "libprojconstants.h"
+#include "libprojfilesetloaders.h"
 
 
 using Core::IDocument;
@@ -16,37 +16,12 @@ using Libproj::Internal::Plugin;
 using json11::Json;
 using std::string;
 using std::array;
-typedef array<QString, 2> paths;
+using LibprojManager::Interface::FileSetLoader;
 
 namespace LibprojManager {
 namespace Internal {
 
-const QStringList  Project::getFileNames() const
-{
-    jsonToQVM convert(contentOfProjectFile, std::initializer_list<std::string>({"files"}));
-    QVariantMap m;
-   return convert(m) ["files"].toStringList();
-}
-
-const QString  Project::getProjectName() const
-{
-    jsonToQVM convert(contentOfProjectFile, std::initializer_list<std::string>({"project"}));
-    QVariantMap m;
-   return convert(m) ["project"].toString();
-}
-
-bool Project::readProjectFile(const string & ContentOfProjectFile_)
-{
-
-    string err;
-    contentOfProjectFile = Json::parse(ContentOfProjectFile_, err);
-    if (err.empty())
-        return true;
-    else
-        return false;
-}
-
-Project::Project(Manager * Manager, const string & ContentOfProjectFile, const paths& Paths)
+Project::Project(Manager * Manager, const FileSetLoader * Loader)
     : manager(Manager)
 {
     qDebug() << "Calling c-tor for Project";
@@ -55,58 +30,54 @@ Project::Project(Manager * Manager, const string & ContentOfProjectFile, const p
     setProjectContext(Core::Context(LibprojManager::Constants::PROJECTCONTEXT));
     setProjectLanguages(Core::Context(ProjectExplorer::Constants::LANG_CXX));
 
-    if (readProjectFile(ContentOfProjectFile))
-    {
-        enum { WithFile = 0, WithoutFile = 1 };
+    QString pathToRootNode = QString::fromStdString(Loader->getPathToRootNode());
 
-        nameOfProject = getProjectName();
-        projectFiles = getFileNames();
-        projectFile = new ProjectFile (this, Paths.at(WithFile));
-        rootNode = new ProjectNode (this, projectFile);
+    nameOfProject = QString::fromStdString(Loader->getProjectName());
+    for(const auto & filename : Loader->getFileNames())
+        projectFiles << QString::fromStdString(filename);
 
-       QList<FileNode*> listOfFileNodes;
-        //project file itself:
-        listOfFileNodes.push_back(new FileNode(Paths.at(WithFile), FileType::ProjectFileType,  false));
-        for (const auto& x: projectFiles)
-            listOfFileNodes.push_back(new FileNode(Paths.at(WithoutFile)+QString("/")+x, FileType::ProjectFileType, false));
-        rootNode->addFileNodes(listOfFileNodes);
-        Core::DocumentManager::addDocument(projectFile, false);
-        manager->registerProject(this);
-    }
-    else
-    {
-        /*drop exc when PM will be extracted*/
-    }
+    projectFile = new ProjectFile (this, pathToRootNode);
+    rootNode = new ProjectNode (this, projectFile);
+
+    QList<FileNode*> listOfFileNodes;
+    listOfFileNodes.push_back(new FileNode(QString::fromStdString(Loader->getPathToRootNode()),
+                                           FileType::ProjectFileType, false)); //pr. file itself
+    for (const auto& x: projectFiles)
+        listOfFileNodes.push_back(new FileNode(QFileInfo(pathToRootNode).absolutePath()+QString("/")+x,
+                                               FileType::ProjectFileType, false));
+    rootNode->addFileNodes(listOfFileNodes);
+    Core::DocumentManager::addDocument(projectFile, false);
+    manager->registerProject(this);
 }
 
 QString Project::displayName() const
 {
-    qDebug() << "Calling Project::displayName()";
+    //qDebug() << "Calling Project::displayName()";
     return nameOfProject;
 }
 
 IDocument * Project::document() const
 {
-    qDebug() << "Calling Project::document()";
+    //qDebug() << "Calling Project::document()";
     return projectFile;
 }
 
 ProjectExplorer::IProjectManager * Project::projectManager() const
 {
-    qDebug() << "Calling Project::projectManager()";
+    //qDebug() << "Calling Project::projectManager()";
     return manager;
 }
 
 ProjectExplorer::ProjectNode * Project::rootProjectNode() const
 {
-    qDebug() << "Calling Project::rootProjectNode()";
+    //qDebug() << "Calling Project::rootProjectNode()";
     return rootNode;
 }
 
 QStringList Project::files(FilesMode fileMode) const{
     /* TODO
      * must return list of absolute paths*/
-    qDebug() << "Calling Project::files(FilesMode)";
+    //qDebug() << "Calling Project::files(FilesMode)";
     return Project::files();
 }
 

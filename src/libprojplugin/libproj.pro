@@ -7,8 +7,7 @@ SOURCES += libprojplugin.cpp \
     libprojproject.cpp \
     libprojprojectnodes.cpp \
     libprojprojectfile.cpp \
-    libprojinterface.cpp \
-    libprojprojectfactory.cpp
+    libprojfilesetloaders.cpp
 
 
 HEADERS += libprojplugin.h \
@@ -18,8 +17,7 @@ HEADERS += libprojplugin.h \
     libprojprojectnodes.h \
     libprojprojectfile.h \
     libprojprojectmanager.h \
-    libprojinterface.h \
-    libprojprojectfactory.h
+    libprojfilesetloaders.h
 
 
 
