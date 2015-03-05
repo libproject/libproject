@@ -3,7 +3,6 @@
 #include <QDebug>
 #include <QFileInfo>
 #include "libprojproject.h"
-#include "libprojprojectfactory.h"
 #include "libprojfilesetloaders.h"
 
 typedef ProjectExplorer::Project AbstractProject;
