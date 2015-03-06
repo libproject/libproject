@@ -19,25 +19,6 @@ public:
 };
 
 
-class JsonFileSetLoader : public FileSetLoader
-{
-
-    std::string sContentOfProjectFile,
-                pathToProjectFile;
-    json11::Json jContentOfProjectFile;
-    bool loaded;
-
-public:
-    JsonFileSetLoader(const std::string& ProjectFile)
-        : pathToProjectFile(ProjectFile), loaded(false) { }
-
-    virtual bool open();
-    virtual const std::list<std::string> getFileNames() const;
-    virtual const std::string getProjectName() const;
-    virtual const std::string getPathToRootNode() const { return loaded ? pathToProjectFile : std::string(); }
-
-};
-
 class AbstractFileSetCreator {
 public:
 
@@ -51,9 +32,7 @@ public:
 
     virtual ~FileSetCreator() { }
 
-    virtual FileSetLoader * create(const std::string & pathToRootNode) const {
-        return new JsonFileSetLoader(pathToRootNode);
-    }
+    virtual FileSetLoader * create(const std::string & pathToRootNode) const;
 };
 
 class FileSetFactory
@@ -78,10 +57,7 @@ protected:
 
 public:
 
-    static FileSetLoader * createFileSet(const std::string & pathToRootNode_)
-    {
-        return AbstractFileSetCreatorSingleton::getCreator().create(pathToRootNode_);
-    }
+    static FileSetLoader * createFileSet(const std::string & pathToRootNode_);
 };
 
 
