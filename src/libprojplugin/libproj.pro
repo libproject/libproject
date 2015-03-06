@@ -55,7 +55,6 @@ QTC_PLUGIN_RECOMMENDS += \
 
 ###### End _dependencies.pri contents ######
 include($$QTCREATOR_SOURCES/src/qtcreatorplugin.pri)
-include($$PWD/../../tools/json11.pri)
 DEFINES -= QT_NO_CAST_FROM_ASCII
 
 RESOURCES += \
@@ -73,3 +72,12 @@ first.depends = $(first) copydata
 export(first.depends)
 export(copydata.commands)
 QMAKE_EXTRA_TARGETS += first copydata
+
+win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../fileset/release/ -lfileset
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../fileset/debug/ -lfileset
+else:unix: LIBS += -L$$OUT_PWD/../fileset/ -lfileset
+
+INCLUDEPATH += $$PWD/../fileset
+DEPENDPATH += $$PWD/../fileset
+
+copydata.commands = $(COPY) $$OUT_PWD/../fileset/libfileset.so.1.0.0 $$IDE_BUILD_TREE/lib/qtcreator/plugins/libfileset.so.1

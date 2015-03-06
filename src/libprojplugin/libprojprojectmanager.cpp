@@ -5,11 +5,17 @@
 #include "libprojproject.h"
 #include "libprojfilesetloaders.h"
 
+#include "fileset.h"
+
+//bool open();
+
 typedef ProjectExplorer::Project AbstractProject;
 using std::string;
 using LibprojManager::Interface::FileSetLoader;
-using LibprojManager::Interface::FileSetFactory;
 namespace LibprojManager {
+//namespace Interface { class FileSetFactory; }
+using LibprojManager::Interface::FileSetFactory;
+//FileSetLoader * FileSetFactory::createFileSet(const string &pathToRootNode_);
 namespace Internal {
 
 Manager::Manager()

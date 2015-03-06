@@ -8,6 +8,7 @@
 #include "libprojconstants.h"
 #include "libprojfilesetloaders.h"
 
+#include "fileset.h"
 
 using Core::IDocument;
 using ProjectExplorer::FileNode;

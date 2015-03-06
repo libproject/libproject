@@ -13,7 +13,6 @@
 #include "libprojprojectnodes.h"
 #include "libproj_global.h"
 #include "libprojproject.h"
-#include "json11.hpp"
 #include <coreplugin/mimedatabase.h>
 #include <extensionsystem/pluginmanager.h>
 #include <projectexplorer/iprojectmanager.h>
@@ -22,7 +21,6 @@ typedef ProjectExplorer::Project AbstractProject;
 using ProjectExplorer::FileType;
 using ProjectExplorer::FileNode;
 using namespace Libproj::Internal;
-using json11::Json;
 using std::string;
 using LibprojManager::Internal::Project;
 

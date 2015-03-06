@@ -3,10 +3,8 @@
 #include <projectexplorer/project.h>
 #include <string>
 #include <vector>
-#include "json11.hpp"
 #include <array>
 #include "libprojconstants.h"
-#
 
 namespace LibprojManager {
 namespace Interface { class FileSetLoader; }
