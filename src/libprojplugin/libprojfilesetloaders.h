@@ -1,7 +1,6 @@
 #pragma once
 #include <list>
 #include <string>
-#include "json11.hpp"
 
 namespace LibprojManager {
 namespace Interface {

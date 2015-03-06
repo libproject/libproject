@@ -3,7 +3,7 @@
 #include <sstream>
 #include <list>
 #include "json11.hpp"
-#include <QDebug> //for first time
+#include <QDebug>
 
 using std::ifstream;
 using std::ostringstream;
@@ -16,20 +16,19 @@ namespace Interface {
 
     class JsonFileSetLoader : public FileSetLoader
     {
-
-        std::string sContentOfProjectFile,
+        string sContentOfProjectFile,
                     pathToProjectFile;
-        json11::Json jContentOfProjectFile;
+        Json jContentOfProjectFile;
         bool loaded;
 
     public:
-        JsonFileSetLoader(const std::string& ProjectFile)
+        JsonFileSetLoader(const string& ProjectFile)
             : pathToProjectFile(ProjectFile), loaded(false) { }
 
         virtual bool open();
-        virtual const std::list<std::string> getFileNames() const;
-        virtual const std::string getProjectName() const;
-        virtual const std::string getPathToRootNode() const { return loaded ? pathToProjectFile : std::string(); }
+        virtual const list<string> getFileNames() const;
+        virtual const string getProjectName() const;
+        virtual const string getPathToRootNode() const { return loaded ? pathToProjectFile : string(); }
 
     };
 
@@ -68,7 +67,7 @@ namespace Interface {
         return false;
     }
 
-    const std::list<std::string>
+    const list<string>
     JsonFileSetLoader::getFileNames() const
     {
         if (!loaded)
@@ -94,15 +93,14 @@ namespace Interface {
         return jContentOfProjectFile["project"].string_value();
     }
 
-
     FileSetLoader *
-    FileSetCreator::create(const std::string &pathToRootNode) const
+    FileSetCreator::create(const string &pathToRootNode) const
     {
         return new JsonFileSetLoader(pathToRootNode);
     }
 
     FileSetLoader *
-    FileSetFactory::createFileSet(const std::string &pathToRootNode_)
+    FileSetFactory::createFileSet(const string &pathToRootNode_)
     {
         return AbstractFileSetCreatorSingleton::getCreator().create(pathToRootNode_);
     }
