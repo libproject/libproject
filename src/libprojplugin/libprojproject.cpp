@@ -6,7 +6,6 @@
 #include "libprojplugin.h"
 #include "libprojprojectfile.h"
 #include "libprojconstants.h"
-#include "libprojfilesetloaders.h"
 
 #include "fileset.h"
 

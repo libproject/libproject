@@ -6,7 +6,7 @@
 
 QT       += core
 
-TARGET = fileset
+TARGET = project
 TEMPLATE = lib
 
 DEFINES += FILESET_LIBRARY

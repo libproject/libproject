@@ -6,8 +6,7 @@ SOURCES += libprojplugin.cpp \
     libprojprojectmanager.cpp \
     libprojproject.cpp \
     libprojprojectnodes.cpp \
-    libprojprojectfile.cpp \
-    libprojfilesetloaders.cpp
+    libprojprojectfile.cpp
 
 
 HEADERS += libprojplugin.h \
@@ -16,8 +15,7 @@ HEADERS += libprojplugin.h \
     libprojproject.h \
     libprojprojectnodes.h \
     libprojprojectfile.h \
-    libprojprojectmanager.h \
-    libprojfilesetloaders.h
+    libprojprojectmanager.h
 
 
 
@@ -73,11 +71,11 @@ export(first.depends)
 export(copydata.commands)
 QMAKE_EXTRA_TARGETS += first copydata
 
-win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../fileset/release/ -lfileset
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../fileset/debug/ -lfileset
-else:unix: LIBS += -L$$OUT_PWD/../fileset/ -lfileset
+win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../fileset/release/ -lproject
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../fileset/debug/ -lproject
+else:unix: LIBS += -L$$OUT_PWD/../fileset/ -lproject
 
 INCLUDEPATH += $$PWD/../fileset
 DEPENDPATH += $$PWD/../fileset
 
-copydata.commands = $(COPY) $$OUT_PWD/../fileset/libfileset.so.1.0.0 $$IDE_BUILD_TREE/lib/qtcreator/plugins/libfileset.so.1
+copydata.commands = $(COPY) $$OUT_PWD/../fileset/libproject.so.1.0.0 $$IDE_BUILD_TREE/lib/qtcreator/plugins/libproject.so.1
