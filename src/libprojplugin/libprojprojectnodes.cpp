@@ -4,15 +4,17 @@
 #include "libprojplugin.h"
 #include <QFile>
 
+typedef ProjectExplorer::Project AbstractProject;
 using ProjectExplorer::FileNode;
 using ProjectExplorer::FileType;
 using Libproj::Internal::Plugin;
 using ProjectExplorer::ProjectAction;
+using LibprojManager::Internal::Project;
 
 namespace  LibprojManager {
 namespace Internal {
 
-ProjectNode::ProjectNode(Project * Project, ProjectFile * ProjectFile)
+ProjectNode::ProjectNode(AbstractProject * Project, ProjectFile * ProjectFile)
     : ProjectExplorer::ProjectNode(ProjectFile->filePath().toString()),
       project(Project),
       projectFile(ProjectFile)
@@ -51,7 +53,7 @@ bool ProjectNode::addFiles(const QStringList &filePaths, QStringList *notAdded)
 {
     qDebug() << "Calling ProjectNode::addFiles(const QStringList &filePaths, QStringList *notAdded)";
     Q_UNUSED(notAdded)
-    return project->addFiles(filePaths);
+    return qobject_cast<Project*>(project)->addFiles(filePaths);
 }
 
 } // namespace Internal

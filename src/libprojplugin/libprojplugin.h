@@ -2,14 +2,11 @@
 #include <extensionsystem/iplugin.h>
 #include <QVector>
 #include "libprojprojectnodes.h"
-#include "json11.hpp"
 #include <string>
-
-
+#include "libprojconstants.h"
 
 class QFile;
 namespace ProjectExplorer { class Project; }
-namespace LibprojManager { namespace Internal { class Project; } }
 namespace Libproj {
 namespace Internal {
 
@@ -24,7 +21,7 @@ public:
     virtual bool initialize(const QStringList &Arguments, QString *ErrorString);
     virtual void extensionsInitialized();
     virtual ShutdownFlag aboutToShutdown();
-    static void setProject(LibprojManager::Internal::Project * ProjectToSet);
+    static void setProject(ProjectExplorer::Project * ProjectToSet);
 private slots:
     virtual void triggerOpenProjectAction();
     virtual void triggerAddNewFileAction();
@@ -32,7 +29,7 @@ private:
     bool isReadOnly;
     QString projectFilename;
     QString  errorString;
-    static LibprojManager::Internal::Project * project;
+    static ProjectExplorer::Project * project;
 };
 
 } // namespace Internal

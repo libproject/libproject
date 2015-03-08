@@ -1,25 +1,30 @@
 #pragma once
 #include "libprojplugin.h"
 #include <projectexplorer/project.h>
-#include "json11.hpp"
+#include <string>
+#include <vector>
+#include <array>
+#include "libprojconstants.h"
 
 namespace LibprojManager {
+namespace Interface { class FileSetLoader; }
 namespace Internal {
 
 class Manager;
 class ProjectFile;
 class ProjectNode;
+
 class Project : public ProjectExplorer::Project
 {
     Q_OBJECT
     Manager * manager;
-    QString filename, nameOfProject;
-    ProjectFile * file;
+    QString nameOfProject;
+    QStringList projectFiles;
+    ProjectFile * projectFile;
     ProjectNode * rootNode;
-    json11::Json projectData;
 
 public:
-    Project(Manager * Manager, const QString & Filename, const QString & ContentOfProjectFile);
+    Project(Manager * Manager, const Interface::FileSetLoader * Loader);
 
     QString displayName() const;
     Core::IDocument *document() const;
@@ -28,13 +33,6 @@ public:
     QStringList files(FilesMode fileMode) const;
     QStringList files() const;
     bool addFiles(const QStringList &filePaths);
-
-private:
-    json11::Json getProjectData() const { return projectData; }
-    json11::Json setProjectData(const json11::Json& NewProjectData)  { projectData = NewProjectData; }
-    QVariantMap jsonToQVariantMap(const json11::Json& json) const;
-
-    friend class Libproj::Internal::Plugin;
 };
 
 } // namespace Internal

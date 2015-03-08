@@ -1,4 +1,3 @@
-#include <array>
 #include <coreplugin/documentmanager.h>
 #include <projectexplorer/projectexplorerconstants.h>
 #include <coreplugin/icontext.h>
@@ -7,22 +6,21 @@
 #include "libprojplugin.h"
 #include "libprojprojectfile.h"
 #include "libprojconstants.h"
-#include "json11.hpp"
+
+#include "fileset.h"
 
 using Core::IDocument;
 using ProjectExplorer::FileNode;
 using ProjectExplorer::FileType;
 using Libproj::Internal::Plugin;
-using json11::Json;
 using std::string;
-using std::array;
+using LibprojManager::Interface::FileSetLoader;
 
 namespace LibprojManager {
 namespace Internal {
 
-Project::Project(Manager * Manager, const QString & Filename, const QString &ContentOfProjectFile)
-    : manager(Manager),
-      filename(Filename)
+Project::Project(Manager * Manager, const FileSetLoader * Loader)
+    : manager(Manager)
 {
     qDebug() << "Calling c-tor for Project";
 
@@ -30,60 +28,54 @@ Project::Project(Manager * Manager, const QString & Filename, const QString &Con
     setProjectContext(Core::Context(LibprojManager::Constants::PROJECTCONTEXT));
     setProjectLanguages(Core::Context(ProjectExplorer::Constants::LANG_CXX));
 
-    std::string errorString;
-    projectData = Json::parse(ContentOfProjectFile.toStdString(), errorString);
-    if (!errorString.empty())
-    {
-        /* TODO */
-    }
-    else {
-        QFileInfo fileInfo(Filename);
-        nameOfProject =  fileInfo.completeBaseName();
-        file = new ProjectFile (this, filename);
-        rootNode = new ProjectNode (this, file);
-        qDebug() << "Starting to add files to root node";
-        QList<FileNode*> listOfFileNodes;
+    QString pathToRootNode = QString::fromStdString(Loader->getPathToRootNode());
 
-        //project file itself:
-        listOfFileNodes.push_back(new FileNode(fileInfo.absoluteFilePath(), FileType::ProjectFileType,  false));
+    nameOfProject = QString::fromStdString(Loader->getProjectName());
+    for(const auto & filename : Loader->getFileNames())
+        projectFiles << QString::fromStdString(filename);
 
-        for (const auto& x: jsonToQVariantMap(projectData)["files"].toStringList())
-            listOfFileNodes.push_back(new FileNode(fileInfo.absolutePath()+QString("/")+x, FileType::ProjectFileType, false));
+    projectFile = new ProjectFile (this, pathToRootNode);
+    rootNode = new ProjectNode (this, projectFile);
 
-        rootNode->addFileNodes(listOfFileNodes);
-        Core::DocumentManager::addDocument(file, false);
-        manager->registerProject(this);
-    }
+    QList<FileNode*> listOfFileNodes;
+    listOfFileNodes.push_back(new FileNode(QString::fromStdString(Loader->getPathToRootNode()),
+                                           FileType::ProjectFileType, false)); //pr. file itself
+    for (const auto& x: projectFiles)
+        listOfFileNodes.push_back(new FileNode(QFileInfo(pathToRootNode).absolutePath()+QString("/")+x,
+                                               FileType::ProjectFileType, false));
+    rootNode->addFileNodes(listOfFileNodes);
+    Core::DocumentManager::addDocument(projectFile, false);
+    manager->registerProject(this);
 }
 
 QString Project::displayName() const
 {
-    qDebug() << "Calling Project::displayName()";
+    //qDebug() << "Calling Project::displayName()";
     return nameOfProject;
 }
 
 IDocument * Project::document() const
 {
-    qDebug() << "Calling Project::document()";
-    return file;
+    //qDebug() << "Calling Project::document()";
+    return projectFile;
 }
 
 ProjectExplorer::IProjectManager * Project::projectManager() const
 {
-    qDebug() << "Calling Project::projectManager()";
+    //qDebug() << "Calling Project::projectManager()";
     return manager;
 }
 
 ProjectExplorer::ProjectNode * Project::rootProjectNode() const
 {
-    qDebug() << "Calling Project::rootProjectNode()";
+    //qDebug() << "Calling Project::rootProjectNode()";
     return rootNode;
 }
 
 QStringList Project::files(FilesMode fileMode) const{
     /* TODO
      * must return list of absolute paths*/
-    qDebug() << "Calling Project::files(FilesMode)";
+    //qDebug() << "Calling Project::files(FilesMode)";
     return Project::files();
 }
 
@@ -114,33 +106,6 @@ bool Project::addFiles(const QStringList &filePaths)
     return true;
 }
 
-QVariantMap Project::jsonToQVariantMap(const Json& json) const
-{
-    /* TODO
-     * there must be recursive function for parsing more complex files*/
-    QVariantMap data = QVariantMap();
-    const int size = 2;
-    array<string, size> toCheck = { /*0: */"author",  /*1: */ "files"  };
-    /*first key*/
-    if (!json[toCheck[0]].string_value().empty())
-        data.insert(QString(toCheck[0].c_str()), QVariant(json[toCheck[0]].string_value().c_str()));
-    else
-        return QVariantMap(); /*TODO: I'm not controlling it*/
-    /*END_ first key*/
-    /*second key*/
-    if (!json[toCheck[1]].array_items().empty())
-    {
-        QStringList files;
-        int cnt = 0;
-        while (cnt < json[toCheck[1]].array_items().size() )
-           files << QString(json[toCheck[1]].array_items().at(cnt++).string_value().c_str());
-        data.insert(QString(toCheck[1].c_str()), files);
-    }
-    else
-        return QVariantMap();
-    /*END_ second key*/
-    return data;
-}
 
 } // namespace Internal
 } // namespace LibprojManager
