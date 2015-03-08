@@ -76,7 +76,25 @@
 //                             tr("This is an action from libprojtest."));
 //}
 
-int main()
+#include "filesetmock.h"
+
+using ::testing::AtLeast;
+
+TEST(TestOpenProject, CanOpen) {
+    //#1
+    LibprojManager::Interface::FileSetLoaderMock loader;
+    EXPECT_CALL(loader, open()) .Times(AtLeast(0));
+
+    //#2
+    EXPECT_FALSE(loader.open());
+
+    /* here I need some code that uses mocks*/
+
+}
+
+int main(int argc, char** argv)
 {
-    return 0;
+
+    ::testing::InitGoogleMock(&argc, argv);
+    return RUN_ALL_TESTS();
 }
