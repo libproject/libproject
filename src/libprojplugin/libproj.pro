@@ -27,7 +27,7 @@ isEmpty(QTCREATOR_SOURCES):QTCREATOR_SOURCES=/home/drew/Git/qt-creator
 ## set the QTC_BUILD environment variable to override the setting here
 IDE_BUILD_TREE = $$(QTC_BUILD)
 isEmpty(IDE_BUILD_TREE):IDE_BUILD_TREE=/home/drew/QtCreatorProjects/QTC-GCC-BUILD
-
+message(Path to QtC build: $$IDE_BUILD_TREE)
 ## uncomment to build plugin into user config directory
 ## <localappdata>/plugins/<ideversion>
 ##    where <localappdata> is e.g.
@@ -64,13 +64,6 @@ OTHER_FILES += \
 #    ../libprojw/file.h \
 #    ../libprojw/main.cpp
 
-#Copying wizard file
-copydata.commands = $(COPY_DIR) $$PWD/../libprojw $$IDE_BUILD_TREE/share/qtcreator/templates/wizards/projects/
-first.depends = $(first) copydata
-export(first.depends)
-export(copydata.commands)
-QMAKE_EXTRA_TARGETS += first copydata
-
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../fileset/release/ -lproject
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../fileset/debug/ -lproject
 else:unix: LIBS += -L$$OUT_PWD/../fileset/ -lproject
@@ -78,4 +71,10 @@ else:unix: LIBS += -L$$OUT_PWD/../fileset/ -lproject
 INCLUDEPATH += $$PWD/../fileset
 DEPENDPATH += $$PWD/../fileset
 
-copydata.commands = $(COPY) $$OUT_PWD/../fileset/libproject.so.1.0.0 $$IDE_BUILD_TREE/lib/qtcreator/plugins/libproject.so.1
+copydata.commands = $(COPY_DIR) $$PWD/../libprojw $$IDE_BUILD_TREE/share/qtcreator/templates/wizards/projects/ ; \
+                $(COPY) $$OUT_PWD/../fileset/libproject.so.1.0.0 $$IDE_BUILD_TREE/lib/qtcreator/plugins/libproject.so.1
+
+first.depends = $(first) copydata
+export(first.depends)
+export(copydata.commands)
+QMAKE_EXTRA_TARGETS += first copydata
