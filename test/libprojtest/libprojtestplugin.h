@@ -11,19 +11,13 @@ namespace Internal {
 
 class libprojtestPlugin : public Libproj::Internal::LibprojPlugin
 {
-//    Q_OBJECT
-//    Q_PLUGIN_METADATA(IID "org.qt-project.Qt.QtCreatorPlugin" FILE "libprojtest.json")
+
 
 public:
-//    libprojtestPlugin();
-//    ~libprojtestPlugin();
 
-//    bool initialize(const QStringList &arguments, QString *errorString);
-//    void extensionsInitialized();
-//    ShutdownFlag aboutToShutdown();
 
 private slots:
-//    void triggerAction();
+
 };
 
 } // namespace Internal

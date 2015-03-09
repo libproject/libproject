@@ -4,5 +4,5 @@ TEMPLATE = subdirs
 
 SUBDIRS += src/libprojplugin/libproj.pro \
     src/fileset \
-    test/filesetmock \
+    test/filesettest \
     test/libprojtest

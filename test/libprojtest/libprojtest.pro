@@ -43,10 +43,4 @@ QTC_PLUGIN_RECOMMENDS += \
 
 include($$QTCREATOR_SOURCES/src/qtcreatorplugin.pri)
 
-INCLUDEPATH += $$PWD/../../src/libproj \
-                $$PWD/../../src/fileset \
-                $$PWD/../filesetmock
 
-DEPENDPATH += $$PWD/../../src/libproj \
-                $$PWD/../../src/fileset \
-                $$PWD/../filesetmock
