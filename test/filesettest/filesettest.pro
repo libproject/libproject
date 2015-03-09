@@ -4,18 +4,26 @@ CONFIG += console
 CONFIG -= app_bundle
 CONFIG += qt
 
-SOURCES += filesettest.cpp
+## If environment variable GMOCK_HOME is set, get path here, otherwise get default value
+GMOCK_HOME = $$(GMOCK_HOME)
+isEmpty(GMOCK_HOME):GMOCK_HOME="$$PWD/../../../gmock"
 
-include(deployment.pri)
-qtcAddDeployment()
+SOURCES += filesettest.cpp \
+           $$GMOCK_HOME/src/gmock-all.cc \
+           $$GMOCK_HOME/gtest/src/gtest-all.cc
 
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../../src/fileset/release/ -lproject
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../../src/fileset/debug/ -lproject
 else:unix: LIBS += -L$$OUT_PWD/../../src/fileset/ -lproject
 
-INCLUDEPATH += $$PWD/../../src/fileset
+INCLUDEPATH += $$PWD/../../src/fileset \
+               $$GMOCK_HOME/include \
+               $$GMOCK_HOME/gtest/include \
+               $$GMOCK_HOME/gtest \
+               $$GMOCK_HOME/
+
+
 DEPENDPATH += $$PWD/../../src/fileset
 
 QMAKE_CXXFLAGS += -std=c++11
-QMAKE_CXXFLAGS += -lgtest
 QMAKE_CXXFLAGS += -lpthread
