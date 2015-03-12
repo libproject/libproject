@@ -30,6 +30,9 @@ namespace Interface {
         virtual const string getProjectName() const;
         virtual const string getPathToRootNode() const { return loaded ? pathToProjectFile : string(); }
 
+    private:
+        const Json check_json_for_errors();
+
     };
 
     bool
@@ -51,14 +54,10 @@ namespace Interface {
 
         if (i.eof()) {
             sContentOfProjectFile = o.str();
-            qDebug() << QString::fromStdString(sContentOfProjectFile);
-
-            string err; //starting to parse
-            jContentOfProjectFile = Json::parse(sContentOfProjectFile, err);
-            if (!err.empty()) {
-                qDebug() << "Parsing error";
+            jContentOfProjectFile = check_json_for_errors();
+            if (jContentOfProjectFile.is_null())
                 return false;
-            }
+
             return loaded = true;
         }
 
@@ -70,10 +69,6 @@ namespace Interface {
     const list<string>
     JsonFileSetLoader::getFileNames() const
     {
-        if (!loaded)
-            return list<string>();
-        if(!jContentOfProjectFile["files"].is_array())
-            return list<string>();
         list<string> listOfFiles;
         for(const auto& item : jContentOfProjectFile["files"].array_items()) {
             listOfFiles.push_back(item.string_value());
@@ -89,8 +84,36 @@ namespace Interface {
             return string();
         if(!jContentOfProjectFile["project"].is_string())
             return string();
-        qDebug() << QString::fromStdString(jContentOfProjectFile["project"].string_value());
         return jContentOfProjectFile["project"].string_value();
+    }
+
+    const Json
+    JsonFileSetLoader::check_json_for_errors()
+    {
+        string err; //starting to parse
+        Json j = Json::parse(sContentOfProjectFile, err);
+
+        if (!err.empty()) {
+            qDebug() << "Parsing error - empty file";
+            return Json();
+        }
+        if (!j["project"].is_string()) {
+            qDebug() << "Parsing error - corrupted file - no \"project\" key";
+            return Json();
+        }
+        if (!j["files"].is_array()) {
+            qDebug() << "Parsing error - corrupted file - no \"files\" key";
+            return Json();
+        }
+        if (j["files"].is_array()) {
+            if ( j["files"].array_items().at(0).type() != Json::STRING ) {
+                qDebug() << "Parsing error - corrupted file - not relevant \"files\" value";
+                return Json();
+            }
+        }
+        if (!err.empty())
+            return Json();
+        return j;
     }
 
     FileSetLoader *
@@ -104,5 +127,6 @@ namespace Interface {
     {
         return AbstractFileSetCreatorSingleton::getCreator().create(pathToRootNode_);
     }
+
 } // namespace Interface
 } // namespace LibprojManager
