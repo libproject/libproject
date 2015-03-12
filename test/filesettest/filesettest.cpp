@@ -21,6 +21,9 @@ public:
     virtual ~FileSetTest() { }
 
     virtual void SetUp() {
+        if(loader)
+            delete loader;
+
         projectNormalFile = {"project_files/normal.libproject"};
         projectEmptyFile  = {"project_files/empty.libproject"};
         projectInconsistentFile = {"project_files/inconsistent.libproject"};
@@ -36,8 +39,6 @@ public:
 /* TESTOPENFILE */
 TEST_F(FileSetTest, testOpenFile__NormalFile) {
 
-    if(loader)
-        delete loader;
     loader = FileSetFactory::createFileSet(projectNormalFile);
     EXPECT_EQ(1, loader->open()) << "Test for open normal file";
 
@@ -45,8 +46,6 @@ TEST_F(FileSetTest, testOpenFile__NormalFile) {
 
 TEST_F(FileSetTest, testOpenFile__EmptyFile) {
 
-    if(loader)
-        delete loader;
     loader = FileSetFactory::createFileSet(projectEmptyFile);
     EXPECT_EQ(1, loader->open()) << "Test for open empty file";
 
@@ -54,8 +53,6 @@ TEST_F(FileSetTest, testOpenFile__EmptyFile) {
 
 TEST_F(FileSetTest, testOpenFile__InconsistentFile) {
 
-    if(loader)
-        delete loader;
     loader = FileSetFactory::createFileSet(projectInconsistentFile);
     EXPECT_EQ(1, loader->open()) << "Test for open Inconsistent file";
 
@@ -63,16 +60,13 @@ TEST_F(FileSetTest, testOpenFile__InconsistentFile) {
 
 TEST_F(FileSetTest, testOpenFile__BrokenFile) {
 
-    if(loader)
-        delete loader;
     loader = FileSetFactory::createFileSet(projectBrokenFile);
     EXPECT_EQ(1, loader->open()) << "Test for open Broken file";
 
 }
 
 TEST_F(FileSetTest, testGetFileNames__NormalFile) {
-    if(loader)
-        delete loader;
+
     loader = FileSetFactory::createFileSet(projectNormalFile);
     ASSERT_NE(0, loader->getFileNames().empty());
 }
