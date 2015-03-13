@@ -68,19 +68,19 @@ protected:
 
 TEST_F(FileSetTest_NORMALENV, testOpenFile) {
   loader = FileSetFactory::createFileSet(projectNormalFile);
-  EXPECT_EQ(1, loader->open());
+  EXPECT_EQ(true, loader->open());
 }
 
 TEST_F(FileSetTest_NORMALENV, testGetPathToRootNode) {
   loader = FileSetFactory::createFileSet(projectNormalFile);
   loader->open();
-  ASSERT_STRNE("", loader->getPathToRootNode().c_str());
+  ASSERT_NE(string(""), loader->getPathToRootNode());
 }
 
 TEST_F(FileSetTest_NORMALENV, checkProjectName) {
   loader = FileSetFactory::createFileSet(projectNormalFile);
   loader->open();
-  EXPECT_STREQ(projectNameRef.c_str(), loader->getProjectName().c_str());
+  EXPECT_EQ(projectNameRef, loader->getProjectName());
 }
 
 TEST_F(FileSetTest_NORMALENV, checkFileList) {
