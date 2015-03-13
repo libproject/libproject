@@ -23,3 +23,6 @@ unix {
 include($$PWD/../../tools/json11.pri)
 
 QMAKE_CXXFLAGS += -std=c++11
+
+QMAKE_CXXFLAGS += -fprofile-arcs -ftest-coverage -fprofile-dir=$$OUT_PWD
+QMAKE_LFLAGS += -fprofile-arcs -ftest-coverage -fprofile-dir=$$OUT_PWD

@@ -36,11 +36,10 @@ QMAKE_EXTRA_TARGETS += first copydata
 ## Defining additional target for code coverage reports
 #### .gcno and .gcda files in build directory generating every build cycle hence
 #### there are three additional following parameters for c++-compiler
-QMAKE_CXXFLAGS += -fprofile-arcs -ftest-coverage -fprofile-dir=$$OUT_PWD
-QMAKE_LFLAGS += -fprofile-arcs -ftest-coverage -fprofile-dir=$$OUT_PWD
+
 coverage.commands = \
 (LD_LIBRARY_PATH=$$OUT_PWD/../../src/fileset/ ./filesettest ; \
-cd $$OUT_PWD ; \
-gcov -o . $$PWD/filesettest.cpp ; \
-gcovr --object-directory= . -r $$PWD --html -o report.html)
+cd $$OUT_PWD/../../src/fileset ; \
+gcov -o . $$PWD/../../src/fileset/fileset.cpp ; \
+gcovr --object-directory= . -r $$PWD/../../src/fileset/ --html --html-details -o $$OUT_PWD/report.html)
 QMAKE_EXTRA_TARGETS += coverage
