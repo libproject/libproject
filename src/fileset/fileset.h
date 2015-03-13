@@ -16,6 +16,7 @@ public:
     virtual const std::list<std::string> getFileNames() const = 0;
     virtual const std::string getProjectName() const = 0;
     virtual const std::string getPathToRootNode() const = 0;
+
 };
 
 
