@@ -29,7 +29,7 @@ ProjectExplorer::Project * Manager::openProject(const QString &Filename, QString
 {
 
     FileSetLoader * loader = FileSetFactory::createFileSet(Filename.toStdString());
-    if (loader->open())
+    if (loader->open().empty())
 
         return new LibprojManager::Internal::Project(this, loader);
 
