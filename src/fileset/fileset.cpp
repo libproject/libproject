@@ -18,11 +18,19 @@ using std::string;
 using std::list;
 using json11::Json;
 
+/*!
+ * \brief Covers all classes of present project except Qt creator plugin
+ * instance
+ */
 namespace LibprojManager {
+
+/*!
+ * \brief In this namespace placed all interface-related classes
+ */
 namespace Interface {
 
      /*!
-     * \brief The JsonFileSetLoader class is realization of abstract interface
+     * \brief Gives to user Json-realization of abstract interface
      *
      * It leans on json11 library which gives functional for interaction with
      * JSON syntax
@@ -36,7 +44,7 @@ namespace Interface {
 
     public:
         /*!
-         * \brief JsonFileSetLoader constructs interface instance
+         * \brief Constructs interface instance
          * \param[in] ProjectFile is std::string and it describes path to .libproject
          * file
          */
@@ -44,30 +52,36 @@ namespace Interface {
             : pathToProjectFile(ProjectFile), loaded(false) { }
 
         /*!
-         * \brief open() function reads file and parsing it
+         * \brief Reads file and parsing it
          * \return empty string if open procedure was successful, otherwise - with error code
          */
         virtual const std::string open();
 
         /*!
-         * \brief getFileNames() function gives to user list<string> of filenames
+         * \brief Gives to user list<string> of filenames
          * \return list<string> of filenames of project or empty list if project wasn't loaded
          */
         virtual const list<string> getFileNames() const;
 
         /*!
-         * \brief getProjectName() function gives to user project name
+         * \brief Gives to user project name
          * \return project name in string format or empty string if project wasn't loaded
          */
         virtual const string getProjectName() const;
 
         /*!
-         * \brief getPathToRootNode() function gives to user path to root node
+         * \brief Gives to user path to root node
          * \return path to root node in string format or empty string if project wasn't loaded
          */
         virtual const string getPathToRootNode() const { return loaded ? pathToProjectFile : string(); }
 
     private:
+
+        /*!
+         * \brief check_json_for_errors
+         * \return Json object within the content of project file or Json object
+         * within single key "Error" string value of which contains description of error
+         */
         const Json check_json_for_errors();
 
     };

@@ -3,7 +3,7 @@
 * \brief The header file with input interface specification
 *
 * Present file contains abstract interface class and realization of Factory
-* pattern which creating interface instances on user demand
+* pattern which creates interface instances according to user demand
 */
 #pragma once
 
@@ -14,11 +14,11 @@ namespace LibprojManager {
 namespace Interface {
 
 /*!
- * \brief The FileSetLoader class bases abstract interface which regulates
- * loading and gathering information from input sources
+ * \brief Bases abstract interface which regulates and gathering
+ * information from input sources
  *
  * It provides functions for:
- * opening input sources within error-reporting system covering,
+ * opening input sources within error-report system,
  * getting file names of project in STL list<string> format,
  * getting name of project and path to root node in notions of input format
  */
@@ -35,6 +35,9 @@ public:
 
 };
 
+/*!
+ * \brief Just an abstract skeleton of Factory
+ */
 class AbstractFileSetCreator {
 public:
 
@@ -43,24 +46,35 @@ public:
     virtual FileSetLoader * create(const std::string & pathToRootNode) const = 0;
 };
 
+/*!
+ * \brief Realization of skeleton of Factory
+ */
 class FileSetCreator : public AbstractFileSetCreator {
 public:
 
     virtual ~FileSetCreator() { }
 
+    /*!
+     * \brief generic function of present pattern
+     * \param[in] pathToRootNode specifying path to input source
+     * \return Pointer to interface instance
+     */
     virtual FileSetLoader * create(const std::string & pathToRootNode) const;
 };
 
 /*!
- * \brief The FileSetFactory class provides ability for creating instances
- * of input interface
+ * \brief Provides ability for creating instances of input interface
  *
- * This factory is degenerate kind of such pattern because at this
+ * This Factory is degenerate kind of such pattern because at this
  * moment this facility originates objects of only one kind
  */
 class FileSetFactory
 {
 protected:
+    /*!
+     * \brief The Singleton for Factory skeleton instance
+     *
+     */
     class AbstractFileSetCreatorSingleton
     {
     private:
@@ -81,8 +95,8 @@ protected:
 public:
 
     /*!
-     * \brief createFileSet is public interface of factory facility
-     * \param[in] pathToRootNode_ This parameter specifying path to input source
+     * \brief Public interface of Factory facility
+     * \param[in] pathToRootNode_ specifying path to input source
      * \return Pointer to interface instance
      */
     static FileSetLoader * createFileSet(const std::string & pathToRootNode_);
