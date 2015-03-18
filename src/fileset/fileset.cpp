@@ -1,3 +1,10 @@
+/*!
+* \file
+* \brief The source file which contains realization of input interface
+*
+* Here is located JSON-like realization of abstract input interface
+*/
+
 #include "fileset.h"
 #include <fstream>
 #include <sstream>
@@ -14,20 +21,50 @@ using json11::Json;
 namespace LibprojManager {
 namespace Interface {
 
+     /*!
+     * \brief The JsonFileSetLoader class is realization of abstract interface
+     *
+     * It leans on json11 library which gives functional for interaction with
+     * JSON syntax
+     */
     class JsonFileSetLoader : public FileSetLoader
     {
         string sContentOfProjectFile,
                     pathToProjectFile;
         Json jContentOfProjectFile;
-        bool loaded;
+        bool loaded; //! flag which becoming true condition when instance is busy
 
     public:
+        /*!
+         * \brief JsonFileSetLoader constructs interface instance
+         * \param[in] ProjectFile is std::string and it describes path to .libproject
+         * file
+         */
         JsonFileSetLoader(const string& ProjectFile)
             : pathToProjectFile(ProjectFile), loaded(false) { }
 
+        /*!
+         * \brief open() function reads file and parsing it
+         * \return empty string if open procedure was successful, otherwise - with error code
+         */
         virtual const std::string open();
+
+        /*!
+         * \brief getFileNames() function gives to user list<string> of filenames
+         * \return list<string> of filenames of project or empty list if project wasn't loaded
+         */
         virtual const list<string> getFileNames() const;
+
+        /*!
+         * \brief getProjectName() function gives to user project name
+         * \return project name in string format or empty string if project wasn't loaded
+         */
         virtual const string getProjectName() const;
+
+        /*!
+         * \brief getPathToRootNode() function gives to user path to root node
+         * \return path to root node in string format or empty string if project wasn't loaded
+         */
         virtual const string getPathToRootNode() const { return loaded ? pathToProjectFile : string(); }
 
     private:
