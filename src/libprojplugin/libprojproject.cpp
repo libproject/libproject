@@ -7,7 +7,7 @@
 #include "libprojprojectfile.h"
 #include "libprojconstants.h"
 
-#include "fileset.h"
+#include "libproject.h"
 
 using Core::IDocument;
 using ProjectExplorer::FileNode;

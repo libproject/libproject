@@ -5,7 +5,7 @@
 * Here is located JSON-like realization of abstract input interface
 */
 
-#include "fileset.h"
+#include "libproject.h"
 #include <fstream>
 #include <sstream>
 #include <list>
