@@ -9,11 +9,11 @@ QT       += core
 TARGET = project
 TEMPLATE = lib
 
-DEFINES += FILESET_LIBRARY
+DEFINES += LIBPROJECT_LIBRARY
 
-SOURCES += fileset.cpp
+SOURCES += libproject.cpp
 
-HEADERS += fileset.h
+HEADERS += libproject.h
 
 unix {
     target.path = /usr/lib

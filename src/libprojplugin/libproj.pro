@@ -64,15 +64,15 @@ OTHER_FILES += \
 #    ../libprojw/file.h \
 #    ../libprojw/main.cpp
 
-win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../fileset/release/ -lproject
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../fileset/debug/ -lproject
-else:unix: LIBS += -L$$OUT_PWD/../fileset/ -lproject
+win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../libproject/release/ -lproject
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../libproject/debug/ -lproject
+else:unix: LIBS += -L$$OUT_PWD/../libproject/ -lproject
 
-INCLUDEPATH += $$PWD/../fileset
-DEPENDPATH += $$PWD/../fileset
+INCLUDEPATH += $$PWD/../libproject
+DEPENDPATH += $$PWD/../libproject
 
 copydata.commands = $(COPY_DIR) $$PWD/../libprojw $$IDE_BUILD_TREE/share/qtcreator/templates/wizards/projects/ ; \
-                $(COPY) $$OUT_PWD/../fileset/libproject.so.1.0.0 $$IDE_BUILD_TREE/lib/qtcreator/plugins/libproject.so.1
+                $(COPY) $$OUT_PWD/../libproject/libproject.so.1.0.0 $$IDE_BUILD_TREE/lib/qtcreator/plugins/libproject.so.1
 
 first.depends = $(first) copydata
 export(first.depends)
