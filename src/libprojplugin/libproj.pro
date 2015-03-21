@@ -1,6 +1,7 @@
-DEFINES += LIBPROJ_LIBRARY
+TARGET = proj
+TEMPLATE = lib
 
-# libproj files
+DEFINES += LIBPROJ_LIBRARY
 
 SOURCES += libprojplugin.cpp \
     libprojprojectmanager.cpp \
@@ -23,7 +24,7 @@ HEADERS += libprojplugin.h \
 ## set the QTC_SOURCE environment variable to override the setting here
 QTCREATOR_SOURCES = $$(QTC_SOURCE)
 isEmpty(QTCREATOR_SOURCES):QTCREATOR_SOURCES=/home/drew/Git/qt-creator
-
+message(Path to QtC build: $$QTCREATOR_SOURCES)
 ## set the QTC_BUILD environment variable to override the setting here
 IDE_BUILD_TREE = $$(QTC_BUILD)
 isEmpty(IDE_BUILD_TREE):IDE_BUILD_TREE=/home/drew/QtCreatorProjects/QTC-GCC-BUILD
@@ -64,15 +65,15 @@ OTHER_FILES += \
 #    ../libprojw/file.h \
 #    ../libprojw/main.cpp
 
-win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../fileset/release/ -lproject
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../fileset/debug/ -lproject
-else:unix: LIBS += -L$$OUT_PWD/../fileset/ -lproject
+win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../libproject/release/ -lproject
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../libproject/debug/ -lproject
+else:unix: LIBS += -L$$OUT_PWD/../libproject/ -lproject
 
-INCLUDEPATH += $$PWD/../fileset
-DEPENDPATH += $$PWD/../fileset
+INCLUDEPATH += $$PWD/../libproject
+DEPENDPATH += $$PWD/../libproject
 
 copydata.commands = $(COPY_DIR) $$PWD/../libprojw $$IDE_BUILD_TREE/share/qtcreator/templates/wizards/projects/ ; \
-                $(COPY) $$OUT_PWD/../fileset/libproject.so.1.0.0 $$IDE_BUILD_TREE/lib/qtcreator/plugins/libproject.so.1
+                $(COPY) $$OUT_PWD/../libproject/libproject.so.1.0.0 $$IDE_BUILD_TREE/lib/qtcreator/plugins/libproject.so.1
 
 first.depends = $(first) copydata
 export(first.depends)

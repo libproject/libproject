@@ -4,7 +4,7 @@
 #include <QFileInfo>
 #include "libprojproject.h"
 
-#include "fileset.h"
+#include "libproject.h"
 
 
 typedef ProjectExplorer::Project AbstractProject;

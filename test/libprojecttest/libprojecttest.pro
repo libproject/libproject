@@ -8,21 +8,21 @@ CONFIG += qt
 GMOCK_HOME = $$(GMOCK_HOME)
 isEmpty(GMOCK_HOME):GMOCK_HOME="$$PWD/../../../gmock"
 
-SOURCES += filesettest.cpp \
+SOURCES += libprojecttest.cpp \
            $$GMOCK_HOME/src/gmock-all.cc \
            $$GMOCK_HOME/gtest/src/gtest-all.cc
 
-win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../../src/fileset/release/ -lproject
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../../src/fileset/debug/ -lproject
-else:unix: LIBS += -L$$OUT_PWD/../../src/fileset/ -lproject
+win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../../src/libproject/release/ -lproject
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../../src/libproject/debug/ -lproject
+else:unix: LIBS += -L$$OUT_PWD/../../src/libproject/ -lproject
 
-INCLUDEPATH += $$PWD/../../src/fileset \
+INCLUDEPATH += $$PWD/../../src/libproject \
                $$GMOCK_HOME/include \
                $$GMOCK_HOME/gtest/include \
                $$GMOCK_HOME/gtest \
                $$GMOCK_HOME/
 
-DEPENDPATH += $$PWD/../../src/fileset
+DEPENDPATH += $$PWD/../../src/libproject
 
 QMAKE_CXXFLAGS += -std=c++11
 QMAKE_CXXFLAGS += -lpthread
@@ -38,8 +38,8 @@ QMAKE_EXTRA_TARGETS += first copydata
 #### there are three additional following parameters for c++-compiler
 
 coverage.commands = \
-(LD_LIBRARY_PATH=$$OUT_PWD/../../src/fileset/ ./filesettest ; \
-cd $$OUT_PWD/../../src/fileset ; \
-gcov -o . $$PWD/../../src/fileset/fileset.cpp ; \
-gcovr --object-directory= . -r $$PWD/../../src/fileset/ --html --html-details -o $$OUT_PWD/report.html)
+(LD_LIBRARY_PATH=$$OUT_PWD/../../src/libproject/ ./libprojecttest ; \
+cd $$OUT_PWD/../../src/libproject ; \
+gcov -o . $$PWD/../../src/libproject/libproject.cpp ; \
+gcovr --object-directory= . -r $$PWD/../../src/libproject/ --html --html-details -o $$OUT_PWD/report.html)
 QMAKE_EXTRA_TARGETS += coverage
