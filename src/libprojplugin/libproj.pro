@@ -1,6 +1,7 @@
-DEFINES += LIBPROJ_LIBRARY
+TARGET = proj
+TEMPLATE = lib
 
-# libproj files
+DEFINES += LIBPROJ_LIBRARY
 
 SOURCES += libprojplugin.cpp \
     libprojprojectmanager.cpp \
@@ -23,7 +24,7 @@ HEADERS += libprojplugin.h \
 ## set the QTC_SOURCE environment variable to override the setting here
 QTCREATOR_SOURCES = $$(QTC_SOURCE)
 isEmpty(QTCREATOR_SOURCES):QTCREATOR_SOURCES=/home/drew/Git/qt-creator
-
+message(Path to QtC build: $$QTCREATOR_SOURCES)
 ## set the QTC_BUILD environment variable to override the setting here
 IDE_BUILD_TREE = $$(QTC_BUILD)
 isEmpty(IDE_BUILD_TREE):IDE_BUILD_TREE=/home/drew/QtCreatorProjects/QTC-GCC-BUILD

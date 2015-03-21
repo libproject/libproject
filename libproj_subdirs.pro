@@ -2,9 +2,9 @@ CONFIG += ordered
 
 TEMPLATE = subdirs
 
-SUBDIRS += src/libprojplugin/libproj.pro \
-    src/libproject \
-    test/libprojecttest
+SUBDIRS += src/libproject \
+    test/libprojecttest \
+    src/libprojplugin/libproj.pro
 
 documentation.commands = ( \
 sed -e \'s%INPUT = %INPUT = $$PWD/src/libproject/%g\' $$PWD/doc/Doxyfile > $$OUT_PWD/Doxyfile ; \
