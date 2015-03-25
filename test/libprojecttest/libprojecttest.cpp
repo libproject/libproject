@@ -2,13 +2,26 @@
 #include <list>
 #include <gtest/gtest.h>
 #include "libproject.h"
-#include <algorithm>
-#include <iterator>
+#include "libproject_error.h"
 
 using std::string;
 using std::list;
 using LibprojManager::Interface::FileSetFactory;
 using LibprojManager::Interface::FileSetLoader;
+using namespace LibprojManager::Interface::Error;
+
+namespace {
+list<string> pathsToAbnormalSources = {
+    "project_files/empty.libproject",
+    "project_files/notrelevantfileskey.libproject",
+    "project_files/filesarrayisdigit.libproject",
+    "project_files/filesarrayisstring.libproject",
+    "project_files/nofileskey.libproject",
+    "project_files/broken.libproject",
+    "project_files/noprojectkey.libproject",
+    "project_files/notexist.libproject"
+};
+}
 
 class FileSetTest : public ::testing::Test {
 
@@ -37,38 +50,30 @@ protected:
     FileSetTest::SetUp();
     Normal = {"project_files/normal.libproject"};
     projectNameRef = {"SameAmmoniteOnPurpleSkies *** 42"};
-    projectFilesRef = list<string>{
+    projectFilesRef = {
         "main.cpp", "Test.h", "Test.cpp", "Foo.h", "Foo.cpp", "README",
-        "kekeke.cpp", "testnew.cpp", "testadd2.cpp", "testadd3.cpp"};
+        "kekeke.cpp", "testnew.cpp", "testadd2.cpp", "testadd3.cpp"
+    };
   }
 };
 
-class FileSetTest_ABNORMALINPUT : public FileSetTest {
+class FileSetTest_ABNORMALINPUT : public FileSetTest,
+                                  public ::testing::WithParamInterface<string>
+{
 protected:
-  string Empty, NotRelevantFilesKey,
-      NoFilesKey, FilesArrayIsDigit,
-      FilesArrayIsString, Broken,
-      NoProjectKey, FileNotExist;
-
-  void SetUp() {
-    FileSetTest::SetUp();
-    Empty = {"project_files/empty.libproject"};
-    NotRelevantFilesKey = {"project_files/notrelevantfileskey.libproject"};
-    FilesArrayIsDigit = {
-        "project_files/filesarrayisdigit.libproject"};
-    FilesArrayIsString = {
-        "project_files/filesarrayisstring.libproject"};
-    NoFilesKey = {"project_files/nofileskey.libproject"};
-    Broken = {"project_files/broken.libproject"};
-    NoProjectKey = {"project_files/noprojectkey.libproject"};
-    FileNotExist = "{project_files/notexist.libproject";
-
-  }
+    void SetUp() {
+        FileSetTest::SetUp();
+    }
+    void TearDown() { }
 };
+
+INSTANTIATE_TEST_CASE_P(Instantiation_FileSetTest_ABNORMALINPUT,
+                        FileSetTest_ABNORMALINPUT,
+                        ::testing::ValuesIn(pathsToAbnormalSources));
 
 TEST_F(FileSetTest_NORMALINPUT, testOpenFile) {
   loader = FileSetFactory::createFileSet(Normal);
-  EXPECT_EQ(string(""), loader->open());
+  ASSERT_NO_THROW(loader->open());
 }
 
 TEST_F(FileSetTest_NORMALINPUT, testGetPathToRootNode) {
@@ -86,60 +91,62 @@ TEST_F(FileSetTest_NORMALINPUT, checkProjectName) {
 TEST_F(FileSetTest_NORMALINPUT, checkFileList) {
   loader = FileSetFactory::createFileSet(Normal);
   loader->open();
-  list<string> testingList(loader->getFileNames()),
-               diff;
-  std::front_insert_iterator<list<string> > fIter(diff);
-  std::set_symmetric_difference(
-      projectFilesRef.cbegin(), projectFilesRef.cend(),
-      testingList.cbegin(), testingList.cend(), fIter);
-  EXPECT_EQ(0, diff.size());
-}
-
-TEST_F(FileSetTest_ABNORMALINPUT, Open_Empty_File) {
-  loader = FileSetFactory::createFileSet(Empty);
-  ASSERT_EQ(string("Empty or broken file!"), loader->open());
-}
-
-TEST_F(FileSetTest_ABNORMALINPUT, Open_File_Witn_Not_Relevant_Files_Key) {
-  loader = FileSetFactory::createFileSet(NotRelevantFilesKey);
-  ASSERT_EQ(string("Wrong value type of files key!"), loader->open());
-}
-
-TEST_F(FileSetTest_ABNORMALINPUT, Open_File_Without_Files_Key) {
-  loader = FileSetFactory::createFileSet(NoFilesKey);
-  ASSERT_EQ(string("Corrupted or absent files key!"), loader->open());
-}
-
-TEST_F(FileSetTest_ABNORMALINPUT, Open_File_Without_Project_Key) {
-  loader = FileSetFactory::createFileSet(NoProjectKey);
-  ASSERT_EQ(string("Corrupted or absent project key!"), loader->open());
-}
-
-TEST_F(FileSetTest_ABNORMALINPUT, Open_File_With_Files_Digit_Value) {
-  loader = FileSetFactory::createFileSet(FilesArrayIsDigit);
-  ASSERT_EQ(string("Corrupted or absent files key!"), loader->open());
-}
-
-TEST_F(FileSetTest_ABNORMALINPUT, Open_File_With_Files_String_Value) {
-  loader = FileSetFactory::createFileSet(FilesArrayIsString);
-  ASSERT_EQ(string("Corrupted or absent files key!"), loader->open());
-}
-
-TEST_F(FileSetTest_ABNORMALINPUT, Open_Broken_File) {
-  loader = FileSetFactory::createFileSet(Broken);
-  ASSERT_EQ(string("Empty or broken file!"), loader->open());
+  EXPECT_EQ(true, loader->getFileNames() == projectFilesRef);
 }
 
 TEST_F(FileSetTest_NORMALINPUT, Open_File_While_Already_Opened) {
     loader = FileSetFactory::createFileSet(Normal);
-    if (loader->open().empty())
-        ASSERT_EQ(string("Project file already loaded!"), loader->open());
+    loader->open();
+    ASSERT_THROW(loader->open(), ErrorInLoaderLogic);
 }
 
-TEST_F(FileSetTest_ABNORMALINPUT, Open_Not_Existing_File) {
-  loader = FileSetFactory::createFileSet(FileNotExist);
-  ASSERT_EQ(string("Error with input stream!"), loader->open());
+TEST_P(FileSetTest_ABNORMALINPUT, testingSetOfAbnormalInputs) {
+    ASSERT_THROW({
+                     loader = FileSetFactory::createFileSet(GetParam());
+                     loader->open();
+                 },
+                 ErrorDuringGettingProjectInfo);
 }
+
+//TEST_F(FileSetTest_ABNORMALINPUT, Open_Empty_File) {
+//  loader = FileSetFactory::createFileSet(Empty);
+//  ASSERT_EQ(string("Empty or broken file!"), loader->open());
+//}
+
+//TEST_F(FileSetTest_ABNORMALINPUT, Open_File_Witn_Not_Relevant_Files_Key) {
+//  loader = FileSetFactory::createFileSet(NotRelevantFilesKey);
+//  ASSERT_EQ(string("Wrong value type of files key!"), loader->open());
+//}
+
+//TEST_F(FileSetTest_ABNORMALINPUT, Open_File_Without_Files_Key) {
+//  loader = FileSetFactory::createFileSet(NoFilesKey);
+//  ASSERT_EQ(string("Corrupted or absent files key!"), loader->open());
+//}
+
+//TEST_F(FileSetTest_ABNORMALINPUT, Open_File_Without_Project_Key) {
+//  loader = FileSetFactory::createFileSet(NoProjectKey);
+//  ASSERT_EQ(string("Corrupted or absent project key!"), loader->open());
+//}
+
+//TEST_F(FileSetTest_ABNORMALINPUT, Open_File_With_Files_Digit_Value) {
+//  loader = FileSetFactory::createFileSet(FilesArrayIsDigit);
+//  ASSERT_EQ(string("Corrupted or absent files key!"), loader->open());
+//}
+
+//TEST_F(FileSetTest_ABNORMALINPUT, Open_File_With_Files_String_Value) {
+//  loader = FileSetFactory::createFileSet(FilesArrayIsString);
+//  ASSERT_EQ(string("Corrupted or absent files key!"), loader->open());
+//}
+
+//TEST_F(FileSetTest_ABNORMALINPUT, Open_Broken_File) {
+//  loader = FileSetFactory::createFileSet(Broken);
+//  ASSERT_EQ(string("Empty or broken file!"), loader->open());
+//}
+
+//TEST_F(FileSetTest_ABNORMALINPUT, Open_Not_Existing_File) {
+//  loader = FileSetFactory::createFileSet(FileNotExist);
+//  ASSERT_EQ(string("Error with input stream!"), loader->open());
+//}
 
 TEST_F(FileSetTest_NORMALINPUT, Get_Project_Name_For_Not_Loaded_FileSet) {
     loader = FileSetFactory::createFileSet(Normal);

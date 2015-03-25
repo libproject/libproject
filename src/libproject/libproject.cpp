@@ -10,14 +10,14 @@
 #include <sstream>
 #include <list>
 #include "json11.hpp"
-#include <iostream>
+#include "libproject_error.h"
 
 using std::ifstream;
 using std::ostringstream;
 using std::string;
 using std::list;
 using json11::Json;
-
+using namespace LibprojManager::Interface::Error;
 /*!
  * \brief Covers all classes of present project except Qt creator plugin
  * instance
@@ -53,9 +53,9 @@ namespace Interface {
 
         /*!
          * \brief Reads file and parsing it
-         * \return empty string if open procedure was successful, otherwise - with error code
+         * \return boolean true if file opened successfully
          */
-        virtual const std::string open();
+        virtual bool open();
 
         /*!
          * \brief Gives to user list<string> of filenames
@@ -86,15 +86,16 @@ namespace Interface {
 
     };
 
-    const string
+    bool
     JsonFileSetLoader::open()
     {
         if (loaded) {
-            return string("Project file already loaded!");
+            throw ErrorInLoaderLogic(Code::PRLD, "Project alredy loaded!");
         }
         ifstream i(pathToProjectFile);
         if(!i) {
-            return string("Error with input stream!");
+            throw ErrorDuringGettingProjectInfo(Code::ICRS,
+                                                "Error with input stream!");
         }
         ostringstream o;
         char buf = 0;
@@ -106,20 +107,22 @@ namespace Interface {
             jContentOfProjectFile = check_json_for_errors();
             if (jContentOfProjectFile["Error"].is_string()) {
                 loaded = false;
-                return jContentOfProjectFile["Error"].string_value();
+                throw ErrorDuringGettingProjectInfo(Code::ICRS,
+                                                    jContentOfProjectFile["Error"].string_value());
             }
             else if (jContentOfProjectFile.is_null()) {
                 loaded = false;
-                return string("Unknown error gathered from json11 library!");
+                throw ErrorDuringGettingProjectInfo(Code::UNKR,
+                                                    "Unknown error gathered from json11 library!");
             }
             else {
-                loaded = true;
-                return string();
+                return loaded = true;
             }
         }
         else {
             loaded = false;
-            return string ("Input stream didn't gave EOF marker!");
+            throw ErrorDuringGettingProjectInfo(Code::ICRS,
+                                                "Input stream didn't gave EOF marker!");
         }
     }
 

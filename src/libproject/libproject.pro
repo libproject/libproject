@@ -11,7 +11,8 @@ DEFINES += LIBPROJECT_LIBRARY
 
 SOURCES += libproject.cpp
 
-HEADERS += libproject.h
+HEADERS += libproject.h \
+    libproject_error.h
 
 unix {
     target.path = /usr/lib
