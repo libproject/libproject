@@ -18,6 +18,9 @@ using std::string;
 using std::list;
 using json11::Json;
 using namespace LibprojManager::Interface::Error;
+typedef FileSetLogicError::ErrType FSLE;
+typedef FileSetRuntimeError::ErrType FSRE;
+
 /*!
  * \brief Covers all classes of present project except Qt creator plugin
  * instance
@@ -90,12 +93,11 @@ namespace Interface {
     JsonFileSetLoader::open()
     {
         if (loaded) {
-            throw ErrorInLoaderLogic(Code::PRLD, "Project alredy loaded!");
+            throw FileSetLogicError(FSLE::AlreadyLoaded, "Project alredy loaded");
         }
         ifstream i(pathToProjectFile);
         if(!i) {
-            throw ErrorDuringGettingProjectInfo(Code::ICRS,
-                                                "Error with input stream!");
+            throw FileSetRuntimeError(FSRE::IncorrectSource, "Error with input stream");
         }
         ostringstream o;
         char buf = 0;
@@ -107,13 +109,11 @@ namespace Interface {
             jContentOfProjectFile = check_json_for_errors();
             if (jContentOfProjectFile["Error"].is_string()) {
                 loaded = false;
-                throw ErrorDuringGettingProjectInfo(Code::ICRS,
-                                                    jContentOfProjectFile["Error"].string_value());
+                throw FileSetRuntimeError(FSRE::IncorrectSource,jContentOfProjectFile["Error"].string_value());
             }
             else if (jContentOfProjectFile.is_null()) {
                 loaded = false;
-                throw ErrorDuringGettingProjectInfo(Code::UNKR,
-                                                    "Unknown error gathered from json11 library!");
+                throw FileSetRuntimeError(FSRE::UnknownError, "Unknown error gathered from json11 library");
             }
             else {
                 return loaded = true;
@@ -121,8 +121,7 @@ namespace Interface {
         }
         else {
             loaded = false;
-            throw ErrorDuringGettingProjectInfo(Code::ICRS,
-                                                "Input stream didn't gave EOF marker!");
+            throw FileSetRuntimeError(FSRE::IncorrectSource, "Input stream didn't gave EOF marker");
         }
     }
 

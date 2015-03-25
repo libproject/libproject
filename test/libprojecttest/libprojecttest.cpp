@@ -97,7 +97,7 @@ TEST_F(FileSetTest_NORMALINPUT, checkFileList) {
 TEST_F(FileSetTest_NORMALINPUT, Open_File_While_Already_Opened) {
     loader = FileSetFactory::createFileSet(Normal);
     loader->open();
-    ASSERT_THROW(loader->open(), ErrorInLoaderLogic);
+    ASSERT_THROW(loader->open(), FileSetLogicError);
 }
 
 TEST_P(FileSetTest_ABNORMALINPUT, testingSetOfAbnormalInputs) {
@@ -105,48 +105,8 @@ TEST_P(FileSetTest_ABNORMALINPUT, testingSetOfAbnormalInputs) {
                      loader = FileSetFactory::createFileSet(GetParam());
                      loader->open();
                  },
-                 ErrorDuringGettingProjectInfo);
+                 FileSetRuntimeError);
 }
-
-//TEST_F(FileSetTest_ABNORMALINPUT, Open_Empty_File) {
-//  loader = FileSetFactory::createFileSet(Empty);
-//  ASSERT_EQ(string("Empty or broken file!"), loader->open());
-//}
-
-//TEST_F(FileSetTest_ABNORMALINPUT, Open_File_Witn_Not_Relevant_Files_Key) {
-//  loader = FileSetFactory::createFileSet(NotRelevantFilesKey);
-//  ASSERT_EQ(string("Wrong value type of files key!"), loader->open());
-//}
-
-//TEST_F(FileSetTest_ABNORMALINPUT, Open_File_Without_Files_Key) {
-//  loader = FileSetFactory::createFileSet(NoFilesKey);
-//  ASSERT_EQ(string("Corrupted or absent files key!"), loader->open());
-//}
-
-//TEST_F(FileSetTest_ABNORMALINPUT, Open_File_Without_Project_Key) {
-//  loader = FileSetFactory::createFileSet(NoProjectKey);
-//  ASSERT_EQ(string("Corrupted or absent project key!"), loader->open());
-//}
-
-//TEST_F(FileSetTest_ABNORMALINPUT, Open_File_With_Files_Digit_Value) {
-//  loader = FileSetFactory::createFileSet(FilesArrayIsDigit);
-//  ASSERT_EQ(string("Corrupted or absent files key!"), loader->open());
-//}
-
-//TEST_F(FileSetTest_ABNORMALINPUT, Open_File_With_Files_String_Value) {
-//  loader = FileSetFactory::createFileSet(FilesArrayIsString);
-//  ASSERT_EQ(string("Corrupted or absent files key!"), loader->open());
-//}
-
-//TEST_F(FileSetTest_ABNORMALINPUT, Open_Broken_File) {
-//  loader = FileSetFactory::createFileSet(Broken);
-//  ASSERT_EQ(string("Empty or broken file!"), loader->open());
-//}
-
-//TEST_F(FileSetTest_ABNORMALINPUT, Open_Not_Existing_File) {
-//  loader = FileSetFactory::createFileSet(FileNotExist);
-//  ASSERT_EQ(string("Error with input stream!"), loader->open());
-//}
 
 TEST_F(FileSetTest_NORMALINPUT, Get_Project_Name_For_Not_Loaded_FileSet) {
     loader = FileSetFactory::createFileSet(Normal);
