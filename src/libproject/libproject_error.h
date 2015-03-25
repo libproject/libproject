@@ -9,8 +9,9 @@ namespace Error {
 /*!
  * \brief Class which represents logic error in FileSet interface
  *
- * Instances of this class appears when FileSet interface getting
- * an erroneous state of logic kind. ErrType represents type of
+ * Instances of this class should generates by throwing
+ * mechanizm when FileSet interface getting an erroneous state
+ * of logic kind. ErrType represents type of
  * logic error
  */
 class FileSetLogicError : public std::logic_error {
@@ -29,7 +30,8 @@ private:
 /*!
  * \brief Class which represents runtime error in FileSet interface
  *
- * Instances of this class appears when FileSet interface getting
+ * Instances of this class should generates by throwing
+ * mechanizm when FileSet interface getting
  * an erroneous state of runtime kind. ErrType represents type of
  * runtime error
  */
