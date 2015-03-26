@@ -30,7 +30,8 @@ ProjectExplorer::Project * Manager::openProject(const QString &Filename, QString
 
     FileSetLoader * loader = FileSetFactory::createFileSet(Filename.toStdString());
     try {
-        bool open_result = loader->open();
+        bool open_result = false;
+        open_result = loader->open();
         if (open_result == false)
             throw FileSetRuntimeError(FileSetRuntimeError::UnknownError, "Unsuccessful opening operation");
         return new LibprojManager::Internal::Project(this, loader);

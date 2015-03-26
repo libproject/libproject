@@ -74,7 +74,10 @@ namespace Interface {
          * \brief Gives to user path to root node
          * \return path to root node in string format or empty string if project wasn't loaded
          */
-        virtual const string getPathToRootNode() const { return loaded ? pathToProjectFile : string(); }
+        virtual const string getPathToRootNode() const {
+            return loaded ? pathToProjectFile :
+                        throw FileSetRuntimeError(FileSetRuntimeError::ActionOnNotLoaded,
+                                                  "Trying to get path to root node on not loaded interface"); }
 
     private:
 
@@ -127,7 +130,7 @@ namespace Interface {
     JsonFileSetLoader::getFileNames() const
     {
         if(!loaded)
-            return list<string>();
+            throw FileSetRuntimeError(FileSetRuntimeError::ActionOnNotLoaded, "Trying to get file names on not loaded interface");
         list<string> listOfFiles;
         for(const auto& item : jContentOfProjectFile["files"].array_items()) {
             listOfFiles.push_back(item.string_value());
@@ -139,7 +142,7 @@ namespace Interface {
     JsonFileSetLoader::getProjectName() const
     {
         if(!loaded)
-            return string();
+            throw FileSetRuntimeError(FileSetRuntimeError::ActionOnNotLoaded, "Trying to get project name on not loaded interface");
         return jContentOfProjectFile["project"].string_value();
     }
 

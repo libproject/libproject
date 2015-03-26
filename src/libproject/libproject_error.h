@@ -19,7 +19,8 @@ public:
     enum ErrType {
         UnknownError = 0,
         IncorrectSource,
-        AlreadyLoaded
+        AlreadyLoaded,
+        ActionOnNotLoaded
     };
 
     FileSetRuntimeError(const ErrType type, const std::string& message)

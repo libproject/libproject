@@ -110,17 +110,17 @@ TEST_P(FileSetTest_ABNORMALINPUT, testingSetOfAbnormalInputs) {
 
 TEST_F(FileSetTest_NORMALINPUT, Get_Project_Name_For_Not_Loaded_FileSet) {
     loader = FileSetFactory::createFileSet(Normal);
-    ASSERT_EQ(string(""), loader->getProjectName());
+    ASSERT_THROW(loader->getProjectName(), FileSetRuntimeError);
 }
 
 TEST_F(FileSetTest_NORMALINPUT, Get_File_Names_For_Not_Loaded_FileSet) {
     loader = FileSetFactory::createFileSet(Normal);
-    ASSERT_EQ(0, loader->getFileNames().size());
+    ASSERT_THROW(loader->getFileNames(), FileSetRuntimeError);
 }
 
 TEST_F(FileSetTest_NORMALINPUT, Get_Path_To_Root_Node_For_Not_Loaded_FileSet) {
     loader = FileSetFactory::createFileSet(Normal);
-    ASSERT_EQ(string(""), loader->getPathToRootNode());
+    ASSERT_THROW(loader->getPathToRootNode(), FileSetRuntimeError);
 }
 
 
