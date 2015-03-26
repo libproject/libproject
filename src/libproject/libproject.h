@@ -28,7 +28,7 @@ public:
 
     virtual ~FileSetLoader() { }
 
-    virtual const std::string open() = 0;
+    virtual bool open() = 0;
     virtual const std::list<std::string> getFileNames() const = 0;
     virtual const std::string getProjectName() const = 0;
     virtual const std::string getPathToRootNode() const = 0;

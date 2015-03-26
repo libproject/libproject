@@ -1,7 +1,7 @@
-TARGET = proj
-TEMPLATE = lib
+#TARGET = libproj
+#TEMPLATE = lib
 
-DEFINES += LIBPROJ_LIBRARY
+DEFINES += PROJ_LIBRARY
 
 SOURCES += libprojplugin.cpp \
     libprojprojectmanager.cpp \
@@ -17,7 +17,6 @@ HEADERS += libprojplugin.h \
     libprojprojectnodes.h \
     libprojprojectfile.h \
     libprojprojectmanager.h
-
 
 
 # Qt Creator linking
@@ -41,7 +40,7 @@ message(Path to QtC build: $$IDE_BUILD_TREE)
 ###### <dirname>_dependencies.pri, where <dirname> is the name of the directory containing the
 ###### plugin's sources.
 
-QTC_PLUGIN_NAME = libproj
+QTC_PLUGIN_NAME = proj
 QTC_LIB_DEPENDS += \
     # nothing here at this time
 

@@ -10,13 +10,14 @@
 #include <sstream>
 #include <list>
 #include "json11.hpp"
-#include <iostream>
+#include "libproject_error.h"
 
 using std::ifstream;
 using std::ostringstream;
 using std::string;
 using std::list;
 using json11::Json;
+using namespace LibprojManager::Interface::Error;
 
 /*!
  * \brief Covers all classes of present project except Qt creator plugin
@@ -53,9 +54,9 @@ namespace Interface {
 
         /*!
          * \brief Reads file and parsing it
-         * \return empty string if open procedure was successful, otherwise - with error code
+         * \return boolean true if file opened successfully
          */
-        virtual const std::string open();
+        virtual bool open();
 
         /*!
          * \brief Gives to user list<string> of filenames
@@ -73,7 +74,10 @@ namespace Interface {
          * \brief Gives to user path to root node
          * \return path to root node in string format or empty string if project wasn't loaded
          */
-        virtual const string getPathToRootNode() const { return loaded ? pathToProjectFile : string(); }
+        virtual const string getPathToRootNode() const {
+            return loaded ? pathToProjectFile :
+                        throw FileSetRuntimeError(FileSetRuntimeError::NotLoaded,
+                                                  "Trying to get path to root node on not loaded interface"); }
 
     private:
 
@@ -86,15 +90,15 @@ namespace Interface {
 
     };
 
-    const string
+    bool
     JsonFileSetLoader::open()
     {
         if (loaded) {
-            return string("Project file already loaded!");
+            throw FileSetRuntimeError(FileSetRuntimeError::AlreadyLoaded, "Project alredy loaded");
         }
         ifstream i(pathToProjectFile);
         if(!i) {
-            return string("Error with input stream!");
+            throw FileSetRuntimeError(FileSetRuntimeError::IncorrectSource, "Error with input stream");
         }
         ostringstream o;
         char buf = 0;
@@ -106,20 +110,19 @@ namespace Interface {
             jContentOfProjectFile = check_json_for_errors();
             if (jContentOfProjectFile["Error"].is_string()) {
                 loaded = false;
-                return jContentOfProjectFile["Error"].string_value();
+                throw FileSetRuntimeError(FileSetRuntimeError::IncorrectSource, jContentOfProjectFile["Error"].string_value());
             }
             else if (jContentOfProjectFile.is_null()) {
                 loaded = false;
-                return string("Unknown error gathered from json11 library!");
+                throw FileSetRuntimeError(FileSetRuntimeError::UnknownError, "Unknown error gathered from json11 library");
             }
             else {
-                loaded = true;
-                return string();
+                return loaded = true;
             }
         }
         else {
             loaded = false;
-            return string ("Input stream didn't gave EOF marker!");
+            throw FileSetRuntimeError(FileSetRuntimeError::IncorrectSource, "Input stream didn't gave EOF marker");
         }
     }
 
@@ -127,7 +130,7 @@ namespace Interface {
     JsonFileSetLoader::getFileNames() const
     {
         if(!loaded)
-            return list<string>();
+            throw FileSetRuntimeError(FileSetRuntimeError::NotLoaded, "Trying to get file names on not loaded interface");
         list<string> listOfFiles;
         for(const auto& item : jContentOfProjectFile["files"].array_items()) {
             listOfFiles.push_back(item.string_value());
@@ -139,7 +142,7 @@ namespace Interface {
     JsonFileSetLoader::getProjectName() const
     {
         if(!loaded)
-            return string();
+            throw FileSetRuntimeError(FileSetRuntimeError::NotLoaded, "Trying to get project name on not loaded interface");
         return jContentOfProjectFile["project"].string_value();
     }
 
