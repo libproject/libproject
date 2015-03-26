@@ -19,8 +19,7 @@ list<string> pathsToAbnormalSources = {
     "project_files/nofileskey.libproject",
     "project_files/broken.libproject",
     "project_files/noprojectkey.libproject",
-    "project_files/notexist.libproject"
-};
+    "project_files/notexist.libproject"};
 }
 
 class FileSetTest : public ::testing::Test {
@@ -50,21 +49,18 @@ protected:
     FileSetTest::SetUp();
     Normal = {"project_files/normal.libproject"};
     projectNameRef = {"SameAmmoniteOnPurpleSkies *** 42"};
-    projectFilesRef = {
-        "main.cpp", "Test.h", "Test.cpp", "Foo.h", "Foo.cpp", "README",
-        "kekeke.cpp", "testnew.cpp", "testadd2.cpp", "testadd3.cpp"
-    };
+    projectFilesRef = {"main.cpp",    "Test.h",      "Test.cpp",
+                       "Foo.h",       "Foo.cpp",     "README",
+                       "kekeke.cpp",  "testnew.cpp", "testadd2.cpp",
+                       "testadd3.cpp"};
   }
 };
 
 class FileSetTest_ABNORMALINPUT : public FileSetTest,
-                                  public ::testing::WithParamInterface<string>
-{
+                                  public ::testing::WithParamInterface<string> {
 protected:
-    void SetUp() {
-        FileSetTest::SetUp();
-    }
-    void TearDown() { }
+  void SetUp() { FileSetTest::SetUp(); }
+  void TearDown() {}
 };
 
 INSTANTIATE_TEST_CASE_P(Instantiation_FileSetTest_ABNORMALINPUT,
@@ -95,34 +91,33 @@ TEST_F(FileSetTest_NORMALINPUT, checkFileList) {
 }
 
 TEST_F(FileSetTest_NORMALINPUT, Open_File_While_Already_Opened) {
-    loader = FileSetFactory::createFileSet(Normal);
-    loader->open();
-    ASSERT_THROW(loader->open(), FileSetRuntimeError);
+  loader = FileSetFactory::createFileSet(Normal);
+  loader->open();
+  ASSERT_THROW(loader->open(), FileSetRuntimeError);
 }
 
 TEST_P(FileSetTest_ABNORMALINPUT, testingSetOfAbnormalInputs) {
-    ASSERT_THROW({
-                     loader = FileSetFactory::createFileSet(GetParam());
-                     loader->open();
-                 },
-                 FileSetRuntimeError);
+  ASSERT_THROW({
+                 loader = FileSetFactory::createFileSet(GetParam());
+                 loader->open();
+               },
+               FileSetRuntimeError);
 }
 
 TEST_F(FileSetTest_NORMALINPUT, Get_Project_Name_For_Not_Loaded_FileSet) {
-    loader = FileSetFactory::createFileSet(Normal);
-    ASSERT_THROW(loader->getProjectName(), FileSetRuntimeError);
+  loader = FileSetFactory::createFileSet(Normal);
+  ASSERT_THROW(loader->getProjectName(), FileSetRuntimeError);
 }
 
 TEST_F(FileSetTest_NORMALINPUT, Get_File_Names_For_Not_Loaded_FileSet) {
-    loader = FileSetFactory::createFileSet(Normal);
-    ASSERT_THROW(loader->getFileNames(), FileSetRuntimeError);
+  loader = FileSetFactory::createFileSet(Normal);
+  ASSERT_THROW(loader->getFileNames(), FileSetRuntimeError);
 }
 
 TEST_F(FileSetTest_NORMALINPUT, Get_Path_To_Root_Node_For_Not_Loaded_FileSet) {
-    loader = FileSetFactory::createFileSet(Normal);
-    ASSERT_THROW(loader->getPathToRootNode(), FileSetRuntimeError);
+  loader = FileSetFactory::createFileSet(Normal);
+  ASSERT_THROW(loader->getPathToRootNode(), FileSetRuntimeError);
 }
-
 
 int main(int argc, char **argv) {
   ::testing::InitGoogleTest(&argc, argv);
