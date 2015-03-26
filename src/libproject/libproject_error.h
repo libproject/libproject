@@ -7,15 +7,6 @@ namespace Interface {
 namespace Error {
 
 /*!
- * \brief Class which represents logic error in FileSet interface
- *
- * Instances of this class should generates by throwing
- * mechanizm when FileSet interface getting an erroneous state
- * of logic kind. ErrType represents type of
- * logic error
- */
-
-/*!
  * \brief Class which represents runtime error in FileSet interface
  *
  * Instances of this class should generates by throwing
@@ -33,6 +24,8 @@ public:
 
     FileSetRuntimeError(const ErrType type, const std::string& message)
         : runtime_error(message), errorType(type) { }
+
+    const ErrType getErrorType() const { return errorType; }
 private:
     ErrType errorType;
 };

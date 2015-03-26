@@ -3,14 +3,14 @@
 #include <QDebug>
 #include <QFileInfo>
 #include "libprojproject.h"
-
 #include "libproject.h"
-
+#include "libproject_error.h"
 
 typedef ProjectExplorer::Project AbstractProject;
 using std::string;
 using LibprojManager::Interface::FileSetLoader;
 using LibprojManager::Interface::FileSetFactory;
+using namespace LibprojManager::Interface::Error;
 namespace LibprojManager {
 namespace Internal {
 
@@ -29,14 +29,16 @@ ProjectExplorer::Project * Manager::openProject(const QString &Filename, QString
 {
 
     FileSetLoader * loader = FileSetFactory::createFileSet(Filename.toStdString());
-    if (loader->open())
-
+    try {
+        bool open_result = loader->open();
+        if (open_result == false)
+            throw FileSetRuntimeError(FileSetRuntimeError::UnknownError, "Unsuccessful opening operation");
         return new LibprojManager::Internal::Project(this, loader);
-
-    else
-    {
-        qWarning() << "File opened unsuccesfully";
-        return nullptr;
+    } catch (FileSetRuntimeError & re) {
+        if (re.getErrorType() == FileSetRuntimeError::AlreadyLoaded)
+            return nullptr;
+        else
+            throw;
     }
 }
 
