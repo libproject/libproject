@@ -97,7 +97,7 @@ TEST_F(FileSetTest_NORMALINPUT, checkFileList) {
 TEST_F(FileSetTest_NORMALINPUT, Open_File_While_Already_Opened) {
     loader = FileSetFactory::createFileSet(Normal);
     loader->open();
-    ASSERT_THROW(loader->open(), FileSetLogicError);
+    ASSERT_THROW(loader->open(), FileSetRuntimeError);
 }
 
 TEST_P(FileSetTest_ABNORMALINPUT, testingSetOfAbnormalInputs) {

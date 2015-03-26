@@ -18,8 +18,6 @@ using std::string;
 using std::list;
 using json11::Json;
 using namespace LibprojManager::Interface::Error;
-typedef FileSetLogicError::ErrType FSLE;
-typedef FileSetRuntimeError::ErrType FSRE;
 
 /*!
  * \brief Covers all classes of present project except Qt creator plugin
@@ -93,11 +91,11 @@ namespace Interface {
     JsonFileSetLoader::open()
     {
         if (loaded) {
-            throw FileSetLogicError(FSLE::AlreadyLoaded, "Project alredy loaded");
+            throw FileSetRuntimeError(FileSetRuntimeError::AlreadyLoaded, "Project alredy loaded");
         }
         ifstream i(pathToProjectFile);
         if(!i) {
-            throw FileSetRuntimeError(FSRE::IncorrectSource, "Error with input stream");
+            throw FileSetRuntimeError(FileSetRuntimeError::IncorrectSource, "Error with input stream");
         }
         ostringstream o;
         char buf = 0;
@@ -109,11 +107,11 @@ namespace Interface {
             jContentOfProjectFile = check_json_for_errors();
             if (jContentOfProjectFile["Error"].is_string()) {
                 loaded = false;
-                throw FileSetRuntimeError(FSRE::IncorrectSource,jContentOfProjectFile["Error"].string_value());
+                throw FileSetRuntimeError(FileSetRuntimeError::IncorrectSource, jContentOfProjectFile["Error"].string_value());
             }
             else if (jContentOfProjectFile.is_null()) {
                 loaded = false;
-                throw FileSetRuntimeError(FSRE::UnknownError, "Unknown error gathered from json11 library");
+                throw FileSetRuntimeError(FileSetRuntimeError::UnknownError, "Unknown error gathered from json11 library");
             }
             else {
                 return loaded = true;
@@ -121,7 +119,7 @@ namespace Interface {
         }
         else {
             loaded = false;
-            throw FileSetRuntimeError(FSRE::IncorrectSource, "Input stream didn't gave EOF marker");
+            throw FileSetRuntimeError(FileSetRuntimeError::IncorrectSource, "Input stream didn't gave EOF marker");
         }
     }
 

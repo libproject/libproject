@@ -14,18 +14,6 @@ namespace Error {
  * of logic kind. ErrType represents type of
  * logic error
  */
-class FileSetLogicError : public std::logic_error {
-public:
-    enum ErrType {
-        UnknownError = 0,
-        AlreadyLoaded
-    };
-
-    FileSetLogicError(const ErrType type, const std::string& message)
-        : logic_error(message), errorType(type) { }
-private:
-    ErrType errorType;
-};
 
 /*!
  * \brief Class which represents runtime error in FileSet interface
@@ -39,7 +27,8 @@ class FileSetRuntimeError : public std::runtime_error {
 public:
     enum ErrType {
         UnknownError = 0,
-        IncorrectSource
+        IncorrectSource,
+        AlreadyLoaded
     };
 
     FileSetRuntimeError(const ErrType type, const std::string& message)
