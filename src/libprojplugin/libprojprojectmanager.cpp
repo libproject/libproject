@@ -35,7 +35,7 @@ ProjectExplorer::Project * Manager::openProject(const QString &Filename, QString
         if (open_result == false)
             throw FileSetRuntimeError(FileSetRuntimeError::UnknownError, "Unsuccessful opening operation");
         return new LibprojManager::Internal::Project(this, loader);
-    } catch (FileSetRuntimeError & re) {
+    } catch (const FileSetRuntimeError & re) {
         if (re.getErrorType() == FileSetRuntimeError::AlreadyLoaded)
             return nullptr;
         else

@@ -50,8 +50,8 @@ Project::Project(Manager *Manager, const FileSetLoader *Loader)
     rootNode->addFileNodes(listOfFileNodes);
     Core::DocumentManager::addDocument(projectFile, false);
     manager->registerProject(this);
-  } catch (FileSetRuntimeError &re) {
-    qDebug() << re.what();
+  } catch (const FileSetRuntimeError & re) {
+    qWarning() << re.what();
     throw;
   }
 }

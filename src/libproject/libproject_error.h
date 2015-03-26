@@ -17,10 +17,10 @@ namespace Error {
 class FileSetRuntimeError : public std::runtime_error {
 public:
     enum ErrType {
-        UnknownError = 0,
+        UnknownError,
         IncorrectSource,
         AlreadyLoaded,
-        ActionOnNotLoaded
+        NotLoaded
     };
 
     FileSetRuntimeError(const ErrType type, const std::string& message)

@@ -76,7 +76,7 @@ namespace Interface {
          */
         virtual const string getPathToRootNode() const {
             return loaded ? pathToProjectFile :
-                        throw FileSetRuntimeError(FileSetRuntimeError::ActionOnNotLoaded,
+                        throw FileSetRuntimeError(FileSetRuntimeError::NotLoaded,
                                                   "Trying to get path to root node on not loaded interface"); }
 
     private:
@@ -130,7 +130,7 @@ namespace Interface {
     JsonFileSetLoader::getFileNames() const
     {
         if(!loaded)
-            throw FileSetRuntimeError(FileSetRuntimeError::ActionOnNotLoaded, "Trying to get file names on not loaded interface");
+            throw FileSetRuntimeError(FileSetRuntimeError::NotLoaded, "Trying to get file names on not loaded interface");
         list<string> listOfFiles;
         for(const auto& item : jContentOfProjectFile["files"].array_items()) {
             listOfFiles.push_back(item.string_value());
@@ -142,7 +142,7 @@ namespace Interface {
     JsonFileSetLoader::getProjectName() const
     {
         if(!loaded)
-            throw FileSetRuntimeError(FileSetRuntimeError::ActionOnNotLoaded, "Trying to get project name on not loaded interface");
+            throw FileSetRuntimeError(FileSetRuntimeError::NotLoaded, "Trying to get project name on not loaded interface");
         return jContentOfProjectFile["project"].string_value();
     }
 
