@@ -11,6 +11,7 @@
 #include <list>
 #include "json11.hpp"
 #include "libproject_error.h"
+#include <map>
 
 using std::ifstream;
 using std::ostringstream;
@@ -18,6 +19,7 @@ using std::string;
 using std::list;
 using json11::Json;
 using namespace LibprojManager::Interface::Error;
+using std::map;
 
 /*!
  * \brief Covers all classes of present project except Qt creator plugin
@@ -41,6 +43,7 @@ namespace Interface {
         string sContentOfProjectFile,
                     pathToProjectFile;
         Json jContentOfProjectFile;
+        map<string, FileSetLoader*> subprojects;
         bool loaded; //! flag which becoming true condition when instance is busy
 
     public:
@@ -79,50 +82,66 @@ namespace Interface {
                         throw FileSetRuntimeError(FileSetRuntimeError::NotLoaded,
                                                   "Trying to get path to root node on not loaded interface"); }
 
+        /*!
+          * \brief Gives number of subprojects to user
+          * \return number of subprojects. Zero implied
+          */
+        virtual const int countSubprojects() const;
+
+        /*!
+         * \brief Gives STL map with pointers to loaders
+         * \return map<string, FileSetLoader*> of subprojects associated with its names
+         */
+        map<std::string, FileSetLoader *> getSubprojectLoaders();
+
     private:
 
         /*!
-         * \brief check_json_for_errors
+         * \brief checkProjectFileForErrors
          * \return Json object within the content of project file or Json object
          * within single key "Error" string value of which contains description of error
          */
-        const Json check_json_for_errors();
+        const Json checkProjectFileForErrors(const std::string &sContent);
+
+        /*!
+         * \brief loadSubprojects loads nested subprojects
+         * \return map<string, FileSetLoader*> of interface instances
+         */
+        map<std::string, FileSetLoader *> loadSubprojects();
 
     };
 
     bool
     JsonFileSetLoader::open()
     {
-        if (loaded) {
+        if (loaded)
             throw FileSetRuntimeError(FileSetRuntimeError::AlreadyLoaded, "Project alredy loaded");
-        }
         ifstream i(pathToProjectFile);
-        if(!i) {
+        if(!i)
             throw FileSetRuntimeError(FileSetRuntimeError::IncorrectSource, "Error with input stream");
-        }
         ostringstream o;
         char buf = 0;
         while (i.get(buf))
             o << buf;
-
-        if (i.eof()) {
-            sContentOfProjectFile = o.str();
-            jContentOfProjectFile = check_json_for_errors();
-            if (jContentOfProjectFile["Error"].is_string()) {
-                loaded = false;
-                throw FileSetRuntimeError(FileSetRuntimeError::IncorrectSource, jContentOfProjectFile["Error"].string_value());
-            }
-            else if (jContentOfProjectFile.is_null()) {
-                loaded = false;
-                throw FileSetRuntimeError(FileSetRuntimeError::UnknownError, "Unknown error gathered from json11 library");
-            }
-            else {
-                return loaded = true;
-            }
-        }
-        else {
+        if (!i.eof()) {
             loaded = false;
             throw FileSetRuntimeError(FileSetRuntimeError::IncorrectSource, "Input stream didn't gave EOF marker");
+        }
+
+        sContentOfProjectFile = o.str(); /// Getting string-data which gathered from .libproject file
+
+        jContentOfProjectFile = checkProjectFileForErrors(sContentOfProjectFile); /// Checking JSON-data for consistentness, correctness and reading it
+
+        if (jContentOfProjectFile["Error"].is_string()) { /// Checking data for higher abstract errors - project level errors
+            loaded = false;
+            throw FileSetRuntimeError(FileSetRuntimeError::IncorrectSource, jContentOfProjectFile["Error"].string_value());
+        } else if (jContentOfProjectFile.is_null()) {
+            loaded = false;
+            throw FileSetRuntimeError(FileSetRuntimeError::UnknownError, "Unknown error gathered from json11 library");
+        } else {
+            if (jContentOfProjectFile["subprojects"].is_array()) /// Checking project data for subprojects
+               subprojects = loadSubprojects(); /// If above is true loading subprojects
+            return loaded = true;
         }
     }
 
@@ -146,8 +165,26 @@ namespace Interface {
         return jContentOfProjectFile["project"].string_value();
     }
 
+    const int
+    JsonFileSetLoader::countSubprojects() const
+    {
+        if(!loaded)
+            throw FileSetRuntimeError(FileSetRuntimeError::NotLoaded, "Trying to count subprojects on not loaded interface");
+        return subprojects.size();
+
+    }
+
+    map<string, FileSetLoader *>
+    JsonFileSetLoader::getSubprojectLoaders()
+    {
+        if(!loaded) { }
+            throw FileSetRuntimeError(FileSetRuntimeError::NotLoaded, "Trying to get subprojects loaders on not loaded interface");
+        return subprojects;
+
+    }
+
     const Json
-    JsonFileSetLoader::check_json_for_errors()
+    JsonFileSetLoader::checkProjectFileForErrors(const string& sContent)
     {
         string err = string(); //starting to parse
         const string error_code = {"{\"Error\" : \""};
@@ -167,7 +204,41 @@ namespace Interface {
                 return Json::parse(error_code + "Wrong value type of files key!\"}", err);
             }
         }
+        if (j["subprojects"].is_array()) {
+            if (j["subprojects"].array_items().at(0).type() != Json::OBJECT ) {
+                return Json::parse(error_code + "Wrong value type of subprojects key!\"}", err);
+            }
+            for (auto& sub : j["subprojects"].array_items()) {
+                string out;
+                sub.dump(out);
+                Json jj = checkProjectFileForErrors(out);
+                if (!jj["error"].string_value().empty())
+                        return jj;
+            }
+        }
         return j;
+    }
+
+    map<string, FileSetLoader*>
+    JsonFileSetLoader::loadSubprojects()
+    {
+        auto getDirPath = [this](const string& s) -> const string {
+            std::size_t found =
+                    s.find(this->jContentOfProjectFile["project"].string_value() + string(".libproject"));
+            return s.substr(0, found);
+        };
+
+        map<string, FileSetLoader*> subprojectLoaders;
+        string path, name;
+        for (const auto& x: jContentOfProjectFile["subprojects"].array_items()) {
+                    path = getDirPath(this->pathToProjectFile);
+                    name = x["project"].string_value();
+                    //std::cout << "debug:\t" << path + name + string ("/") + name + string(".libproject") << '\n';
+                    subprojectLoaders.emplace(name,
+                                              FileSetFactory::createFileSet(
+                                                  path + name + string ("/") + name + string(".libproject")));
+        }
+        return subprojectLoaders;
     }
 
     FileSetLoader *
