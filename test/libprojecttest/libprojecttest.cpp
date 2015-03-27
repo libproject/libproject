@@ -11,15 +11,15 @@ using LibprojManager::Interface::FileSetLoader;
 using namespace LibprojManager::Interface::Error;
 
 namespace {
-list<string> pathsToAbnormalSources = {
-    "project_files/empty.libproject",
-    "project_files/notrelevantfileskey.libproject",
-    "project_files/filesarrayisdigit.libproject",
-    "project_files/filesarrayisstring.libproject",
-    "project_files/nofileskey.libproject",
-    "project_files/broken.libproject",
-    "project_files/noprojectkey.libproject",
-    "project_files/notexist.libproject"};
+list<string> pathsToSingleAbnormal = {
+    "project_files/single/empty.libproject",
+    "project_files/single/notrelevantfileskey.libproject",
+    "project_files/single/filesarrayisdigit.libproject",
+    "project_files/single/filesarrayisstring.libproject",
+    "project_files/single/nofileskey.libproject",
+    "project_files/single/broken.libproject",
+    "project_files/single/noprojectkey.libproject",
+    "project_files/single/notexist.libproject"};
 }
 
 namespace FileSetTests {
@@ -40,15 +40,15 @@ public:
   virtual void TearDown() { delete loader; }
 };
 
-class TestRegularInput : public TestSkeleton {
+class TestRegularSingle : public TestSkeleton {
 protected:
-  string Normal;
+  string PathToFile;
   string projectNameRef;
   list<string> projectFilesRef;
 
   void SetUp() {
     TestSkeleton::SetUp();
-    Normal = {"project_files/normal.libproject"};
+    PathToFile = {"project_files/single/normal.libproject"};
     projectNameRef = {"SameAmmoniteOnPurpleSkies *** 42"};
     projectFilesRef = {"main.cpp",    "Test.h",      "Test.cpp",
                        "Foo.h",       "Foo.cpp",     "README",
@@ -57,27 +57,52 @@ protected:
   }
 };
 
-class TestAbnormalInput : public TestSkeleton,
+class TestAbnormalSingles : public TestSkeleton,
                           public ::testing::WithParamInterface<string> {
 protected:
   void SetUp() { TestSkeleton::SetUp(); }
   void TearDown() {}
 };
 
-TEST_F(TestRegularInput, Open_file) {
-  loader = FileSetFactory::createFileSet(Normal);
+class TestRegularNested : public TestSkeleton {
+protected:
+  string PathToFile;
+  string projectNameRef;
+  list<string> projectFilesRef;
+  int subprojectsCount;
+  list<string> subprojectsNamesRef;
+  list<list<string>> subprojectsFilesRef;
+
+  void SetUp() {
+    TestSkeleton::SetUp();
+    PathToFile = {"project_files/nested/normal.libproject"};
+    projectNameRef = {"Nested *** 43"};
+    projectFilesRef = {"main.cpp", "Test.h", "Test.cpp"};
+    subprojectsCount = 2;
+    subprojectsNamesRef = {"subpr1", "subpr2"};
+    subprojectsFilesRef = {{"README", "header.h"}, {"INSTALL", "main.cpp"}};
+  }
+};
+
+TEST_F(TestRegularSingle, Open_file) {
+  loader = FileSetFactory::createFileSet(PathToFile);
   ASSERT_NO_THROW(loader->open());
 }
 
-TEST_F(TestRegularInput, Open_file_while_already_loaded) {
-  loader = FileSetFactory::createFileSet(Normal);
+TEST_F(TestRegularNested, Open_file) {
+  loader = FileSetFactory::createFileSet(PathToFile);
+  ASSERT_NO_THROW(loader->open());
+}
+
+TEST_F(TestRegularSingle, Open_file_while_already_loaded) {
+  loader = FileSetFactory::createFileSet(PathToFile);
   loader->open();
   ASSERT_THROW(loader->open(), FileSetRuntimeError);
 }
 
-INSTANTIATE_TEST_CASE_P(InstantiationOfTestAbnormalInput, TestAbnormalInput,
-                        ::testing::ValuesIn(pathsToAbnormalSources));
-TEST_P(TestAbnormalInput, Set_of_attempts_to_open_abnormal_files) {
+INSTANTIATE_TEST_CASE_P(InstantiationOfTestAbnormalSingles, TestAbnormalSingles,
+                        ::testing::ValuesIn(pathsToSingleAbnormal));
+TEST_P(TestAbnormalSingles, Set_of_attempts_to_open_abnormal_files) {
   ASSERT_THROW({
                  loader = FileSetFactory::createFileSet(GetParam());
                  loader->open();
@@ -85,38 +110,40 @@ TEST_P(TestAbnormalInput, Set_of_attempts_to_open_abnormal_files) {
                FileSetRuntimeError);
 }
 
-TEST_F(TestRegularInput, Get_path_to_root_node) {
-  loader = FileSetFactory::createFileSet(Normal);
+TEST_F(TestRegularSingle, Get_path_to_root_node) {
+  loader = FileSetFactory::createFileSet(PathToFile);
   loader->open();
   ASSERT_NE(string(""), loader->getPathToRootNode());
 }
 
-TEST_F(TestRegularInput, Get_path_to_root_node_for_not_loaded) {
-  loader = FileSetFactory::createFileSet(Normal);
+TEST_F(TestRegularSingle, Get_path_to_root_node_for_not_loaded) {
+  loader = FileSetFactory::createFileSet(PathToFile);
   ASSERT_THROW(loader->getPathToRootNode(), FileSetRuntimeError);
 }
 
-TEST_F(TestRegularInput, Get_project_name) {
-  loader = FileSetFactory::createFileSet(Normal);
+TEST_F(TestRegularSingle, Get_project_name) {
+  loader = FileSetFactory::createFileSet(PathToFile);
   loader->open();
   EXPECT_EQ(projectNameRef, loader->getProjectName());
 }
 
-TEST_F(TestRegularInput, Get_project_name_for_not_loaded) {
-  loader = FileSetFactory::createFileSet(Normal);
+TEST_F(TestRegularSingle, Get_project_name_for_not_loaded) {
+  loader = FileSetFactory::createFileSet(PathToFile);
   ASSERT_THROW(loader->getProjectName(), FileSetRuntimeError);
 }
 
-TEST_F(TestRegularInput, Get_list_of_files) {
-  loader = FileSetFactory::createFileSet(Normal);
+TEST_F(TestRegularSingle, Get_list_of_files) {
+  loader = FileSetFactory::createFileSet(PathToFile);
   loader->open();
   EXPECT_EQ(true, loader->getFileNames() == projectFilesRef);
 }
 
-TEST_F(TestRegularInput, Get_list_of_files_for_not_loaded) {
-  loader = FileSetFactory::createFileSet(Normal);
+TEST_F(TestRegularSingle, Get_list_of_files_for_not_loaded) {
+  loader = FileSetFactory::createFileSet(PathToFile);
   ASSERT_THROW(loader->getFileNames(), FileSetRuntimeError);
 }
+
+
 } // namespace FileSetTests
 
 int main(int argc, char **argv) {

@@ -20,7 +20,8 @@ public:
         UnknownError,
         IncorrectSource,
         AlreadyLoaded,
-        NotLoaded
+        NotLoaded,
+        BrokenSubproject
     };
 
     FileSetRuntimeError(const ErrType type, const std::string& message)

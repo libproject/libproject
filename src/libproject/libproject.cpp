@@ -12,6 +12,7 @@
 #include "json11.hpp"
 #include "libproject_error.h"
 #include <map>
+#include <iostream> //////////////
 
 using std::ifstream;
 using std::ostringstream;
@@ -190,32 +191,22 @@ namespace Interface {
         const string error_code = {"{\"Error\" : \""};
         Json j = Json::parse(sContentOfProjectFile, err);
 
-        if (j.is_null()) {
+        if (j.is_null())
             return Json::parse(error_code + "Empty or broken file!\"}", err);
-        }
-        if (!j["project"].is_string()) {
+
+        if (!j["project"].is_string())
             return Json::parse(error_code + "Corrupted or absent project key!\"}", err);
-        }
-        if (!j["files"].is_array()) {
+
+        if (!j["files"].is_array())
             return Json::parse(error_code + "Corrupted or absent files key!\"}", err);
-        }
-        if (j["files"].is_array()) {
-            if ( j["files"].array_items().at(0).type() != Json::STRING ) {
-                return Json::parse(error_code + "Wrong value type of files key!\"}", err);
-            }
-        }
-        if (j["subprojects"].is_array()) {
-            if (j["subprojects"].array_items().at(0).type() != Json::OBJECT ) {
-                return Json::parse(error_code + "Wrong value type of subprojects key!\"}", err);
-            }
-            for (auto& sub : j["subprojects"].array_items()) {
-                string out;
-                sub.dump(out);
-                Json jj = checkProjectFileForErrors(out);
-                if (!jj["error"].string_value().empty())
-                        return jj;
-            }
-        }
+        else if ( j["files"].array_items().at(0).type() != Json::STRING)
+            return Json::parse(error_code + "Wrong values type of files key!\"}", err);
+
+        if (j["subprojects"].is_array())
+            if (j["subprojects"].array_items().at(0).type() != Json::STRING)
+                return Json::parse(error_code + "Wrong values type of subprojects key!\"}", err);
+        else if (!j["subprojects"].is_null() && !j["subprojects"].is_array())
+            return Json::parse(error_code + "Corrupted or absent subprojects key!\"}", err);
         return j;
     }
 
@@ -223,22 +214,28 @@ namespace Interface {
     JsonFileSetLoader::loadSubprojects()
     {
         auto getDirPath = [this](const string& s) -> const string {
-            std::size_t found =
-                    s.find(this->jContentOfProjectFile["project"].string_value() + string(".libproject"));
-            return s.substr(0, found);
+            #ifdef __linux__
+            std::size_t found = s.find_last_of("//");
+            #endif
+            return s.substr(0, found + 1);
         };
+        try {
+            map<string, FileSetLoader*> subprojectLoaders;
+            string pathHead, pathSub, nameOfSubproject;
+            FileSetLoader * loaderOfSubproject;
+            pathHead = getDirPath(this->pathToProjectFile);
+            for (const auto& x: jContentOfProjectFile["subprojects"].array_items()) {
+                        pathSub = x.string_value();
+                        loaderOfSubproject = FileSetFactory::createFileSet(pathHead + pathSub);
+                        loaderOfSubproject->open();
+                        nameOfSubproject = loaderOfSubproject->getProjectName();
+                        subprojectLoaders.emplace(nameOfSubproject, loaderOfSubproject);
+            }
 
-        map<string, FileSetLoader*> subprojectLoaders;
-        string path, name;
-        for (const auto& x: jContentOfProjectFile["subprojects"].array_items()) {
-                    path = getDirPath(this->pathToProjectFile);
-                    name = x["project"].string_value();
-                    //std::cout << "debug:\t" << path + name + string ("/") + name + string(".libproject") << '\n';
-                    subprojectLoaders.emplace(name,
-                                              FileSetFactory::createFileSet(
-                                                  path + name + string ("/") + name + string(".libproject")));
-        }
-        return subprojectLoaders;
+            return subprojectLoaders;
+            } catch (const FileSetRuntimeError& re) {
+                throw FileSetRuntimeError(FileSetRuntimeError::BrokenSubproject, string(re.what()));
+            }
     }
 
     FileSetLoader *
