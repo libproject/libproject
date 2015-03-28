@@ -11,8 +11,6 @@
 #include <list>
 #include "json11.hpp"
 #include "libproject_error.h"
-#include <map>
-#include <iostream> //////////////
 
 using std::ifstream;
 using std::ostringstream;
@@ -64,21 +62,21 @@ namespace Interface {
 
         /*!
          * \brief Gives to user list<string> of filenames
-         * \return list<string> of filenames of project or empty list if project wasn't loaded
+         * \return list<string> of filenames of project or drops exception if project wasn't loaded
          */
         virtual const list<string> getFileNames() const;
 
         /*!
          * \brief Gives to user project name
-         * \return project name in string format or empty string if project wasn't loaded
+         * \return project name in string format or drops exception if project wasn't loaded
          */
         virtual const string getProjectName() const;
 
         /*!
-         * \brief Gives to user path to root node
-         * \return path to root node in string format or empty string if project wasn't loaded
+         * \brief Gives to user path to node
+         * \return path to node in string format or drops exception if project wasn't loaded
          */
-        virtual const string getPathToRootNode() const {
+        virtual const string getPathToNode() const {
             return loaded ? pathToProjectFile :
                         throw FileSetRuntimeError(FileSetRuntimeError::NotLoaded,
                                                   "Trying to get path to root node on not loaded interface"); }
@@ -93,7 +91,7 @@ namespace Interface {
          * \brief Gives STL map with pointers to loaders
          * \return map<string, FileSetLoader*> of subprojects associated with its names
          */
-        map<std::string, FileSetLoader *> getSubprojectLoaders();
+        virtual map<string, FileSetLoader *> getSubprojectLoaders();
 
     private:
 
@@ -142,8 +140,8 @@ namespace Interface {
         } else {
             if (jContentOfProjectFile["subprojects"].is_array()) /// Checking project data for subprojects
                subprojects = loadSubprojects(); /// If above is true loading subprojects
-            return loaded = true;
         }
+        return loaded = true;
     }
 
     const list<string>
@@ -178,7 +176,7 @@ namespace Interface {
     map<string, FileSetLoader *>
     JsonFileSetLoader::getSubprojectLoaders()
     {
-        if(!loaded) { }
+        if(loaded == false) { }
             throw FileSetRuntimeError(FileSetRuntimeError::NotLoaded, "Trying to get subprojects loaders on not loaded interface");
         return subprojects;
 
@@ -214,9 +212,9 @@ namespace Interface {
     JsonFileSetLoader::loadSubprojects()
     {
         auto getDirPath = [this](const string& s) -> const string {
-            #ifdef __linux__
+            //#ifdef __linux__
             std::size_t found = s.find_last_of("//");
-            #endif
+            //#endif
             return s.substr(0, found + 1);
         };
         try {

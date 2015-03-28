@@ -3,12 +3,14 @@
 #include <gtest/gtest.h>
 #include "libproject.h"
 #include "libproject_error.h"
+#include <map>
 
 using std::string;
 using std::list;
 using LibprojManager::Interface::FileSetFactory;
 using LibprojManager::Interface::FileSetLoader;
 using namespace LibprojManager::Interface::Error;
+using std::map;
 
 namespace {
 list<string> pathsToSingleAbnormal = {
@@ -113,12 +115,20 @@ TEST_P(TestAbnormalSingles, Set_of_attempts_to_open_abnormal_files) {
 TEST_F(TestRegularSingle, Get_path_to_root_node) {
   loader = FileSetFactory::createFileSet(PathToFile);
   loader->open();
-  ASSERT_NE(string(""), loader->getPathToRootNode());
+  ASSERT_NO_THROW(loader->getPathToNode());
+}
+
+TEST_F(TestRegularNested, Get_path_to_1st_subnode) {
+    loader = FileSetFactory::createFileSet(PathToFile);
+    loader->open();
+    map<string, FileSetLoader *> msl = loader->getSubprojectLoaders();
+    //msl[*subprojectsNamesRef.begin()]->open();
+    //ASSERT_NO_THROW(msl[*subprojectsNamesRef.begin()]->getPathToNode());
 }
 
 TEST_F(TestRegularSingle, Get_path_to_root_node_for_not_loaded) {
   loader = FileSetFactory::createFileSet(PathToFile);
-  ASSERT_THROW(loader->getPathToRootNode(), FileSetRuntimeError);
+  ASSERT_THROW(loader->getPathToNode(), FileSetRuntimeError);
 }
 
 TEST_F(TestRegularSingle, Get_project_name) {

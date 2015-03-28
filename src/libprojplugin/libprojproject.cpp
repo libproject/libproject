@@ -31,7 +31,7 @@ Project::Project(Manager *Manager, const FileSetLoader *Loader)
     setProjectLanguages(Core::Context(ProjectExplorer::Constants::LANG_CXX));
 
     QString pathToRootNode =
-        QString::fromStdString(Loader->getPathToRootNode());
+        QString::fromStdString(Loader->getPathToNode());
     nameOfProject = QString::fromStdString(Loader->getProjectName());
     for (const auto &filename : Loader->getFileNames())
       projectFiles << QString::fromStdString(filename);
@@ -41,7 +41,7 @@ Project::Project(Manager *Manager, const FileSetLoader *Loader)
 
     QList<FileNode *> listOfFileNodes;
     listOfFileNodes.push_back(
-        new FileNode(QString::fromStdString(Loader->getPathToRootNode()),
+        new FileNode(QString::fromStdString(Loader->getPathToNode()),
                      FileType::ProjectFileType, false)); // pr. file itself
     for (const auto &x : projectFiles)
       listOfFileNodes.push_back(new FileNode(

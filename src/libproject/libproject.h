@@ -9,6 +9,7 @@
 
 #include <list>
 #include <string>
+#include <map>
 
 namespace LibprojManager {
 namespace Interface {
@@ -31,7 +32,9 @@ public:
     virtual bool open() = 0;
     virtual const std::list<std::string> getFileNames() const = 0;
     virtual const std::string getProjectName() const = 0;
-    virtual const std::string getPathToRootNode() const = 0;
+    virtual const std::string getPathToNode() const = 0;
+    virtual const int countSubprojects() const = 0;
+    virtual std::map<std::string, FileSetLoader *> getSubprojectLoaders() = 0;
 
 };
 
