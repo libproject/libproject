@@ -147,7 +147,7 @@ namespace Interface {
     const list<string>
     JsonFileSetLoader::getFileNames() const
     {
-        if(!loaded)
+        if(loaded == false)
             throw FileSetRuntimeError(FileSetRuntimeError::NotLoaded, "Trying to get file names on not loaded interface");
         list<string> listOfFiles;
         for(const auto& item : jContentOfProjectFile["files"].array_items()) {
@@ -159,7 +159,7 @@ namespace Interface {
     const string
     JsonFileSetLoader::getProjectName() const
     {
-        if(!loaded)
+        if(loaded == false)
             throw FileSetRuntimeError(FileSetRuntimeError::NotLoaded, "Trying to get project name on not loaded interface");
         return jContentOfProjectFile["project"].string_value();
     }
@@ -167,16 +167,16 @@ namespace Interface {
     const int
     JsonFileSetLoader::countSubprojects() const
     {
-        if(!loaded)
+        if(loaded == false)
             throw FileSetRuntimeError(FileSetRuntimeError::NotLoaded, "Trying to count subprojects on not loaded interface");
-        return subprojects.size();
+        return subprojects.empty()? 0 : subprojects.size();
 
     }
 
     map<string, FileSetLoader *>
     JsonFileSetLoader::getSubprojectLoaders()
     {
-        if(loaded == false) { }
+        if(loaded == false)
             throw FileSetRuntimeError(FileSetRuntimeError::NotLoaded, "Trying to get subprojects loaders on not loaded interface");
         return subprojects;
 
