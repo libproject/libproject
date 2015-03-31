@@ -35,6 +35,7 @@ public:
     virtual const std::string getPathToNode() const = 0;
     virtual const int countSubprojects() const = 0;
     virtual std::map<std::string, FileSetLoader *> getSubprojectLoaders() = 0;
+
 };
 
 /*!

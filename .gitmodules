@@ -1,3 +1,9 @@
 [submodule "tools/json11"]
 	path = tools/json11
 	url = https://github.com/dropbox/json11
+[submodule "json"]
+	path = json
+	url = https://github.com/nlohmann/json.git
+[submodule "tools/json"]
+	path = tools/json
+	url = https://github.com/nlohmann/json.git

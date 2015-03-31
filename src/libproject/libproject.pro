@@ -19,7 +19,7 @@ unix {
     INSTALLS += target
 }
 
-include($$PWD/../../tools/json11.pri)
+INCLUDEPATH += ../../tools/json/src
 
 QMAKE_CXXFLAGS += -std=c++11 -O0
 

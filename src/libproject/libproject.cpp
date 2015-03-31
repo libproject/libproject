@@ -9,14 +9,14 @@
 #include <fstream>
 #include <sstream>
 #include <list>
-#include "json11.hpp"
+#include "json.hpp"
 #include "libproject_error.h"
 
 using std::ifstream;
 using std::ostringstream;
 using std::string;
 using std::list;
-using json11::Json;
+using nlohmann::json;
 using namespace LibprojManager::Interface::Error;
 using std::map;
 
@@ -41,7 +41,7 @@ namespace Interface {
     {
         string sContentOfProjectFile,
                     pathToProjectFile;
-        Json jContentOfProjectFile;
+        json jContentOfProjectFile;
         map<string, FileSetLoader*> subprojects;
         bool loaded; //! flag which becoming true condition when instance is busy
 
@@ -100,7 +100,7 @@ namespace Interface {
          * \return Json object within the content of project file or Json object
          * within single key "Error" string value of which contains description of error
          */
-        const Json checkProjectFileForErrors(const std::string &sContent);
+        const json checkProjectFileForErrors(std::ifstream &) const;
 
         /*!
          * \brief loadSubprojects loads nested subprojects
@@ -118,25 +118,12 @@ namespace Interface {
         ifstream i(pathToProjectFile);
         if(!i)
             throw FileSetRuntimeError(FileSetRuntimeError::IncorrectSource, "Error with input stream");
-        ostringstream o;
-        char buf = 0;
-        while (i.get(buf))
-            o << buf;
-        if (!i.eof()) {
-            loaded = false;
-            throw FileSetRuntimeError(FileSetRuntimeError::IncorrectSource, "Input stream didn't gave EOF marker");
-        }
 
-        sContentOfProjectFile = o.str(); /// Getting string-data which gathered from .libproject file
-
-        jContentOfProjectFile = checkProjectFileForErrors(sContentOfProjectFile); /// Checking JSON-data for consistentness, correctness and reading it
+        jContentOfProjectFile = checkProjectFileForErrors(i); /// Checking JSON-data for consistentness, correctness and reading it
 
         if (jContentOfProjectFile["Error"].is_string()) { /// Checking data for higher abstract errors - project level errors
             loaded = false;
-            throw FileSetRuntimeError(FileSetRuntimeError::IncorrectSource, jContentOfProjectFile["Error"].string_value());
-        } else if (jContentOfProjectFile.is_null()) {
-            loaded = false;
-            throw FileSetRuntimeError(FileSetRuntimeError::UnknownError, "Unknown error gathered from json11 library");
+            throw FileSetRuntimeError(FileSetRuntimeError::IncorrectSource, jContentOfProjectFile["Error"].get<string>());
         } else {
             if (jContentOfProjectFile["subprojects"].is_array()) /// Checking project data for subprojects
                subprojects = loadSubprojects(); /// If above is true loading subprojects
@@ -150,8 +137,8 @@ namespace Interface {
         if(loaded == false)
             throw FileSetRuntimeError(FileSetRuntimeError::NotLoaded, "Trying to get file names on not loaded interface");
         list<string> listOfFiles;
-        for(const auto& item : jContentOfProjectFile["files"].array_items()) {
-            listOfFiles.push_back(item.string_value());
+        for(const auto& item : jContentOfProjectFile["files"]) {
+            listOfFiles.push_back(item.get<string>());
         }
         return listOfFiles;
     }
@@ -161,7 +148,7 @@ namespace Interface {
     {
         if(loaded == false)
             throw FileSetRuntimeError(FileSetRuntimeError::NotLoaded, "Trying to get project name on not loaded interface");
-        return jContentOfProjectFile["project"].string_value();
+        return jContentOfProjectFile["project"].get<string>();
     }
 
     const int
@@ -182,30 +169,37 @@ namespace Interface {
 
     }
 
-    const Json
-    JsonFileSetLoader::checkProjectFileForErrors(const string& sContent)
+    const json JsonFileSetLoader::checkProjectFileForErrors(ifstream& ifs) const
     {
-        string err = string(); //starting to parse
         const string error_code = {"{\"Error\" : \""};
-        Json j = Json::parse(sContentOfProjectFile, err);
+        try {
+            json j;
+            j << ifs;
+            if (ifs.eof() == false)
+                return json::parse(error_code + "Input stream didn't gave EOF marker!\"}");
 
-        if (j.is_null())
-            return Json::parse(error_code + "Empty or broken file!\"}", err);
+            if (j.is_null())
+                return json::parse(error_code + "Empty or broken file!\"}");
 
-        if (!j["project"].is_string())
-            return Json::parse(error_code + "Corrupted or absent project key!\"}", err);
+            if (j["project"].is_string() == false)
+                return json::parse(error_code + "Corrupted or absent project key!\"}");
 
-        if (!j["files"].is_array())
-            return Json::parse(error_code + "Corrupted or absent files key!\"}", err);
-        else if ( j["files"].array_items().at(0).type() != Json::STRING)
-            return Json::parse(error_code + "Wrong values type of files key!\"}", err);
+            if (j["files"].is_array() == false)
+                return json::parse(error_code + "Corrupted or absent files key!\"}");
+            else if (j["files"].at(0).is_string() == false)
+                return json::parse(error_code + "Wrong values type of files key!\"}");
 
-        if (j["subprojects"].is_array())
-            if (j["subprojects"].array_items().at(0).type() != Json::STRING)
-                return Json::parse(error_code + "Wrong values type of subprojects key!\"}", err);
-        else if (!j["subprojects"].is_null() && !j["subprojects"].is_array())
-            return Json::parse(error_code + "Corrupted or absent subprojects key!\"}", err);
-        return j;
+            if (j["subprojects"].is_array())
+                if (j["subprojects"].at(0).is_string() == false)
+                    return json::parse(error_code + "Wrong values type of subprojects key!\"}");
+            else if (!j["subprojects"].is_null() && !j["subprojects"].is_array())
+                return json::parse(error_code + "Corrupted or absent subprojects key!\"}");
+
+
+            return j;
+        } catch (const std::exception& e) {
+            throw FileSetRuntimeError(FileSetRuntimeError::UnknownError, (string)"Error gathered from json API: " + (string)e.what());
+        }
     }
 
     map<string, FileSetLoader*>
@@ -222,8 +216,8 @@ namespace Interface {
             string pathHead, pathSub, nameOfSubproject;
             FileSetLoader * loaderOfSubproject;
             pathHead = getDirPath(this->pathToProjectFile);
-            for (const auto& x: jContentOfProjectFile["subprojects"].array_items()) {
-                        pathSub = x.string_value();
+            for (const auto& x: jContentOfProjectFile["subprojects"]) {
+                        pathSub = x.get<string>();
                         loaderOfSubproject = FileSetFactory::createFileSet(pathHead + pathSub);
                         loaderOfSubproject->open();
                         nameOfSubproject = loaderOfSubproject->getProjectName();
