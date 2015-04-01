@@ -17,6 +17,7 @@ else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../../src/libprojec
 else:unix: LIBS += -L$$OUT_PWD/../../src/libproject/ -lproject
 
 INCLUDEPATH += $$PWD/../../src/libproject \
+               ../../tools/json/src \
                $$GMOCK_HOME/include \
                $$GMOCK_HOME/gtest/include \
                $$GMOCK_HOME/gtest \

@@ -5,6 +5,7 @@
 #include "libproject_error.h"
 #include <map>
 #include <vector>
+#include "json.hpp"
 
 using std::string;
 using std::list;
@@ -13,6 +14,7 @@ using LibprojManager::Interface::FileSetLoader;
 using namespace LibprojManager::Interface::Error;
 using std::map;
 using std::vector;
+using nlohmann::json;
 
 namespace {
 list<string> pathsToSingleAbnormal = {
@@ -23,7 +25,14 @@ list<string> pathsToSingleAbnormal = {
     "project_files/single/nofileskey.libproject",
     "project_files/single/broken.libproject",
     "project_files/single/noprojectkey.libproject",
-    "project_files/single/notexist.libproject"};
+    "project_files/single/notexist.libproject"
+};
+
+vector<vector<string>> pathsToRegularSubprojects = {
+    {
+        "project_files/foradd/regular/normalsingle.libproject"
+    }
+};
 }
 
 namespace FileSetTests {
@@ -89,6 +98,21 @@ protected:
     subprojectsNamesRef = {"subpr1", "subpr2"};
   }
 };
+
+class TestAddRegularSubprojectsToSingle
+        : public TestSkeleton,
+        public ::testing::WithParamInterface<vector<string>> {
+protected:
+    string pathToMainFile;
+    void SetUp() {
+        pathToMainFile = {"project_files/singleaddhere/addhere.libproject"};
+        TestSkeleton::SetUp(); }
+    void TearDown() {}
+};
+
+// class TestAddRegularSubprojectsToNested
+// class TestAddBrokenSubprojectsToSingle
+// class TestAddBrokenSubprojectsToNested
 
 TEST_F(TestRegularSingle, Open_file) {
   loader = FileSetFactory::createFileSet(PathToFile);
@@ -200,6 +224,20 @@ TEST_F(TestRegularSingle, Count_subprojects_of_sinlge_not_loaded) {
     loader = FileSetFactory::createFileSet(PathToFile);
     ASSERT_THROW(loader->countSubprojects(), FileSetRuntimeError);
 }
+
+INSTANTIATE_TEST_CASE_P(InstantiationOfTestAddRegularSubprojectsToSingle,
+                        TestAddRegularSubprojectsToSingle,
+                        ::testing::ValuesIn(pathsToRegularSubprojects));
+TEST_P(TestAddRegularSubprojectsToSingle,
+       Set_of_attempts_of_adding_regular_subprojects) {
+    ASSERT_NO_THROW({
+                     loader = FileSetFactory::createFileSet(pathToMainFile);
+                     loader->open();
+                     loader->addSubprojects(GetParam());
+                 });
+    //save here and check saved file
+}
+
 
 } // namespace FileSetTests
 

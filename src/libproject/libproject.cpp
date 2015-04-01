@@ -42,7 +42,8 @@ namespace Interface {
         string sContentOfProjectFile,
                     pathToProjectFile;
         json jContentOfProjectFile;
-        map<string, FileSetLoader*> subprojects;
+        json jChangedContentOfProjectFile;
+        map<string, FileSetLoader *> subprojects;
         bool loaded; //! flag which becoming true condition when instance is busy
 
     public:
@@ -51,7 +52,7 @@ namespace Interface {
          * \param[in] ProjectFile is std::string and it describes path to .libproject
          * file
          */
-        JsonFileSetLoader(const string& ProjectFile)
+        JsonFileSetLoader(const string & ProjectFile)
             : pathToProjectFile(ProjectFile), loaded(false) { }
 
         /*!
@@ -65,6 +66,11 @@ namespace Interface {
          * \return list<string> of filenames of project or drops exception if project wasn't loaded
          */
         virtual const list<string> getFileNames() const;
+
+        /*!
+         * \brief save
+         */
+        virtual void save();
 
         /*!
          * \brief Gives to user project name
@@ -92,6 +98,12 @@ namespace Interface {
          * \return map<string, FileSetLoader*> of subprojects associated with its names
          */
         virtual map<string, FileSetLoader *> getSubprojectLoaders();
+        /*!
+         * \brief addSubprojects
+         * \param subp
+         * \return
+         */
+        virtual void addSubprojects(const std::vector<std::string> & subp);
 
     private:
 
@@ -131,6 +143,14 @@ namespace Interface {
         return loaded = true;
     }
 
+    void
+    JsonFileSetLoader::save()
+    {
+        if (jChangedContentOfProjectFile != jContentOfProjectFile)
+            jContentOfProjectFile = jChangedContentOfProjectFile;
+        return;
+    }
+
     const list<string>
     JsonFileSetLoader::getFileNames() const
     {
@@ -166,6 +186,19 @@ namespace Interface {
         if(loaded == false)
             throw FileSetRuntimeError(FileSetRuntimeError::NotLoaded, "Trying to get subprojects loaders on not loaded interface");
         return subprojects;
+
+    }
+
+    void
+    JsonFileSetLoader::addSubprojects(const std::vector<std::string> &subp)
+    {
+        if(loaded == false)
+            throw FileSetRuntimeError(FileSetRuntimeError::NotLoaded, "Trying to add subprojects on not loaded interface");
+        if(jChangedContentOfProjectFile["subprojects"].is_null())
+            jChangedContentOfProjectFile["subprojects"] = { };
+        for(const auto& sp : subp)
+            jChangedContentOfProjectFile["subprojects"].push_back(sp);
+        // TODO check for already added subprojects
 
     }
 
