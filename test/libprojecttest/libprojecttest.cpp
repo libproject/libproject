@@ -32,7 +32,7 @@ list<string> pathsToSingleAbnormal = {
 
 vector<vector<string>> pathsToRegularSubprojects = {
     {
-        "project_files/foradd/regular/normalsingle.libproject"
+        "project_files/testaddtosingle/regular/normalsingle.libproject"
     }
 };
 }
@@ -108,11 +108,19 @@ protected:
     string pathToMainFile;
     json contentReference;
     void SetUp() {
-        pathToMainFile = {"project_files/singleaddhere/addhere.libproject"};
+        auto getDirPath = [this](const string& s) -> const string {
+            //#ifdef __linux__
+            std::size_t found = s.find_last_of("//");
+            //#endif
+            return s.substr(0, found + 1);
+        };
+        pathToMainFile = {"project_files/testaddtosingle/mainproject.libproject"};
         contentReference = {
           { "project", "there must be subprojects" },
+
           { "files", { "main.cpp", "Test.h" } },
-          { "subprojects", {"../foradd/regular/normalsingle.libproject"} }
+
+          { "subprojects", {getDirPath(pathToMainFile)+"regular/normalsingle.libproject"} }
         };
         TestSkeleton::SetUp(); }
     void TearDown() {}
@@ -243,12 +251,13 @@ TEST_P(TestAddRegularSubprojectsToSingle,
                         loader = FileSetFactory::createFileSet(pathToMainFile);
                         loader->open();
                         loader->addSubprojects(GetParam());
+                        loader->save();
                         ifstream i(pathToMainFile);
                         if (i.fail())
                             throw std::exception();
                         fileToTest << i;
                  });
-    ASSERT_EQ(contentReference, fileToTest);
+    ASSERT_EQ(contentReference.dump(4), fileToTest.dump(4));
 }
 
 

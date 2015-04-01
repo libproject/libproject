@@ -19,6 +19,7 @@ using std::list;
 using nlohmann::json;
 using namespace LibprojManager::Interface::Error;
 using std::map;
+using std::ofstream;
 
 /*!
  * \brief Covers all classes of present project except Qt creator plugin
@@ -133,7 +134,7 @@ namespace Interface {
 
         jContentOfProjectFile = checkProjectFileForErrors(i); /// Checking JSON-data for consistentness, correctness and reading it
 
-        if (jContentOfProjectFile["Error"].is_string()) { /// Checking data for higher abstract errors - project level errors
+        if (jContentOfProjectFile.count("Error") != 0) { /// Checking data for higher abstract errors - project level errors
             loaded = false;
             throw FileSetRuntimeError(FileSetRuntimeError::IncorrectSource, jContentOfProjectFile["Error"].get<string>());
         } else {
@@ -150,6 +151,10 @@ namespace Interface {
     {
         if (jChangedContentOfProjectFile != jContentOfProjectFile)
             jContentOfProjectFile = jChangedContentOfProjectFile;
+
+        ofstream o(pathToProjectFile);
+        // TODO some exc-s
+        o << std::setw(4) << jContentOfProjectFile;
         return;
     }
 
@@ -196,6 +201,7 @@ namespace Interface {
     {
         if(loaded == false)
             throw FileSetRuntimeError(FileSetRuntimeError::NotLoaded, "Trying to add subprojects on not loaded interface");
+        jChangedContentOfProjectFile = jContentOfProjectFile;
         if(jChangedContentOfProjectFile["subprojects"].is_null())
             jChangedContentOfProjectFile["subprojects"] = { };
         for(const auto& sp : subp)
