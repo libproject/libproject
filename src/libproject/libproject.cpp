@@ -140,6 +140,8 @@ namespace Interface {
             if (jContentOfProjectFile["subprojects"].is_array()) /// Checking project data for subprojects
                subprojects = loadSubprojects(); /// If above is true loading subprojects
         }
+
+        i.close();
         return loaded = true;
     }
 

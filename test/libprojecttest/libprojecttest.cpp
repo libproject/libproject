@@ -6,6 +6,7 @@
 #include <map>
 #include <vector>
 #include "json.hpp"
+#include <fstream>
 
 using std::string;
 using std::list;
@@ -15,6 +16,7 @@ using namespace LibprojManager::Interface::Error;
 using std::map;
 using std::vector;
 using nlohmann::json;
+using std::ifstream;
 
 namespace {
 list<string> pathsToSingleAbnormal = {
@@ -104,8 +106,14 @@ class TestAddRegularSubprojectsToSingle
         public ::testing::WithParamInterface<vector<string>> {
 protected:
     string pathToMainFile;
+    json contentReference;
     void SetUp() {
         pathToMainFile = {"project_files/singleaddhere/addhere.libproject"};
+        contentReference = {
+          { "project", "there must be subprojects" },
+          { "files", { "main.cpp", "Test.h" } },
+          { "subprojects", {"../foradd/regular/normalsingle.libproject"} }
+        };
         TestSkeleton::SetUp(); }
     void TearDown() {}
 };
@@ -230,12 +238,17 @@ INSTANTIATE_TEST_CASE_P(InstantiationOfTestAddRegularSubprojectsToSingle,
                         ::testing::ValuesIn(pathsToRegularSubprojects));
 TEST_P(TestAddRegularSubprojectsToSingle,
        Set_of_attempts_of_adding_regular_subprojects) {
+    json fileToTest = { };
     ASSERT_NO_THROW({
-                     loader = FileSetFactory::createFileSet(pathToMainFile);
-                     loader->open();
-                     loader->addSubprojects(GetParam());
+                        loader = FileSetFactory::createFileSet(pathToMainFile);
+                        loader->open();
+                        loader->addSubprojects(GetParam());
+                        ifstream i(pathToMainFile);
+                        if (i.fail())
+                            throw std::exception();
+                        fileToTest << i;
                  });
-    //save here and check saved file
+    ASSERT_EQ(contentReference, fileToTest);
 }
 
 
