@@ -29,12 +29,6 @@ list<string> pathsToSingleAbnormal = {
     "project_files/single/noprojectkey.libproject",
     "project_files/single/notexist.libproject"
 };
-
-vector<vector<string>> pathsToRegularSubprojects = {
-    {
-        "project_files/testaddtosingle/regular/normalsingle.libproject"
-    }
-};
 }
 
 namespace FileSetTests {
@@ -101,27 +95,28 @@ protected:
   }
 };
 
-class TestAddRegularSubprojectsToSingle
-        : public TestSkeleton,
-        public ::testing::WithParamInterface<vector<string>> {
+class TestAddRegularSubprojects : public TestSkeleton {
 protected:
     string pathToMainFile;
     json contentReference;
+    vector<string> pathToOneRegularSingleSubproject;
+    vector<string> pathToOneRegularNestedSubproject;
     void SetUp() {
-        auto getDirPath = [this](const string& s) -> const string {
-            //#ifdef __linux__
-            std::size_t found = s.find_last_of("//");
-            //#endif
-            return s.substr(0, found + 1);
-        };
-        pathToMainFile = {"project_files/testaddtosingle/mainproject.libproject"};
+        pathToMainFile = R"(project_files/testaddtosingle/mainproject.libproject)";
         contentReference = {
           { "project", "there must be subprojects" },
 
           { "files", { "main.cpp", "Test.h" } },
 
-          { "subprojects", {getDirPath(pathToMainFile)+"regular/normalsingle.libproject"} }
+          { "subprojects", {"regular/normalsingle.libproject"} }
         };
+        pathToOneRegularSingleSubproject = {
+            "project_files/testaddtosingle/regular/normalsingle.libproject"
+        };
+        pathToOneRegularNestedSubproject = {
+            "project_files/testaddtosingle/regular/normalnested.libproject"
+        };
+
         TestSkeleton::SetUp(); }
     void TearDown() {}
 };
@@ -241,16 +236,12 @@ TEST_F(TestRegularSingle, Count_subprojects_of_sinlge_not_loaded) {
     ASSERT_THROW(loader->countSubprojects(), FileSetRuntimeError);
 }
 
-INSTANTIATE_TEST_CASE_P(InstantiationOfTestAddRegularSubprojectsToSingle,
-                        TestAddRegularSubprojectsToSingle,
-                        ::testing::ValuesIn(pathsToRegularSubprojects));
-TEST_P(TestAddRegularSubprojectsToSingle,
-       Set_of_attempts_of_adding_regular_subprojects) {
+TEST_F(TestAddRegularSubprojects, Add_one_regular_single_subproject) {
     json fileToTest = { };
     ASSERT_NO_THROW({
                         loader = FileSetFactory::createFileSet(pathToMainFile);
                         loader->open();
-                        loader->addSubprojects(GetParam());
+                        loader->addSubprojects(pathToOneRegularSingleSubproject);
                         loader->save();
                         ifstream i(pathToMainFile);
                         if (i.fail())
@@ -260,6 +251,20 @@ TEST_P(TestAddRegularSubprojectsToSingle,
     ASSERT_EQ(contentReference.dump(4), fileToTest.dump(4));
 }
 
+TEST_F(TestAddRegularSubprojects, Add_one_regular_nested_subproject) {
+    json fileToTest = { };
+    ASSERT_NO_THROW({
+                        loader = FileSetFactory::createFileSet(pathToMainFile);
+                        loader->open();
+                        loader->addSubprojects(pathToOneRegularNestedSubproject);
+                        loader->save();
+                        ifstream i(pathToMainFile);
+                        if (i.fail())
+                            throw std::exception();
+                        fileToTest << i;
+                 });
+    ASSERT_EQ(contentReference.dump(4), fileToTest.dump(4));
+}
 
 } // namespace FileSetTests
 

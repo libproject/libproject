@@ -11,6 +11,7 @@
 #include <list>
 #include "json.hpp"
 #include "libproject_error.h"
+#include <libgen.h>
 
 using std::ifstream;
 using std::ostringstream;
@@ -40,8 +41,8 @@ namespace Interface {
      */
     class JsonFileSetLoader : public FileSetLoader
     {
-        string sContentOfProjectFile,
-                    pathToProjectFile;
+        string sContentOfProjectFile;
+        const string pathToProjectFile;
         json jContentOfProjectFile;
         json jChangedContentOfProjectFile;
         map<string, FileSetLoader *> subprojects;
@@ -127,7 +128,7 @@ namespace Interface {
     JsonFileSetLoader::open()
     {
         if (loaded)
-            throw FileSetRuntimeError(FileSetRuntimeError::AlreadyLoaded, "Project alredy loaded");
+            throw FileSetRuntimeError(FileSetRuntimeError::AlreadyLoaded, "Project already loaded");
         ifstream i(pathToProjectFile);
         if(!i)
             throw FileSetRuntimeError(FileSetRuntimeError::IncorrectSource, "Error with input stream");
@@ -152,8 +153,10 @@ namespace Interface {
         if (jChangedContentOfProjectFile != jContentOfProjectFile)
             jContentOfProjectFile = jChangedContentOfProjectFile;
 
-        ofstream o(pathToProjectFile);
-        // TODO some exc-s
+        ofstream o;
+        o.open(pathToProjectFile, std::ofstream::out);
+        if (!o)
+            throw FileSetRuntimeError(FileSetRuntimeError::UnknownError, "Unidentified problem with output file stream");
         o << std::setw(4) << jContentOfProjectFile;
         return;
     }
@@ -199,13 +202,25 @@ namespace Interface {
     void
     JsonFileSetLoader::addSubprojects(const std::vector<std::string> &subp)
     {
+        auto getDirPath = [this](const string& s) -> const string {
+            //#ifdef __linux__
+            std::size_t found = s.find_last_of("//");
+            //#endif
+            return s.substr(0, found + 1);
+        };
+
         if(loaded == false)
             throw FileSetRuntimeError(FileSetRuntimeError::NotLoaded, "Trying to add subprojects on not loaded interface");
         jChangedContentOfProjectFile = jContentOfProjectFile;
         if(jChangedContentOfProjectFile["subprojects"].is_null())
             jChangedContentOfProjectFile["subprojects"] = { };
-        for(const auto& sp : subp)
-            jChangedContentOfProjectFile["subprojects"].push_back(sp);
+        for(const auto& sp : subp) {
+            const char * cPathToProjectFile = pathToProjectFile.c_str();
+            const char * dname = dirname((char*)cPathToProjectFile);
+            int whereRelativePathStarts = ((string)dname).length() + 1; // +1 because we need to skip "/" symbol
+            string relativePath = sp.substr(whereRelativePathStarts);
+            jChangedContentOfProjectFile["subprojects"].push_back(relativePath);
+        }
         // TODO check for already added subprojects
 
     }
@@ -252,6 +267,7 @@ namespace Interface {
             //#endif
             return s.substr(0, found + 1);
         };
+
         try {
             map<string, FileSetLoader*> subprojectLoaders;
             string pathHead, pathSub, nameOfSubproject;
