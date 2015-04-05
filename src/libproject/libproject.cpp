@@ -70,7 +70,7 @@ namespace Interface {
         virtual const list<string> getFileNames() const;
 
         /*!
-         * \brief save
+         * \brief Saves changes of .libproject file to it
          */
         virtual void save();
 
@@ -101,8 +101,9 @@ namespace Interface {
          */
         virtual map<string, FileSetLoader *> getSubprojectLoaders();
         /*!
-         * \brief addSubprojects
-         * \param subp
+         * \brief This function perform adding existing subprojects which are present on
+         * filesystem to cache .libproject file. But NOT saving it.
+         * \param[in] std::vector of pathes to subprojects
          * \return
          */
         virtual void addSubprojects(const std::vector<std::string> & subp);
