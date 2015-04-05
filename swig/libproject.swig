@@ -4,3 +4,5 @@
 #include "../src/libproject/libproject.h"
 #include "../src/libproject/libproject_error.h"
 %}
+%include "../src/libproject/libproject.h"
+%include "../src/libproject/libproject_error.h"
