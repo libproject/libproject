@@ -266,6 +266,20 @@ TEST_F(TestAddRegularSubprojects, Add_one_regular_nested_subproject) {
     ASSERT_EQ(contentReference.dump(4), fileToTest.dump(4));
 }
 
+#include <libgen.h>
+class DISABLED_Test : public ::testing::Test { };
+TEST_F(DISABLED_Test, Checking_dirname) {
+    string path = "hello/world";
+    const char * const cpath = path.c_str();
+    const char * const bname = basename((char * const)cpath);
+    const char * const dname = dirname((char * const)cpath);
+    std::cout << dname;
+    std::cout << ' ';
+    std::cout << bname << '\n';
+
+
+}
+
 } // namespace FileSetTests
 
 int main(int argc, char **argv) {

@@ -215,9 +215,9 @@ namespace Interface {
         if(jChangedContentOfProjectFile["subprojects"].is_null())
             jChangedContentOfProjectFile["subprojects"] = { };
         for(const auto& sp : subp) {
-            const char * cPathToProjectFile = pathToProjectFile.c_str();
-            const char * dname = dirname((char*)cPathToProjectFile);
-            int whereRelativePathStarts = ((string)dname).length() + 1; // +1 because we need to skip "/" symbol
+            const char * const cPathToProjectFile = pathToProjectFile.c_str();
+            const char * const dname = dirname((char* const)cPathToProjectFile);
+            int whereRelativePathStarts = string(dname).length() + 1; // +1 because we need to skip "/" symbol
             string relativePath = sp.substr(whereRelativePathStarts);
             jChangedContentOfProjectFile["subprojects"].push_back(relativePath);
         }
