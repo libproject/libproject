@@ -97,18 +97,28 @@ protected:
 
 class TestAddRegularSubprojects : public TestSkeleton {
 protected:
-    string pathToMainFile;
-    json contentReference;
+    string pathToMainFileWhereWillBeSingle;
+    string pathToMainFileWhereWillBeNested;
+    json contentReferenceWithSingle;
+    json contentReferenceWithNested;
     vector<string> pathToOneRegularSingleSubproject;
     vector<string> pathToOneRegularNestedSubproject;
     void SetUp() {
-        pathToMainFile = R"(project_files/testaddtosingle/mainproject.libproject)";
-        contentReference = {
+        pathToMainFileWhereWillBeSingle = R"(project_files/testaddtosingle/mainproject_addsingle.libproject)";
+        pathToMainFileWhereWillBeNested = R"(project_files/testaddtosingle/mainproject_addnested.libproject)";
+        contentReferenceWithSingle = {
           { "project", "there must be subprojects" },
 
           { "files", { "main.cpp", "Test.h" } },
 
           { "subprojects", {"regular/normalsingle.libproject"} }
+        };
+        contentReferenceWithNested = {
+          { "project", "there must be subprojects" },
+
+          { "files", { "main.cpp", "Test.h" } },
+
+          { "subprojects", {"regular/normalnested.libproject"} }
         };
         pathToOneRegularSingleSubproject = {
             "project_files/testaddtosingle/regular/normalsingle.libproject"
@@ -122,8 +132,11 @@ protected:
 };
 
 // class TestAddRegularSubprojectsToNested
+/**/
 // class TestAddBrokenSubprojectsToSingle
+/**/
 // class TestAddBrokenSubprojectsToNested
+/**/
 
 TEST_F(TestRegularSingle, Open_file) {
   loader = FileSetFactory::createFileSet(PathToFile);
@@ -239,45 +252,31 @@ TEST_F(TestRegularSingle, Count_subprojects_of_sinlge_not_loaded) {
 TEST_F(TestAddRegularSubprojects, Add_one_regular_single_subproject) {
     json fileToTest = { };
     ASSERT_NO_THROW({
-                        loader = FileSetFactory::createFileSet(pathToMainFile);
+                        loader = FileSetFactory::createFileSet(pathToMainFileWhereWillBeSingle);
                         loader->open();
                         loader->addSubprojects(pathToOneRegularSingleSubproject);
                         loader->save();
-                        ifstream i(pathToMainFile);
+                        ifstream i(pathToMainFileWhereWillBeSingle);
                         if (i.fail())
                             throw std::exception();
                         fileToTest << i;
                  });
-    ASSERT_EQ(contentReference.dump(4), fileToTest.dump(4));
+    ASSERT_EQ(contentReferenceWithSingle.dump(4), fileToTest.dump(4));
 }
 
 TEST_F(TestAddRegularSubprojects, Add_one_regular_nested_subproject) {
     json fileToTest = { };
     ASSERT_NO_THROW({
-                        loader = FileSetFactory::createFileSet(pathToMainFile);
+                        loader = FileSetFactory::createFileSet(pathToMainFileWhereWillBeNested);
                         loader->open();
                         loader->addSubprojects(pathToOneRegularNestedSubproject);
                         loader->save();
-                        ifstream i(pathToMainFile);
+                        ifstream i(pathToMainFileWhereWillBeNested);
                         if (i.fail())
                             throw std::exception();
                         fileToTest << i;
                  });
-    ASSERT_EQ(contentReference.dump(4), fileToTest.dump(4));
-}
-
-#include <libgen.h>
-class DISABLED_Test : public ::testing::Test { };
-TEST_F(DISABLED_Test, Checking_dirname) {
-    string path = "hello/world";
-    const char * const cpath = path.c_str();
-    const char * const bname = basename((char * const)cpath);
-    const char * const dname = dirname((char * const)cpath);
-    std::cout << dname;
-    std::cout << ' ';
-    std::cout << bname << '\n';
-
-
+    ASSERT_EQ(contentReferenceWithNested.dump(4), fileToTest.dump(4));
 }
 
 } // namespace FileSetTests

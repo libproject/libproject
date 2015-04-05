@@ -12,6 +12,7 @@
 #include "json.hpp"
 #include "libproject_error.h"
 #include <libgen.h>
+#include <cstring>
 
 using std::ifstream;
 using std::ostringstream;
@@ -154,8 +155,7 @@ namespace Interface {
         if (jChangedContentOfProjectFile != jContentOfProjectFile)
             jContentOfProjectFile = jChangedContentOfProjectFile;
 
-        ofstream o;
-        o.open(pathToProjectFile, std::ofstream::out);
+        ofstream o(pathToProjectFile);
         if (!o)
             throw FileSetRuntimeError(FileSetRuntimeError::UnknownError, "Unidentified problem with output file stream");
         o << std::setw(4) << jContentOfProjectFile;
@@ -216,7 +216,8 @@ namespace Interface {
         if(jChangedContentOfProjectFile["subprojects"].is_null())
             jChangedContentOfProjectFile["subprojects"] = { };
         for(const auto& sp : subp) {
-            const char * const cPathToProjectFile = pathToProjectFile.c_str();
+            char cPathToProjectFile[pathToProjectFile.length() + 1] = {'\0'};
+            std::strcpy(cPathToProjectFile, pathToProjectFile.c_str());
             const char * const dname = dirname((char* const)cPathToProjectFile);
             int whereRelativePathStarts = string(dname).length() + 1; // +1 because we need to skip "/" symbol
             string relativePath = sp.substr(whereRelativePathStarts);
