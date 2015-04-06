@@ -13,6 +13,7 @@
 #include "libproject_error.h"
 #include <libgen.h>
 #include <cstring>
+#include <vector>
 
 using std::ifstream;
 using std::ostringstream;
@@ -22,6 +23,7 @@ using nlohmann::json;
 using namespace LibprojManager::Interface::Error;
 using std::map;
 using std::ofstream;
+using std::vector;
 
 /*!
  * \brief Covers all classes of present project except Qt creator plugin
@@ -101,13 +103,15 @@ namespace Interface {
          * \return map<string, FileSetLoader*> of subprojects associated with its names
          */
         virtual map<string, FileSetLoader *> getSubprojectLoaders();
+
         /*!
          * \brief This function perform adding existing subprojects which are present on
          * filesystem to cache .libproject file. But NOT saving it.
          * \param[in] std::vector of pathes to subprojects
-         * \return
+         * \return std::vector<std::string> of broken subproject (paths). Empty if everything
+         * ok
          */
-        virtual void addSubprojects(const std::vector<std::string> & subp);
+        virtual vector<string> addSubprojects(const std::vector<std::string> & subp);
 
     private:
 
@@ -135,7 +139,7 @@ namespace Interface {
         if(!i)
             throw FileSetRuntimeError(FileSetRuntimeError::IncorrectSource, "Error with input stream");
 
-        jContentOfProjectFile = checkProjectFileForErrors(i); /// Checking JSON-data for consistentness, correctness and reading it
+        jChangedContentOfProjectFile = jContentOfProjectFile = checkProjectFileForErrors(i); /// Checking JSON-data for consistentness, correctness and reading it
 
         if (jContentOfProjectFile.count("Error") != 0) { /// Checking data for higher abstract errors - project level errors
             loaded = false;
@@ -152,13 +156,15 @@ namespace Interface {
     void
     JsonFileSetLoader::save()
     {
-        if (jChangedContentOfProjectFile != jContentOfProjectFile)
-            jContentOfProjectFile = jChangedContentOfProjectFile;
+        if (jChangedContentOfProjectFile == jContentOfProjectFile)
+            return;
 
+        jContentOfProjectFile = jChangedContentOfProjectFile;
         ofstream o(pathToProjectFile);
         if (!o)
             throw FileSetRuntimeError(FileSetRuntimeError::UnknownError, "Unidentified problem with output file stream");
         o << std::setw(4) << jContentOfProjectFile;
+        o.close();
         return;
     }
 
@@ -200,7 +206,7 @@ namespace Interface {
 
     }
 
-    void
+    vector<string>
     JsonFileSetLoader::addSubprojects(const std::vector<std::string> &subp)
     {
         auto getDirPath = [this](const string& s) -> const string {
@@ -210,19 +216,62 @@ namespace Interface {
             return s.substr(0, found + 1);
         };
 
+        vector<string> brokenSubprojects;
         if(loaded == false)
             throw FileSetRuntimeError(FileSetRuntimeError::NotLoaded, "Trying to add subprojects on not loaded interface");
         jChangedContentOfProjectFile = jContentOfProjectFile;
-        if(jChangedContentOfProjectFile["subprojects"].is_null())
-            jChangedContentOfProjectFile["subprojects"] = { };
         for(const auto& sp : subp) {
             char cPathToProjectFile[pathToProjectFile.length() + 1] = {'\0'};
             std::strcpy(cPathToProjectFile, pathToProjectFile.c_str());
             const char * const dname = dirname((char* const)cPathToProjectFile);
             int whereRelativePathStarts = string(dname).length() + 1; // +1 because we need to skip "/" symbol
             string relativePath = sp.substr(whereRelativePathStarts);
+
+            if(jChangedContentOfProjectFile.count("subprojects") != 0) {
+                bool found = false;
+                for (const auto& cachedSubproject : jChangedContentOfProjectFile["subprojects"]) {
+                    if (relativePath == cachedSubproject) {
+                        found = true;
+                        break;
+                    }
+                }
+                if (found)
+                    continue; /* TODO there must be some debug info */
+            }
+            if(jContentOfProjectFile.count("subprojects") != 0) {
+                bool found = false;
+                for (const auto& cachedSubproject : jChangedContentOfProjectFile["subprojects"]) {
+                    if (relativePath == cachedSubproject) {
+                        found = true;
+                        break;
+                    }
+                }
+                if (found)
+                    continue; /* TODO there must be some debug info */
+            }
+
+            try {
+                ifstream checkSubprojectsStream;
+                checkSubprojectsStream.open(getDirPath(pathToProjectFile)+relativePath);
+                json check = checkProjectFileForErrors(checkSubprojectsStream);
+                if (check.count("Error") != 0) {
+                    brokenSubprojects.push_back(relativePath);
+                    continue;
+                }
+                checkSubprojectsStream.close();
+            } catch (const FileSetRuntimeError& re) {
+                /* there must be some debug output */
+                brokenSubprojects.push_back(relativePath);
+                continue;
+            } catch (...) {
+                throw;
+            }
+
+            if(jChangedContentOfProjectFile.count("subprojects") == 0)
+                jChangedContentOfProjectFile["subprojects"] = { };
             jChangedContentOfProjectFile["subprojects"].push_back(relativePath);
         }
+        return brokenSubprojects;
         // TODO check for already added subprojects
 
     }

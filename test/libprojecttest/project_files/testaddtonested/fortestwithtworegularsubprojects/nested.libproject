@@ -1,0 +1,5 @@
+{
+	"project": "nested for test with two subprojects",
+	"files": ["main.cpp", "foo.cpp"],
+	"subprojects": ["nested/one.libproject", "nested/two.libproject"]
+}

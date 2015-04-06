@@ -1,0 +1,4 @@
+{
+	"project": "here must not be any subproject field",
+	"files": ["main.cpp", "Test.h"]
+}

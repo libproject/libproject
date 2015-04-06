@@ -1,0 +1,4 @@
+{
+	"project": "one",
+	"files": ["main.cpp", "foo.cpp"]
+}
