@@ -14,6 +14,7 @@
 #include <libgen.h>
 #include <cstring>
 #include <vector>
+#include <algorithm>
 
 using std::ifstream;
 using std::ostringstream;
@@ -24,7 +25,7 @@ using namespace LibprojManager::Interface::Error;
 using std::map;
 using std::ofstream;
 using std::vector;
-
+using std::for_each;
 /*!
  * \brief Covers all classes of present project except Qt creator plugin
  * instance
@@ -64,30 +65,30 @@ namespace Interface {
          * \brief Reads file and parsing it
          * \return boolean true if file opened successfully
          */
-        virtual bool open();
+        /*virtual*/ bool open();
 
         /*!
          * \brief Gives to user list<string> of filenames
          * \return list<string> of filenames of project or drops exception if project wasn't loaded
          */
-        virtual const list<string> getFileNames() const;
+        /*virtual*/ const list<string> getFileNames() const;
 
         /*!
          * \brief Saves changes of .libproject file to it
          */
-        virtual void save();
+        /*virtual*/ void save();
 
         /*!
          * \brief Gives to user project name
          * \return project name in string format or drops exception if project wasn't loaded
          */
-        virtual const string getProjectName() const;
+        /*virtual*/ const string getProjectName() const;
 
         /*!
          * \brief Gives to user path to node
          * \return path to node in string format or drops exception if project wasn't loaded
          */
-        virtual const string getPathToNode() const {
+        /*virtual*/ const string getPathToNode() const {
             return loaded ? pathToProjectFile :
                         throw FileSetRuntimeError(FileSetRuntimeError::NotLoaded,
                                                   "Trying to get path to root node on not loaded interface"); }
@@ -96,22 +97,33 @@ namespace Interface {
           * \brief Gives number of subprojects to user
           * \return number of subprojects. Zero implied
           */
-        virtual const int countSubprojects() const;
+        /*virtual*/ const int countSubprojects() const;
 
         /*!
          * \brief Gives STL map with pointers to loaders
          * \return map<string, FileSetLoader*> of subprojects associated with its names
          */
-        virtual map<string, FileSetLoader *> getSubprojectLoaders();
+        /*virtual*/ map<string, FileSetLoader *> getSubprojectLoaders();
 
         /*!
          * \brief This function perform adding existing subprojects which are present on
          * filesystem to cache .libproject file. But NOT saving it.
          * \param[in] std::vector of pathes to subprojects
-         * \return std::vector<std::string> of broken subproject (paths). Empty if everything
+         * \return std::vector<std::string> of broken path to subprojects. Empty if everything
          * ok
          */
-        virtual vector<string> addSubprojects(const std::vector<std::string> & subp);
+        /*virtual*/ vector<string> addSubprojects(const std::vector<std::string> & subp);
+
+        /*!
+         * \brief This function perform removing existing subprojects in cache or saved
+         * .libproject file
+         * \param[in] std::vector of pathes to subprojects
+         * \return std::vector<std::string> of broken path to subprojects. Empty if everything
+         * ok
+         */
+        /*virtual*/ vector<string> removeSubprojects(const std::vector<std::string> & subp);
+
+        /*virtual*/ bool removeSubproject(const std::string& s);
 
     private:
 
@@ -274,6 +286,33 @@ namespace Interface {
         return brokenSubprojects;
         // TODO check for already added subprojects
 
+    }
+
+    vector<string>
+    JsonFileSetLoader::removeSubprojects(const std::vector<std::string> &subp)
+    {
+        vector<string> notFound;
+        auto fRemoveSubproject = [&notFound, this](const string& path) {
+            json::iterator iteratorForFile = jContentOfProjectFile["subprojects"].find("path");
+            json::iterator iteratorForCache = jChangedContentOfProjectFile["subprojects"].find("path");
+
+            if (iteratorForFile == jContentOfProjectFile.end() && iteratorForCache == jChangedContentOfProjectFile.end())
+                notFound.push_back(path);
+            else if (iteratorForFile != jContentOfProjectFile.end() && iteratorForCache != jChangedContentOfProjectFile.end())
+                throw FileSetRuntimeError(FileSetRuntimeError::UnknownError, "Subproject already present in cache and file");
+            else {
+                iteratorForFile == jContentOfProjectFile.end() ? jChangedContentOfProjectFile.erase(path) : jContentOfProjectFile.erase(path);
+            }
+        };
+        for_each(subp.cbegin(), subp.cend(), fRemoveSubproject);
+        return notFound;
+
+    }
+
+    bool
+    JsonFileSetLoader::removeSubproject(const std::string &s)
+    {
+        return (removeSubprojects({s})).empty();
     }
 
     const json JsonFileSetLoader::checkProjectFileForErrors(ifstream& ifs) const

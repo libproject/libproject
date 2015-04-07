@@ -283,7 +283,28 @@ protected:
     void TearDown() {}
 };
 
-// add no subprojects
+class TestRemoveSubprojects : public TestSkeleton {
+protected:
+    string pathToMainFileWhereNeedToRemoveOneSubprojectInArrayOfTwo_0;
+    json contentReference_case0;
+    string path_case0;
+    void SetUp() {
+        pathToMainFileWhereNeedToRemoveOneSubprojectInArrayOfTwo_0 =
+                R"(project_files/testremove/normal.libproject)";
+
+        contentReference_case0 = {
+            { "project", "try to remove" },
+
+            { "files", { "main.cpp", "Test.h", "Test.cpp" } },
+
+            { "subprojects", {"sub/s2.libproject"} }
+          };
+
+        string path_case0 = R"(sub/s1.libproject)";
+        TestSkeleton::SetUp();
+    }
+    void TearDown() {}
+};
 
 TEST_F(TestRegularSingle, Open_file) {
   loader = FileSetFactory::createFileSet(PathToFile);
@@ -652,6 +673,22 @@ TEST_F(TestAddRegularSubprojectsToNested, Add_empty_vector_of_subprojects) {
                     });
     ASSERT_EQ(contentReferenceForTestWithEmptyVector.dump(4), fileToTest.dump(4));
 }
+
+TEST_F(TestRemoveSubprojects, Remove_one_subproject_from_file_with_two) {
+    json fileToTest = { };
+    ASSERT_NO_THROW({
+                        loader = FileSetFactory::createFileSet(pathToMainFileWhereNeedToRemoveOneSubprojectInArrayOfTwo_0);
+                        loader->open();
+                        loader->removeSubproject(path_case0);
+                        loader->save();
+                        ifstream i(pathToMainFileWhereNeedToRemoveOneSubprojectInArrayOfTwo_0);
+                        if (i.fail())
+                            throw std::exception();
+                        fileToTest << i;
+                    });
+    ASSERT_EQ(contentReference_case0.dump(4), fileToTest.dump(4));
+}
+//TODO test with pair broken path and regular
 
 } // namespace FileSetTests
 
