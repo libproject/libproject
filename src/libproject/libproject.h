@@ -38,8 +38,8 @@ public:
     virtual const int countSubprojects() const = 0;
     virtual std::map<std::string, FileSetLoader *> getSubprojectLoaders() = 0;
     virtual std::vector<std::string> addSubprojects(const std::vector<std::string>&) = 0;
-    virtual std::vector<std::string> removeSubprojects(const std::vector<std::string>&) = 0;
-    virtual bool removeSubproject(const std::string&) = 0;
+    virtual void removeSubprojects(const std::vector<std::string>) = 0;
+    virtual void removeSubproject(const std::string&) = 0;
 
 };
 

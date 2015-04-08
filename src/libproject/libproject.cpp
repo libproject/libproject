@@ -121,9 +121,9 @@ namespace Interface {
          * \return std::vector<std::string> of broken path to subprojects. Empty if everything
          * ok
          */
-        /*virtual*/ vector<string> removeSubprojects(const std::vector<std::string> & subp);
+        /*virtual*/ void removeSubprojects(const vector<std::string> subp);
 
-        /*virtual*/ bool removeSubproject(const std::string& s);
+        /*virtual*/ void removeSubproject(const std::string& s);
 
     private:
 
@@ -288,31 +288,63 @@ namespace Interface {
 
     }
 
-    vector<string>
-    JsonFileSetLoader::removeSubprojects(const std::vector<std::string> &subp)
+    void
+    JsonFileSetLoader::removeSubprojects(const vector<string> subp)
     {
-        vector<string> notFound;
-        auto fRemoveSubproject = [&notFound, this](const string& path) {
-            json::iterator iteratorForFile = jContentOfProjectFile["subprojects"].find("path");
-            json::iterator iteratorForCache = jChangedContentOfProjectFile["subprojects"].find("path");
+        vector<string> v;
+        for (auto s : jChangedContentOfProjectFile["subprojects"])
+            v.push_back(s);
+        int sizeBefore = v.size();
+        vector<string>::iterator it = v.begin();
+        for (const auto& path : subp) {
+            remove_if(v.begin(), v.end(),
+                           [&path, &it](const string& p) {
+                ++it;
+                return path == p;
+            });
+            v.erase(--it);
+        }
+        int sizeAfter = v.size();
+        if (sizeBefore != sizeAfter) {
+            jChangedContentOfProjectFile.erase("subprojects");
+            jChangedContentOfProjectFile["subprojects"] = v;
+            return;
+        } else {
+            //throw TODO
+        }
 
-            if (iteratorForFile == jContentOfProjectFile.end() && iteratorForCache == jChangedContentOfProjectFile.end())
-                notFound.push_back(path);
-            else if (iteratorForFile != jContentOfProjectFile.end() && iteratorForCache != jChangedContentOfProjectFile.end())
-                throw FileSetRuntimeError(FileSetRuntimeError::UnknownError, "Subproject already present in cache and file");
-            else {
-                iteratorForFile == jContentOfProjectFile.end() ? jChangedContentOfProjectFile.erase(path) : jContentOfProjectFile.erase(path);
-            }
-        };
-        for_each(subp.cbegin(), subp.cend(), fRemoveSubproject);
-        return notFound;
+        v.clear();
+        for (auto s : jContentOfProjectFile["subprojects"])
+            v.push_back(s);
+        sizeBefore = v.size();
+        it = v.begin();
+        for (const auto& path : subp) {
+            remove_if(v.begin(), v.end(),
+                           [&path, &it](const string& p) {
+                ++it;
+                return path == p;
+            });
+            v.erase(--it);
+        }
+        sizeAfter = v.size();
+
+        if (sizeBefore != sizeAfter) {
+            jContentOfProjectFile.erase("subprojects");
+            jContentOfProjectFile["subprojects"] = v;
+        } else {
+            //throw TODO
+        }
 
     }
 
-    bool
-    JsonFileSetLoader::removeSubproject(const std::string &s)
+    void JsonFileSetLoader::removeSubproject(const std::string &s)
     {
-        return (removeSubprojects({s})).empty();
+//        try {
+//            if (!(removeSubprojects({s})).empty())
+//                throw
+//        } catch (...) {
+//            // TODO
+//        }
     }
 
     const json JsonFileSetLoader::checkProjectFileForErrors(ifstream& ifs) const
