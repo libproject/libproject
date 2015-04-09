@@ -229,23 +229,16 @@ namespace Interface {
     void
     JsonFileSetLoader::addSubprojects(const std::vector<std::string> &subp)
     {
-        auto getDirPath = [this](const string& s) -> const string {
-            //#ifdef __linux__
-            std::size_t found = s.find_last_of("//");
-            //#endif
-            return s.substr(0, found + 1);
-        };
-
         if(loaded == false)
             throw FileSetRuntimeError(FileSetRuntimeError::NotLoaded, "Trying to add subprojects on not loaded interface");
 
         jChangedContentOfProjectFile = jContentOfProjectFile;
 
+        char * cPathToProjectFile, * dname;
+        cPathToProjectFile = strdup(pathToProjectFile.c_str());
+        dname = dirname(cPathToProjectFile);
+        int whereRelativePathStarts = string(dname).length() + 1; // +1 because we need to skip "/" symbol
         for(const auto& sp : subp) {
-            char cPathToProjectFile[pathToProjectFile.length() + 1] = {'\0'};
-            std::strcpy(cPathToProjectFile, pathToProjectFile.c_str());
-            const char * const dname = dirname((char* const)cPathToProjectFile);
-            int whereRelativePathStarts = string(dname).length() + 1; // +1 because we need to skip "/" symbol
             string relativePath = sp.substr(whereRelativePathStarts);
 
             if(jChangedContentOfProjectFile.count("subprojects") != 0) {
@@ -262,7 +255,7 @@ namespace Interface {
             }
 
             ifstream checkSubprojectsStream;
-            checkSubprojectsStream.open(getDirPath(pathToProjectFile)+relativePath);
+            checkSubprojectsStream.open((string)dname+string("/")+relativePath);
             json check = checkProjectFileForErrors(checkSubprojectsStream);
             if (check.count("Error") != 0)
                 throw FileSetRuntimeError(FileSetRuntimeError::UnknownError, "Trying to add broken subproject(s)");
@@ -381,18 +374,14 @@ namespace Interface {
     map<string, FileSetLoader*>
     JsonFileSetLoader::loadSubprojects()
     {
-        auto getDirPath = [this](const string& s) -> const string {
-            //#ifdef __linux__
-            std::size_t found = s.find_last_of("//");
-            //#endif
-            return s.substr(0, found + 1);
-        };
-
         try {
             map<string, FileSetLoader*> subprojectLoaders;
             string pathHead, pathSub, nameOfSubproject;
             FileSetLoader * loaderOfSubproject;
-            pathHead = getDirPath(this->pathToProjectFile);
+            char * cPathToProjectFile, * dname;
+            cPathToProjectFile = strdup(pathToProjectFile.c_str());
+            dname = dirname(cPathToProjectFile);
+            pathHead = string(dname) + string("/");
             for (const auto& x: jContentOfProjectFile["subprojects"]) {
                         pathSub = x.get<string>();
                         loaderOfSubproject = FileSetFactory::createFileSet(pathHead + pathSub);
