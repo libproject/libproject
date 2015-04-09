@@ -112,7 +112,7 @@ namespace Interface {
          * \return std::vector<std::string> of broken path to subprojects. Empty if everything
          * ok
          */
-        /*virtual*/ vector<string> addSubprojects(const std::vector<std::string> & subp);
+        /*virtual*/ void addSubprojects(const std::vector<std::string> & subp);
 
         /*!
          *
@@ -226,7 +226,7 @@ namespace Interface {
 
     }
 
-    vector<string>
+    void
     JsonFileSetLoader::addSubprojects(const std::vector<std::string> &subp)
     {
         auto getDirPath = [this](const string& s) -> const string {
@@ -236,7 +236,6 @@ namespace Interface {
             return s.substr(0, found + 1);
         };
 
-        vector<string> brokenSubprojects;
         if(loaded == false)
             throw FileSetRuntimeError(FileSetRuntimeError::NotLoaded, "Trying to add subprojects on not loaded interface");
 
@@ -250,50 +249,30 @@ namespace Interface {
             string relativePath = sp.substr(whereRelativePathStarts);
 
             if(jChangedContentOfProjectFile.count("subprojects") != 0) {
-                bool found = false;
                 for (const auto& cachedSubproject : jChangedContentOfProjectFile["subprojects"]) {
-                    if (relativePath == cachedSubproject) {
-                        found = true;
-                        break;
-                    }
+                    if (relativePath == cachedSubproject)
+                        throw FileSetRuntimeError(FileSetRuntimeError::UnknownError, "Trying to add subproject(s) which already exists in cache");
                 }
-                if (found)
-                    continue; /* TODO there must be some debug info */
             }
             if(jContentOfProjectFile.count("subprojects") != 0) {
-                bool found = false;
                 for (const auto& cachedSubproject : jChangedContentOfProjectFile["subprojects"]) {
-                    if (relativePath == cachedSubproject) {
-                        found = true;
-                        break;
-                    }
+                    if (relativePath == cachedSubproject)
+                        throw FileSetRuntimeError(FileSetRuntimeError::UnknownError, "Trying to add subproject(s) which already exists in project file");
                 }
-                if (found)
-                    continue; /* TODO there must be some debug info */
             }
 
-            try {
-                ifstream checkSubprojectsStream;
-                checkSubprojectsStream.open(getDirPath(pathToProjectFile)+relativePath);
-                json check = checkProjectFileForErrors(checkSubprojectsStream);
-                if (check.count("Error") != 0) {
-                    brokenSubprojects.push_back(relativePath);
-                    continue;
-                }
-                checkSubprojectsStream.close();
-            } catch (const FileSetRuntimeError& re) {
-                /* there must be some debug output */
-                brokenSubprojects.push_back(relativePath);
-                continue;
-            } catch (...) {
-                throw;
-            }
+            ifstream checkSubprojectsStream;
+            checkSubprojectsStream.open(getDirPath(pathToProjectFile)+relativePath);
+            json check = checkProjectFileForErrors(checkSubprojectsStream);
+            if (check.count("Error") != 0)
+                throw FileSetRuntimeError(FileSetRuntimeError::UnknownError, "Trying to add broken subproject(s)");
+            checkSubprojectsStream.close();
 
             if(jChangedContentOfProjectFile.count("subprojects") == 0)
                 jChangedContentOfProjectFile["subprojects"] = { };
             jChangedContentOfProjectFile["subprojects"].push_back(relativePath);
         }
-        return brokenSubprojects;
+
         // TODO check for already added subprojects
 
     }
@@ -302,7 +281,7 @@ namespace Interface {
     JsonFileSetLoader::addSubproject(const std::string & subp)
     {
         try {
-            addSubprojects({s});
+            addSubprojects({subp});
         } catch (...) {
             throw;
         }
