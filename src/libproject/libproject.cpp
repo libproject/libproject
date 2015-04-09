@@ -288,13 +288,18 @@ namespace Interface {
             v.push_back(s);
         int sizeBefore = v.size();
         vector<string>::iterator it = v.begin();
+        vector<vector<string>::iterator> whatToRemove;
         for (const auto& path : subp) {
-            remove_if(v.begin(), v.end(),
-                           [&path, &it](const string& p) {
-                ++it;
-                return path == p;
+            for_each(v.begin(), v.end(),
+                           [&path, &it, &whatToRemove](const string& p) {
+                                    if (path == p)
+                                    {
+                                        whatToRemove.push_back(it);
+                                    }
             });
-            v.erase(--it);
+        }
+        for (const auto& iter : whatToRemove) {
+            v.erase(iter);
         }
         int sizeAfter = v.size();
         if (sizeBefore != sizeAfter) {
@@ -305,27 +310,27 @@ namespace Interface {
             throw FileSetRuntimeError(FileSetRuntimeError::UnknownError, "Trying to remove absent subproject(s)");
         }
 
-        v.clear();
-        for (auto s : jContentOfProjectFile["subprojects"])
-            v.push_back(s);
-        sizeBefore = v.size();
-        it = v.begin();
-        for (const auto& path : subp) {
-            remove_if(v.begin(), v.end(),
-                           [&path, &it](const string& p) {
-                ++it;
-                return path == p;
-            });
-            v.erase(--it);
-        }
-        sizeAfter = v.size();
+//        v.clear();
+//        for (auto s : jContentOfProjectFile["subprojects"])
+//            v.push_back(s);
+//        sizeBefore = v.size();
+//        it = v.begin();
+//        for (const auto& path : subp) {
+//            remove_if(v.begin(), v.end(),
+//                           [&path, &it](const string& p) {
+//                ++it;
+//                return path == p;
+//            });
+//            v.erase(--it);
+//        }
+//        sizeAfter = v.size();
 
-        if (sizeBefore != sizeAfter) {
-            jContentOfProjectFile.erase("subprojects");
-            jContentOfProjectFile["subprojects"] = v;
-        } else {
-            throw FileSetRuntimeError(FileSetRuntimeError::UnknownError, "Trying to remove absent subproject(s)");
-        }
+//        if (sizeBefore != sizeAfter) {
+//            jContentOfProjectFile.erase("subprojects");
+//            jContentOfProjectFile["subprojects"] = v;
+//        } else {
+//            throw FileSetRuntimeError(FileSetRuntimeError::UnknownError, "Trying to remove absent subproject(s)");
+//        }
 
     }
 
