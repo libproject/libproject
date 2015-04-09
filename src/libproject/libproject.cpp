@@ -283,38 +283,18 @@ namespace Interface {
     void
     JsonFileSetLoader::removeSubprojects(const vector<string>& subp)
     {
-        vector<string> v;
-        for (auto s : jChangedContentOfProjectFile["subprojects"])
-            v.push_back(s);
-
 
         for (const auto& path : subp) {
-            vector<string>::iterator * pToIterOnWhatToRemove = nullptr;
-            vector<string>::iterator it = v.begin();
-            class Found { };
-            try {
-                for_each(v.begin(), v.end(),
-                           [&path, &it, &pToIterOnWhatToRemove](const string& p) {
-                                    if (path.compare(p) == 0)
-                                    {
-                                        pToIterOnWhatToRemove = &it;
-                                        throw Found();
-                                    }
-                                    else
-                                    {
-                                        pToIterOnWhatToRemove = nullptr;
-                                    }
-                                    ++it;
-                            }
-                );
-            } catch (const Found&) {
-                v.erase(*pToIterOnWhatToRemove);
-                jChangedContentOfProjectFile.erase("subprojects");
-                jChangedContentOfProjectFile["subprojects"] = v;
-            }
-            if (!pToIterOnWhatToRemove) {
+
+            int i = 0, sizeBefore = jChangedContentOfProjectFile["subprojects"].size();
+            for(; i < sizeBefore; ++i)
+                if (path == jChangedContentOfProjectFile["subprojects"].at(i)) {
+                    jChangedContentOfProjectFile["subprojects"].erase(i);
+                    break;
+                }
+            int sizeAfter = jChangedContentOfProjectFile["subprojects"].size();
+            if (sizeBefore == sizeAfter)
                 throw FileSetRuntimeError(FileSetRuntimeError::UnknownError, "Trying to remove nonexistent subproject(s)");
-            }
         }
     }
 

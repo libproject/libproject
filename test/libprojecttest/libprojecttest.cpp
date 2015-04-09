@@ -729,7 +729,7 @@ TEST_F(TestAddRegularSubprojectsToNested, Add_empty_vector_of_subprojects) {
 
 TEST_F(TestRemoveSubprojects, Remove_one_subproject_from_file_with_two) {
     json fileToTest = { };
-//    ASSERT_NO_THROW({
+    ASSERT_NO_THROW({
                         loader = FileSetFactory::createFileSet(case_0_pathToMainFileWhereNeedToRemoveOneSubprojectInArrayOfTwo);
                         loader->open();
                         loader->removeSubproject(path_case0);
@@ -738,7 +738,7 @@ TEST_F(TestRemoveSubprojects, Remove_one_subproject_from_file_with_two) {
                         if (i.fail())
                             throw std::exception();
                         fileToTest << i;
-//                    });
+                    });
     ASSERT_EQ(contentReference_case0.dump(4), fileToTest.dump(4));
 }
 
