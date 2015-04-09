@@ -286,52 +286,36 @@ namespace Interface {
         vector<string> v;
         for (auto s : jChangedContentOfProjectFile["subprojects"])
             v.push_back(s);
-        int sizeBefore = v.size();
-        vector<string>::iterator it = v.begin();
-        vector<vector<string>::iterator> whatToRemove;
+
+
         for (const auto& path : subp) {
-            for_each(v.begin(), v.end(),
-                           [&path, &it, &whatToRemove](const string& p) {
-                                    if (path == p)
+            vector<string>::iterator * pToIterOnWhatToRemove = nullptr;
+            vector<string>::iterator it = v.begin();
+            class Found { };
+            try {
+                for_each(v.begin(), v.end(),
+                           [&path, &it, &pToIterOnWhatToRemove](const string& p) {
+                                    if (path.compare(p) == 0)
                                     {
-                                        whatToRemove.push_back(it);
+                                        pToIterOnWhatToRemove = &it;
+                                        throw Found();
                                     }
-            });
+                                    else
+                                    {
+                                        pToIterOnWhatToRemove = nullptr;
+                                    }
+                                    ++it;
+                            }
+                );
+            } catch (const Found&) {
+                v.erase(*pToIterOnWhatToRemove);
+                jChangedContentOfProjectFile.erase("subprojects");
+                jChangedContentOfProjectFile["subprojects"] = v;
+            }
+            if (!pToIterOnWhatToRemove) {
+                throw FileSetRuntimeError(FileSetRuntimeError::UnknownError, "Trying to remove nonexistent subproject(s)");
+            }
         }
-        for (const auto& iter : whatToRemove) {
-            v.erase(iter);
-        }
-        int sizeAfter = v.size();
-        if (sizeBefore != sizeAfter) {
-            jChangedContentOfProjectFile.erase("subprojects");
-            jChangedContentOfProjectFile["subprojects"] = v;
-            return;
-        } else {
-            throw FileSetRuntimeError(FileSetRuntimeError::UnknownError, "Trying to remove absent subproject(s)");
-        }
-
-//        v.clear();
-//        for (auto s : jContentOfProjectFile["subprojects"])
-//            v.push_back(s);
-//        sizeBefore = v.size();
-//        it = v.begin();
-//        for (const auto& path : subp) {
-//            remove_if(v.begin(), v.end(),
-//                           [&path, &it](const string& p) {
-//                ++it;
-//                return path == p;
-//            });
-//            v.erase(--it);
-//        }
-//        sizeAfter = v.size();
-
-//        if (sizeBefore != sizeAfter) {
-//            jContentOfProjectFile.erase("subprojects");
-//            jContentOfProjectFile["subprojects"] = v;
-//        } else {
-//            throw FileSetRuntimeError(FileSetRuntimeError::UnknownError, "Trying to remove absent subproject(s)");
-//        }
-
     }
 
     void JsonFileSetLoader::removeSubproject(const std::string &s)
