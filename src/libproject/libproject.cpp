@@ -106,30 +106,30 @@ namespace Interface {
         /*virtual*/ map<string, FileSetLoader *> getSubprojectLoaders();
 
         /*!
-         * \brief This function perform adding existing subprojects which are present on
-         * filesystem to cache .libproject file. But NOT saving it.
+         * \brief This function performs adding existing subprojects which are present on
+         * filesystem to cache of .libproject file. But NOT saves it.
          * \param[in] std::vector of pathes to subprojects
-         * \return std::vector<std::string> of broken path to subprojects. Empty if everything
-         * ok
          */
         /*virtual*/ void addSubprojects(const std::vector<std::string> & subp);
 
         /*!
-         *
+         * \brief This function performs adding existing subproject which is present on
+         * filesystem to cache of .libproject file. But NOT saves it.
+         * \param[in] std::string with path to subproject
          */
         /*virtual*/ void addSubproject(const std::string & subp);
 
         /*!
-         * \brief This function perform removing existing subprojects in cache or saved
+         * \brief This function performs removing existing subprojects in cache or in saved
          * .libproject file
          * \param[in] std::vector of pathes to subprojects
-         * \return std::vector<std::string> of broken path to subprojects. Empty if everything
-         * ok
          */
         /*virtual*/ void removeSubprojects(const vector<std::string> & subp);
 
         /*!
-         *
+         * \brief This function performs removing existing subproject in cache or in saved
+         * .libproject file
+         * \param[in] std::string with path to subproject
          */
         /*virtual*/ void removeSubproject(const std::string& s);
 
