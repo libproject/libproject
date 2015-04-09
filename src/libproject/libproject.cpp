@@ -25,7 +25,7 @@ using namespace LibprojManager::Interface::Error;
 using std::map;
 using std::ofstream;
 using std::vector;
-using std::for_each;
+using std::remove_if;
 /*!
  * \brief Covers all classes of present project except Qt creator plugin
  * instance
@@ -115,14 +115,22 @@ namespace Interface {
         /*virtual*/ vector<string> addSubprojects(const std::vector<std::string> & subp);
 
         /*!
+         *
+         */
+        /*virtual*/ void addSubproject(const std::string & subp);
+
+        /*!
          * \brief This function perform removing existing subprojects in cache or saved
          * .libproject file
          * \param[in] std::vector of pathes to subprojects
          * \return std::vector<std::string> of broken path to subprojects. Empty if everything
          * ok
          */
-        /*virtual*/ void removeSubprojects(const vector<std::string> subp);
+        /*virtual*/ void removeSubprojects(const vector<std::string> & subp);
 
+        /*!
+         *
+         */
         /*virtual*/ void removeSubproject(const std::string& s);
 
     private:
@@ -231,7 +239,9 @@ namespace Interface {
         vector<string> brokenSubprojects;
         if(loaded == false)
             throw FileSetRuntimeError(FileSetRuntimeError::NotLoaded, "Trying to add subprojects on not loaded interface");
+
         jChangedContentOfProjectFile = jContentOfProjectFile;
+
         for(const auto& sp : subp) {
             char cPathToProjectFile[pathToProjectFile.length() + 1] = {'\0'};
             std::strcpy(cPathToProjectFile, pathToProjectFile.c_str());
@@ -289,7 +299,17 @@ namespace Interface {
     }
 
     void
-    JsonFileSetLoader::removeSubprojects(const vector<string> subp)
+    JsonFileSetLoader::addSubproject(const std::string & subp)
+    {
+        try {
+            addSubprojects({s});
+        } catch (...) {
+            throw;
+        }
+    }
+
+    void
+    JsonFileSetLoader::removeSubprojects(const vector<string>& subp)
     {
         vector<string> v;
         for (auto s : jChangedContentOfProjectFile["subprojects"])
@@ -310,7 +330,7 @@ namespace Interface {
             jChangedContentOfProjectFile["subprojects"] = v;
             return;
         } else {
-            //throw TODO
+            throw FileSetRuntimeError(FileSetRuntimeError::UnknownError, "Trying to remove absent subproject(s)");
         }
 
         v.clear();
@@ -332,19 +352,18 @@ namespace Interface {
             jContentOfProjectFile.erase("subprojects");
             jContentOfProjectFile["subprojects"] = v;
         } else {
-            //throw TODO
+            throw FileSetRuntimeError(FileSetRuntimeError::UnknownError, "Trying to remove absent subproject(s)");
         }
 
     }
 
     void JsonFileSetLoader::removeSubproject(const std::string &s)
     {
-//        try {
-//            if (!(removeSubprojects({s})).empty())
-//                throw
-//        } catch (...) {
-//            // TODO
-//        }
+        try {
+            removeSubprojects({s});
+        } catch (...) {
+            throw;
+        }
     }
 
     const json JsonFileSetLoader::checkProjectFileForErrors(ifstream& ifs) const
