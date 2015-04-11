@@ -341,7 +341,7 @@ protected:
 
             { "files", { "main.cpp", "Test.h", "Test.cpp" } },
 
-            { "subprojects", {"sub/s2.libproject"} }
+            { "subprojects", {"sub/s1.libproject", "sub/s2.libproject"} }
           };
         contentReference_case4 = {
             { "project", "try to remove" },
@@ -755,7 +755,7 @@ TEST_F(TestRemoveSubprojects, Remove_one_subproject_from_file_with_two) {
 
 TEST_F(TestRemoveSubprojects, Remove_last_subproject) {
     json fileToTest = { };
-//    ASSERT_NO_THROW({
+    ASSERT_NO_THROW({
                         loader = FileSetFactory::createFileSet(case_4_pathToMainFileWhereIsOneSubprojectWithWillBeRemoved);
                         loader->open();
                         loader->removeSubproject(path_case4);
@@ -764,7 +764,7 @@ TEST_F(TestRemoveSubprojects, Remove_last_subproject) {
                         if (i.fail())
                             throw std::exception();
                         fileToTest << i;
-//                    });
+                    });
     ASSERT_EQ(contentReference_case4.dump(4), fileToTest.dump(4));
 }
 
@@ -802,11 +802,11 @@ TEST_F(TestRemoveSubprojects, Remove_nonexistent_subprojects) {
 
 TEST_F(TestRemoveSubprojects, Remove_two_equal_correct_subprojects) {
     json fileToTest = { };
-//    ASSERT_THROW({
+    ASSERT_THROW({
                         loader = FileSetFactory::createFileSet(case_3_pathToMainFileWhereNeedToRemoveTwoSubprojectsWithEqualButCorrectPaths );
                         loader->open();
                         loader->removeSubprojects(path_case3);
-//                 }, FileSetRuntimeError);
+                 }, FileSetRuntimeError);
     loader->save();
     ifstream i(case_3_pathToMainFileWhereNeedToRemoveTwoSubprojectsWithEqualButCorrectPaths);
     if (i.fail())

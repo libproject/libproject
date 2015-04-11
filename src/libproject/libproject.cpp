@@ -282,6 +282,13 @@ namespace Interface {
     void
     JsonFileSetLoader::removeSubprojects(const vector<string>& subp)
     {
+        vector<string> sorted = subp;
+        std::sort(sorted.begin(), sorted.end());
+        for (auto it = sorted.begin() + 1; it != sorted.end(); ++it)
+            if (*it == *(it - 1))
+                throw FileSetRuntimeError(FileSetRuntimeError::SubprojectsIncongruity,
+                                          "Duplicate found in candidates to remove");
+
         auto& subprojects = jChangedContentOfProjectFile["subprojects"];
         size_t sizeBefore = subprojects.size();
         if (subp.size() > sizeBefore)
