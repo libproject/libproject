@@ -21,7 +21,8 @@ public:
         IncorrectSource,
         AlreadyLoaded,
         NotLoaded,
-        BrokenSubproject
+        BrokenSubproject,
+        SubprojectsIncongruity
     };
 
     FileSetRuntimeError(const ErrType type, const std::string& message)

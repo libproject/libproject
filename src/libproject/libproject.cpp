@@ -243,13 +243,13 @@ namespace Interface {
             if(jChangedContentOfProjectFile.count("subprojects") != 0) {
                 for (const auto& cachedSubproject : jChangedContentOfProjectFile["subprojects"]) {
                     if (relativePath == cachedSubproject)
-                        throw FileSetRuntimeError(FileSetRuntimeError::UnknownError, "Trying to add subproject(s) which already exists in cache");
+                        throw FileSetRuntimeError(FileSetRuntimeError::SubprojectsIncongruity,"Trying to add subproject(s) which already exists in cache");
                 }
             }
             if(jContentOfProjectFile.count("subprojects") != 0) {
                 for (const auto& cachedSubproject : jChangedContentOfProjectFile["subprojects"]) {
                     if (relativePath == cachedSubproject)
-                        throw FileSetRuntimeError(FileSetRuntimeError::UnknownError, "Trying to add subproject(s) which already exists in project file");
+                        throw FileSetRuntimeError(FileSetRuntimeError::SubprojectsIncongruity, "Trying to add subproject(s) which already exists in project file");
                 }
             }
 
@@ -257,7 +257,7 @@ namespace Interface {
             checkSubprojectsStream.open((string)dname+string("/")+relativePath);
             json check = checkProjectFileForErrors(checkSubprojectsStream);
             if (check.count("Error") != 0)
-                throw FileSetRuntimeError(FileSetRuntimeError::UnknownError, "Trying to add broken subproject(s)");
+                throw FileSetRuntimeError(FileSetRuntimeError::BrokenSubproject, "Trying to add broken subproject(s)");
             checkSubprojectsStream.close();
 
             if(jChangedContentOfProjectFile.count("subprojects") == 0)
@@ -285,7 +285,7 @@ namespace Interface {
         auto& subprojects = jChangedContentOfProjectFile["subprojects"];
         size_t sizeBefore = subprojects.size();
         if (subp.size() > sizeBefore)
-            throw FileSetRuntimeError(FileSetRuntimeError::UnknownError,
+            throw FileSetRuntimeError(FileSetRuntimeError::SubprojectsIncongruity,
                                       "Trying to remove nonexistent subproject(s)");
 
         for (const auto& path : subp) {
@@ -298,7 +298,7 @@ namespace Interface {
         }
 
         if (sizeBefore == subprojects.size())
-            throw FileSetRuntimeError(FileSetRuntimeError::UnknownError,
+            throw FileSetRuntimeError(FileSetRuntimeError::SubprojectsIncongruity,
                                       "Trying to remove nonexistent subproject(s)");
 
         if (subprojects.empty()) {
