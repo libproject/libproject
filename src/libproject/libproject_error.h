@@ -27,7 +27,7 @@ public:
     FileSetRuntimeError(const ErrType type, const std::string& message)
         : runtime_error(message), errorType(type) { }
 
-    const ErrType getErrorType() const { return errorType; }
+    ErrType getErrorType() const { return errorType; }
 private:
     ErrType errorType;
 };

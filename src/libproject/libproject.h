@@ -35,7 +35,7 @@ public:
     virtual const std::list<std::string> getFileNames() const = 0;
     virtual const std::string getProjectName() const = 0;
     virtual const std::string getPathToNode() const = 0;
-    virtual const int countSubprojects() const = 0;
+    virtual int countSubprojects() const = 0;
     virtual std::map<std::string, FileSetLoader *> getSubprojectLoaders() = 0;
     virtual void addSubprojects(const std::vector<std::string>&) = 0;
     virtual void addSubproject(const std::string&) = 0;
