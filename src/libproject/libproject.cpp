@@ -283,18 +283,31 @@ namespace Interface {
     void
     JsonFileSetLoader::removeSubprojects(const vector<string>& subp)
     {
+        int sizeBefore = jChangedContentOfProjectFile["subprojects"].size();
+        if (subp.size() > sizeBefore)
+            throw FileSetRuntimeError(FileSetRuntimeError::UnknownError,
+                                      "Trying to remove nonexistent subproject(s)");
+
+        if (sizeBefore == 1 && subp.size() == 1) {
+            if (subp.front() == *jChangedContentOfProjectFile["subprojects"].begin()) {
+                jChangedContentOfProjectFile.erase("subprojects");
+                return;
+            }
+            else FileSetRuntimeError(FileSetRuntimeError::UnknownError,
+                                     "Trying to remove nonexistent subproject(s)");
+        }
 
         for (const auto& path : subp) {
-
-            int i = 0, sizeBefore = jChangedContentOfProjectFile["subprojects"].size();
-            for(; i < sizeBefore; ++i)
+            int i = 0;
+            for(; i < jChangedContentOfProjectFile["subprojects"].size(); ++i)
                 if (path == jChangedContentOfProjectFile["subprojects"].at(i)) {
                     jChangedContentOfProjectFile["subprojects"].erase(i);
                     break;
                 }
             int sizeAfter = jChangedContentOfProjectFile["subprojects"].size();
             if (sizeBefore == sizeAfter)
-                throw FileSetRuntimeError(FileSetRuntimeError::UnknownError, "Trying to remove nonexistent subproject(s)");
+                throw FileSetRuntimeError(FileSetRuntimeError::UnknownError,
+                                          "Trying to remove nonexistent subproject(s)");
         }
     }
 
