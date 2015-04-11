@@ -27,7 +27,7 @@ QString Manager::mimeType() const
 
 ProjectExplorer::Project * Manager::openProject(const QString &Filename, QString *ErrorString)
 {
-
+    Q_UNUSED(ErrorString);
     FileSetLoader * loader = FileSetFactory::createFileSet(Filename.toStdString());
     try {
         bool open_result = false;

@@ -97,7 +97,7 @@ namespace Interface {
           * \brief Gives number of subprojects to user
           * \return number of subprojects. Zero implied
           */
-        /*virtual*/ const int countSubprojects() const;
+        /*virtual*/ int countSubprojects() const;
 
         /*!
          * \brief Gives STL map with pointers to loaders
@@ -208,8 +208,7 @@ namespace Interface {
         return jContentOfProjectFile["project"].get<string>();
     }
 
-    const int
-    JsonFileSetLoader::countSubprojects() const
+    int JsonFileSetLoader::countSubprojects() const
     {
         if(loaded == false)
             throw FileSetRuntimeError(FileSetRuntimeError::NotLoaded, "Trying to count subprojects on not loaded interface");
@@ -283,31 +282,27 @@ namespace Interface {
     void
     JsonFileSetLoader::removeSubprojects(const vector<string>& subp)
     {
-        int sizeBefore = jChangedContentOfProjectFile["subprojects"].size();
+        auto& subprojects = jChangedContentOfProjectFile["subprojects"];
+        size_t sizeBefore = subprojects.size();
         if (subp.size() > sizeBefore)
             throw FileSetRuntimeError(FileSetRuntimeError::UnknownError,
                                       "Trying to remove nonexistent subproject(s)");
 
-        if (sizeBefore == 1 && subp.size() == 1) {
-            if (subp.front() == *jChangedContentOfProjectFile["subprojects"].begin()) {
-                jChangedContentOfProjectFile.erase("subprojects");
-                return;
-            }
-            else FileSetRuntimeError(FileSetRuntimeError::UnknownError,
-                                     "Trying to remove nonexistent subproject(s)");
-        }
-
         for (const auto& path : subp) {
-            int i = 0;
-            for(; i < jChangedContentOfProjectFile["subprojects"].size(); ++i)
-                if (path == jChangedContentOfProjectFile["subprojects"].at(i)) {
-                    jChangedContentOfProjectFile["subprojects"].erase(i);
+
+            for(size_t i = 0; i < subprojects.size(); ++i)
+                if (path == subprojects.at(i)) {
+                    subprojects.erase(i);
                     break;
                 }
-            int sizeAfter = jChangedContentOfProjectFile["subprojects"].size();
-            if (sizeBefore == sizeAfter)
-                throw FileSetRuntimeError(FileSetRuntimeError::UnknownError,
-                                          "Trying to remove nonexistent subproject(s)");
+        }
+
+        if (sizeBefore == subprojects.size())
+            throw FileSetRuntimeError(FileSetRuntimeError::UnknownError,
+                                      "Trying to remove nonexistent subproject(s)");
+
+        if (subprojects.empty()) {
+            jChangedContentOfProjectFile.erase("subprojects");
         }
     }
 
@@ -340,12 +335,12 @@ namespace Interface {
             else if (j["files"].at(0).is_string() == false)
                 return json::parse(error_code + "Wrong values type of files key!\"}");
 
-            if (j["subprojects"].is_array())
+            if (j["subprojects"].is_array()) {
                 if (j["subprojects"].at(0).is_string() == false)
                     return json::parse(error_code + "Wrong values type of subprojects key!\"}");
-            else if (!j["subprojects"].is_null() && !j["subprojects"].is_array())
+            } else if (!j["subprojects"].is_null() && !j["subprojects"].is_array()) {
                 return json::parse(error_code + "Corrupted or absent subprojects key!\"}");
-
+            }
 
             return j;
         } catch (const std::exception& e) {

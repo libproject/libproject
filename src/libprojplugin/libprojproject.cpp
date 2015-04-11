@@ -81,6 +81,7 @@ ProjectExplorer::ProjectNode * Project::rootProjectNode() const
 }
 
 QStringList Project::files(FilesMode fileMode) const{
+    Q_UNUSED(fileMode);
     /* TODO
      * must return list of absolute paths*/
     //qDebug() << "Calling Project::files(FilesMode)";
