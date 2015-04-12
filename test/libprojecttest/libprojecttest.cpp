@@ -97,6 +97,7 @@ protected:
 
 class TestAddRegularSubprojectsToSingle : public TestSkeleton {
 protected:
+    json fileToTest = { };
     string pathToMainFileWhereWillBeSingleSubproject;
     string pathToMainFileWhereWillBeNestedSubproject;
     string pathToMainFileWhichIsTargetForAddBrokenSubproject;
@@ -145,6 +146,7 @@ protected:
 
 class TestAddRegularSubprojectsToNested : public TestSkeleton {
 protected:
+    json fileToTest = { };
     string pathToMainFileWhereWillBeSingleSubproject;
     string pathToMainFileWhereWillBeNestedSubproject;
     string pathToMainFileForTestWithVectorFullOfPresentSubprojects;
@@ -285,6 +287,7 @@ protected:
 
 class TestRemoveSubprojects : public TestSkeleton {
 protected:
+    json fileToTest = { };
     string case_0_pathToMainFileWhereNeedToRemoveOneSubprojectInArrayOfTwo,
     case_1_pathToMainFileWhereNeedToRemoveOneNonExistentSubproject,
     case_2_pathToMainFileWhereNeedToRemoveTwoNonExistentSubprojects,
@@ -493,7 +496,6 @@ TEST_F(TestRegularSingle, Count_subprojects_of_sinlge_not_loaded) {
 }
 
 TEST_F(TestAddRegularSubprojectsToSingle, Add_one_regular_single_subproject) {
-    json fileToTest = { };
     ASSERT_NO_THROW({
                         loader = FileSetFactory::createFileSet(pathToMainFileWhereWillBeSingleSubproject);
                         loader->open();
@@ -508,7 +510,6 @@ TEST_F(TestAddRegularSubprojectsToSingle, Add_one_regular_single_subproject) {
 }
 
 TEST_F(TestAddRegularSubprojectsToSingle, Add_one_regular_nested_subproject) {
-    json fileToTest = { };
     ASSERT_NO_THROW({
                         loader = FileSetFactory::createFileSet(pathToMainFileWhereWillBeNestedSubproject);
                         loader->open();
@@ -523,7 +524,6 @@ TEST_F(TestAddRegularSubprojectsToSingle, Add_one_regular_nested_subproject) {
 }
 
 TEST_F(TestAddRegularSubprojectsToSingle, Add_broken_subproject) {
-    json fileToTest = { };
     ASSERT_THROW({
                         loader = FileSetFactory::createFileSet(pathToMainFileWhichIsTargetForAddBrokenSubproject);
                         loader->open();
@@ -539,7 +539,6 @@ TEST_F(TestAddRegularSubprojectsToSingle, Add_broken_subproject) {
 }
 
 TEST_F(TestAddRegularSubprojectsToSingle, Add_one_regular_single_which_already_cached) {
-    json fileToTest = { };
     ASSERT_THROW({
                         loader = FileSetFactory::createFileSet(pathToMainFileWhereWillBeSingleSubproject);
                         loader->open();
@@ -556,7 +555,6 @@ TEST_F(TestAddRegularSubprojectsToSingle, Add_one_regular_single_which_already_c
 }
 
 TEST_F(TestAddRegularSubprojectsToNested, Add_one_regular_single_subproject) {
-    json fileToTest = { };
     ASSERT_NO_THROW({
                         loader = FileSetFactory::createFileSet(pathToMainFileWhereWillBeSingleSubproject);
                         loader->open();
@@ -572,7 +570,6 @@ TEST_F(TestAddRegularSubprojectsToNested, Add_one_regular_single_subproject) {
 }
 
 TEST_F(TestAddRegularSubprojectsToNested, Add_one_regular_nested_subproject) {
-    json fileToTest = { };
     ASSERT_NO_THROW({
                         loader = FileSetFactory::createFileSet(pathToMainFileWhereWillBeNestedSubproject);
                         loader->open();
@@ -587,7 +584,6 @@ TEST_F(TestAddRegularSubprojectsToNested, Add_one_regular_nested_subproject) {
 }
 
 TEST_F(TestAddRegularSubprojectsToNested, Add_broken_subproject) {
-    json fileToTest = { };
     ASSERT_THROW({
                         loader = FileSetFactory::createFileSet(pathToMainFileWhichIsTargetForAddBrokenSubproject);
                         loader->open();
@@ -603,7 +599,6 @@ TEST_F(TestAddRegularSubprojectsToNested, Add_broken_subproject) {
 }
 
 TEST_F(TestAddRegularSubprojectsToNested, Add_one_regular_single_which_already_cached) {
-    json fileToTest = { };
     ASSERT_THROW({
                         loader = FileSetFactory::createFileSet(pathToMainFileWhereWillBeSingleSubproject);
                         loader->open();
@@ -620,7 +615,6 @@ TEST_F(TestAddRegularSubprojectsToNested, Add_one_regular_single_which_already_c
 }
 
 TEST_F(TestAddRegularSubprojectsToNested, Add_one_regular_single_which_already_present_in_project_file) {
-    json fileToTest = { };
     ASSERT_THROW({
                         loader = FileSetFactory::createFileSet(pathToMainFileWhereWillBeSingleSubproject);
                         loader->open();
@@ -638,7 +632,6 @@ TEST_F(TestAddRegularSubprojectsToNested, Add_one_regular_single_which_already_p
 }
 
 TEST_F(TestAddRegularSubprojectsToNested, Add_already_cached_and_present_subprojects) {
-    json fileToTest = { };
     vector<string> subprojectsToAdd = pathToOneRegularNestedSubproject;
     subprojectsToAdd.push_back(pathToPresentSubproject);
 
@@ -658,7 +651,6 @@ TEST_F(TestAddRegularSubprojectsToNested, Add_already_cached_and_present_subproj
 }
 
 TEST_F(TestAddRegularSubprojectsToNested, Add_two_regular_subprojects) {
-    json fileToTest = { };
     ASSERT_NO_THROW({
                         loader = FileSetFactory::createFileSet(pathToMainFileWhereMustBeTwoNewRegularSubprojects);
                         loader->open();
@@ -673,7 +665,6 @@ TEST_F(TestAddRegularSubprojectsToNested, Add_two_regular_subprojects) {
 }
 
 TEST_F(TestAddRegularSubprojectsToNested, Add_regular_and_broken_subprojects) {
-    json fileToTest = { };
     ASSERT_THROW({
                         loader = FileSetFactory::createFileSet(pathToMainFileForTestWithRegularAndBrokenSubprojects);
                         loader->open();
@@ -689,7 +680,6 @@ TEST_F(TestAddRegularSubprojectsToNested, Add_regular_and_broken_subprojects) {
 }
 
 TEST_F(TestAddRegularSubprojectsToNested, Add_pair_of_broken_subprojects) {
-    json fileToTest = { };
     ASSERT_THROW({
                         loader = FileSetFactory::createFileSet(pathToMainFileForTestWithTwoBrokenSubprojects);
                         loader->open();
@@ -705,7 +695,6 @@ TEST_F(TestAddRegularSubprojectsToNested, Add_pair_of_broken_subprojects) {
 }
 
 TEST_F(TestAddRegularSubprojectsToNested, Add_regular_and_empty_subprojects) {
-    json fileToTest = { };
     ASSERT_THROW({
                         loader = FileSetFactory::createFileSet(pathToMainFileForTestWithRegularAndEmptySubprojects);
                         loader->open();
@@ -721,7 +710,6 @@ TEST_F(TestAddRegularSubprojectsToNested, Add_regular_and_empty_subprojects) {
 }
 
 TEST_F(TestAddRegularSubprojectsToNested, Add_empty_vector_of_subprojects) {
-    json fileToTest = { };
     ASSERT_NO_THROW({
                         loader = FileSetFactory::createFileSet(pathToMainFileForTestWithEmptyVector);
                         loader->open();
@@ -736,7 +724,6 @@ TEST_F(TestAddRegularSubprojectsToNested, Add_empty_vector_of_subprojects) {
 }
 
 TEST_F(TestRemoveSubprojects, Remove_one_subproject_from_file_with_two) {
-    json fileToTest = { };
     ASSERT_NO_THROW({
                         loader = FileSetFactory::createFileSet(case_0_pathToMainFileWhereNeedToRemoveOneSubprojectInArrayOfTwo);
                         loader->open();
@@ -751,7 +738,6 @@ TEST_F(TestRemoveSubprojects, Remove_one_subproject_from_file_with_two) {
 }
 
 TEST_F(TestRemoveSubprojects, Remove_last_subproject) {
-    json fileToTest = { };
     ASSERT_NO_THROW({
                         loader = FileSetFactory::createFileSet(case_4_pathToMainFileWhereIsOneSubprojectWithWillBeRemoved);
                         loader->open();
@@ -766,7 +752,6 @@ TEST_F(TestRemoveSubprojects, Remove_last_subproject) {
 }
 
 TEST_F(TestRemoveSubprojects, Remove_nonexistent_subproject) {
-    json fileToTest = { };
     ASSERT_THROW({
                         loader = FileSetFactory::createFileSet(case_1_pathToMainFileWhereNeedToRemoveOneNonExistentSubproject);
                         loader->open();
@@ -782,7 +767,6 @@ TEST_F(TestRemoveSubprojects, Remove_nonexistent_subproject) {
 }
 
 TEST_F(TestRemoveSubprojects, Remove_nonexistent_subprojects) {
-    json fileToTest = { };
     ASSERT_THROW({
                         loader = FileSetFactory::createFileSet(case_2_pathToMainFileWhereNeedToRemoveTwoNonExistentSubprojects);
                         loader->open();
@@ -798,7 +782,6 @@ TEST_F(TestRemoveSubprojects, Remove_nonexistent_subprojects) {
 }
 
 TEST_F(TestRemoveSubprojects, Remove_two_equal_correct_subprojects) {
-    json fileToTest = { };
     ASSERT_THROW({
                         loader = FileSetFactory::createFileSet(case_3_pathToMainFileWhereNeedToRemoveTwoSubprojectsWithEqualButCorrectPaths);
                         loader->open();
@@ -814,7 +797,6 @@ TEST_F(TestRemoveSubprojects, Remove_two_equal_correct_subprojects) {
 }
 
 TEST_F(TestRemoveSubprojects, Remove_existent_and_nonexistent_subprojects) {
-    json fileToTest = { };
     ASSERT_THROW({
                         loader = FileSetFactory::createFileSet(case_5_pathToMainFileWhereNeedToRemoveOneExistentAndOneNonExistentSubprojects);
                         loader->open();
@@ -830,7 +812,6 @@ TEST_F(TestRemoveSubprojects, Remove_existent_and_nonexistent_subprojects) {
 }
 
 TEST_F(TestRemoveSubprojects, Remove_on_not_loaded_interface) {
-    json fileToTest = { };
     ASSERT_THROW({
                         loader = FileSetFactory::createFileSet(case_6_pathToMainFileWhichWillNotBeLoaded);
                         loader->removeSubproject(path_case6);
@@ -843,6 +824,7 @@ TEST_F(TestRemoveSubprojects, Remove_on_not_loaded_interface) {
 
     ASSERT_EQ(contentReference_case6.dump(4), fileToTest.dump(4));
 }
+
 
 
 //TODO test with pair broken path and regular
