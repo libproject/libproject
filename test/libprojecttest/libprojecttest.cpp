@@ -290,18 +290,21 @@ protected:
     case_2_pathToMainFileWhereNeedToRemoveTwoNonExistentSubprojects,
     case_3_pathToMainFileWhereNeedToRemoveTwoSubprojectsWithEqualButCorrectPaths,
     case_4_pathToMainFileWhereIsOneSubprojectWithWillBeRemoved,
-    case_5_pathToMainFileWhereNeedToRemoveOneExistentAndOneNonExistentSubprojects;
+    case_5_pathToMainFileWhereNeedToRemoveOneExistentAndOneNonExistentSubprojects,
+    case_6_pathToMainFileWhichWillNotBeLoaded;
 
     json contentReference_case0,
     contentReference_case1,
     contentReference_case4;
     json & contentReference_case2 = contentReference_case1,
     & contentReference_case3 = contentReference_case1,
-    & contentReference_case5 = contentReference_case1;
+    & contentReference_case5 = contentReference_case1,
+    & contentReference_case6 = contentReference_case1;
 
     string path_case0,
     path_case1,
     path_case4;
+    string & path_case6 = path_case0;
     vector<string> path_case2,
     path_case3,
     path_case5;
@@ -319,6 +322,8 @@ protected:
                 R"(project_files/testremove/case_4.libproject)";
         case_5_pathToMainFileWhereNeedToRemoveOneExistentAndOneNonExistentSubprojects =
                 R"(project_files/testremove/case_5.libproject)";
+        case_6_pathToMainFileWhichWillNotBeLoaded =
+                R"(project_files/testremove/case_6.libproject)";
 
         contentReference_case0 = {
             { "project", "try to remove" },
@@ -822,6 +827,21 @@ TEST_F(TestRemoveSubprojects, Remove_existent_and_nonexistent_subprojects) {
     fileToTest << i;
 
     ASSERT_EQ(contentReference_case5.dump(4), fileToTest.dump(4));
+}
+
+TEST_F(TestRemoveSubprojects, Remove_on_not_loaded_interface) {
+    json fileToTest = { };
+    ASSERT_THROW({
+                        loader = FileSetFactory::createFileSet(case_6_pathToMainFileWhichWillNotBeLoaded);
+                        loader->removeSubproject(path_case6);
+                 }, FileSetRuntimeError);
+    loader->save();
+    ifstream i(case_6_pathToMainFileWhichWillNotBeLoaded);
+    if (i.fail())
+        throw std::exception();
+    fileToTest << i;
+
+    ASSERT_EQ(contentReference_case6.dump(4), fileToTest.dump(4));
 }
 
 

@@ -283,6 +283,9 @@ namespace Interface {
     JsonFileSetLoader::removeSubprojects(const vector<string>& subp)
     {
 
+        if(loaded == false)
+            throw FileSetRuntimeError(FileSetRuntimeError::NotLoaded, "Trying to remove subprojects on not loaded interface");
+
         //find duplicates
         vector<string> sorted = subp;
         std::sort(sorted.begin(), sorted.end());
