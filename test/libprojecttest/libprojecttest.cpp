@@ -289,19 +289,22 @@ protected:
     case_1_pathToMainFileWhereNeedToRemoveOneNonExistentSubproject,
     case_2_pathToMainFileWhereNeedToRemoveTwoNonExistentSubprojects,
     case_3_pathToMainFileWhereNeedToRemoveTwoSubprojectsWithEqualButCorrectPaths,
-    case_4_pathToMainFileWhereIsOneSubprojectWithWillBeRemoved;
+    case_4_pathToMainFileWhereIsOneSubprojectWithWillBeRemoved,
+    case_5_pathToMainFileWhereNeedToRemoveOneExistentAndOneNonExistentSubprojects;
 
     json contentReference_case0,
     contentReference_case1,
-    contentReference_case2,
-    contentReference_case3,
     contentReference_case4;
+    json & contentReference_case2 = contentReference_case1,
+    & contentReference_case3 = contentReference_case1,
+    & contentReference_case5 = contentReference_case1;
 
     string path_case0,
     path_case1,
     path_case4;
     vector<string> path_case2,
-    path_case3;
+    path_case3,
+    path_case5;
 
     void SetUp() {
         case_0_pathToMainFileWhereNeedToRemoveOneSubprojectInArrayOfTwo =
@@ -314,6 +317,8 @@ protected:
                 R"(project_files/testremove/case_3.libproject)";
         case_4_pathToMainFileWhereIsOneSubprojectWithWillBeRemoved =
                 R"(project_files/testremove/case_4.libproject)";
+        case_5_pathToMainFileWhereNeedToRemoveOneExistentAndOneNonExistentSubprojects =
+                R"(project_files/testremove/case_5.libproject)";
 
         contentReference_case0 = {
             { "project", "try to remove" },
@@ -323,20 +328,6 @@ protected:
             { "subprojects", {"sub/s2.libproject"} }
           };
         contentReference_case1 = {
-            { "project", "try to remove" },
-
-            { "files", { "main.cpp", "Test.h", "Test.cpp" } },
-
-            { "subprojects", {"sub/s1.libproject", "sub/s2.libproject"} }
-          };
-        contentReference_case2 = {
-            { "project", "try to remove" },
-
-            { "files", { "main.cpp", "Test.h", "Test.cpp" } },
-
-            { "subprojects", {"sub/s1.libproject", "sub/s2.libproject"} }
-          };
-        contentReference_case3 = {
             { "project", "try to remove" },
 
             { "files", { "main.cpp", "Test.h", "Test.cpp" } },
@@ -354,6 +345,7 @@ protected:
         path_case2 = vector<string>({ path_case1, "sub/nonexistent.libproject" });
         path_case3 = vector<string>({ path_case0, path_case0 });
         path_case4 = "sub/s1.libproject";
+        path_case5 = vector<string>({ path_case0, "sub/nonexistent.libproject" });
 
         TestSkeleton::SetUp();
     }
@@ -803,7 +795,7 @@ TEST_F(TestRemoveSubprojects, Remove_nonexistent_subprojects) {
 TEST_F(TestRemoveSubprojects, Remove_two_equal_correct_subprojects) {
     json fileToTest = { };
     ASSERT_THROW({
-                        loader = FileSetFactory::createFileSet(case_3_pathToMainFileWhereNeedToRemoveTwoSubprojectsWithEqualButCorrectPaths );
+                        loader = FileSetFactory::createFileSet(case_3_pathToMainFileWhereNeedToRemoveTwoSubprojectsWithEqualButCorrectPaths);
                         loader->open();
                         loader->removeSubprojects(path_case3);
                  }, FileSetRuntimeError);
@@ -814,6 +806,22 @@ TEST_F(TestRemoveSubprojects, Remove_two_equal_correct_subprojects) {
     fileToTest << i;
 
     ASSERT_EQ(contentReference_case3.dump(4), fileToTest.dump(4));
+}
+
+TEST_F(TestRemoveSubprojects, Remove_existent_and_nonexistent_subprojects) {
+    json fileToTest = { };
+    ASSERT_THROW({
+                        loader = FileSetFactory::createFileSet(case_5_pathToMainFileWhereNeedToRemoveOneExistentAndOneNonExistentSubprojects);
+                        loader->open();
+                        loader->removeSubprojects(path_case5);
+                 }, FileSetRuntimeError);
+    loader->save();
+    ifstream i(case_5_pathToMainFileWhereNeedToRemoveOneExistentAndOneNonExistentSubprojects);
+    if (i.fail())
+        throw std::exception();
+    fileToTest << i;
+
+    ASSERT_EQ(contentReference_case5.dump(4), fileToTest.dump(4));
 }
 
 

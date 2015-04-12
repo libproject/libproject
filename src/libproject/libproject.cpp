@@ -282,6 +282,8 @@ namespace Interface {
     void
     JsonFileSetLoader::removeSubprojects(const vector<string>& subp)
     {
+
+        //find duplicates
         vector<string> sorted = subp;
         std::sort(sorted.begin(), sorted.end());
         for (auto it = sorted.begin() + 1; it != sorted.end(); ++it)
@@ -289,25 +291,23 @@ namespace Interface {
                 throw FileSetRuntimeError(FileSetRuntimeError::SubprojectsIncongruity,
                                           "Duplicate found in candidates to remove");
 
+        //get reference for subprojects array
         auto& subprojects = jChangedContentOfProjectFile["subprojects"];
-        size_t sizeBefore = subprojects.size();
-        if (subp.size() > sizeBefore)
-            throw FileSetRuntimeError(FileSetRuntimeError::SubprojectsIncongruity,
-                                      "Trying to remove nonexistent subproject(s)");
 
+        //find nonexistent subprojects
+        vector<json::iterator> candidates;
         for (const auto& path : subp) {
+            const auto& found = std::find(subprojects.begin(), subprojects.end(), path);
+            if (found == subprojects.end())
+                throw FileSetRuntimeError(FileSetRuntimeError::SubprojectsIncongruity,
+                                                      "Trying to remove nonexistent subproject(s)");
+            else
+                candidates.push_back(found);
 
-            for(size_t i = 0; i < subprojects.size(); ++i)
-                if (path == subprojects.at(i)) {
-                    subprojects.erase(i);
-                    break;
-                }
         }
 
-        if (sizeBefore == subprojects.size())
-            throw FileSetRuntimeError(FileSetRuntimeError::SubprojectsIncongruity,
-                                      "Trying to remove nonexistent subproject(s)");
-
+        //remove subprojects
+        std::for_each(candidates.cbegin(), candidates.cend(), [&subprojects](json::iterator it){ subprojects.erase(it); });
         if (subprojects.empty()) {
             jChangedContentOfProjectFile.erase("subprojects");
         }
