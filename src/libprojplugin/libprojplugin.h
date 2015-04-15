@@ -1,6 +1,6 @@
 #pragma once
 #include <extensionsystem/iplugin.h>
-#include <QVector>
+//#include <QVector>
 #include "libprojprojectnodes.h"
 #include <string>
 #include "libprojconstants.h"

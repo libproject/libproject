@@ -28,7 +28,8 @@ QList<ProjectExplorer::ProjectAction> ProjectNode::supportedActions(Node *node) 
     qDebug() << "Calling ProjectNode::supportedActions(Node *node) const";
     Q_UNUSED(node);
     return QList<ProjectAction>()
-        << ProjectExplorer::ProjectAction::AddNewFile;
+        << ProjectExplorer::ProjectAction::AddNewFile
+        << ProjectExplorer::ProjectAction::AddSubProject;
 }
 
 /*dummies*/
