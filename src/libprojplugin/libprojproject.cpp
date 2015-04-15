@@ -17,6 +17,7 @@ using Libproj::Internal::Plugin;
 using std::string;
 using LibprojManager::Interface::FileSetLoader;
 using namespace LibprojManager::Interface::Error;
+typedef ProjectExplorer::Project AbstractProject;
 
 namespace LibprojManager {
 namespace Internal {
@@ -100,19 +101,37 @@ bool Project::addFiles(const QStringList &filePaths)
 {
     qDebug() << "Calling Project::addFiles(const QStringList &filePaths)";
     QList<FileNode *> fileNodes;
-    for (const auto& x : filePaths) {
-        if (QFileInfo(x).suffix() != QString("h") && QFileInfo(x).suffix() != QString("cpp"))
+    QList<ProjectExplorer::ProjectNode *> subprojectNodes;
+    QString * err = new QString();
+    for (const auto& path : filePaths) {
+        if (QFileInfo(path).suffix() == QString("h") || QFileInfo(path).suffix() == QString("cpp"))
         {
-            qWarning() << "There are unsupported files";
-            continue;
+            fileNodes.push_back(new FileNode(path,
+                                             QFileInfo(path).suffix() == QString("cpp")?
+                                             FileType::SourceType:
+                                             FileType::HeaderType,
+                                             false));
         }
-        fileNodes.push_back(new FileNode(x,
-                                         /*QFileInfo(x).suffix().compare("cpp") == 0 ?
-                                             FileType::SourceType : FileType::HeaderType*/FileType::SourceType,
-                                         false));
+        else if (QFileInfo(path).suffix() == QString("libproject"))
+        {
+            AbstractProject * subproject = this->projectManager()->openProject(path, err);
+            subprojectNodes.push_back(new ProjectNode(subproject,
+                                                   qobject_cast<Project *>(subproject)->getProjectFile()));
+        }
+
     }
-    rootNode->ProjectNode::addFileNodes(fileNodes);
+    if(!fileNodes.isEmpty())
+        rootNode->ProjectNode::addFileNodes(fileNodes);
+    if(!subprojectNodes.isEmpty())
+        rootNode->ProjectNode::addProjectNodes(subprojectNodes);
+    if(fileNodes.isEmpty() && subprojectNodes.isEmpty())
+        return false;
     return true;
+}
+
+ProjectFile * Project::getProjectFile() const
+{
+    return projectFile;
 }
 
 

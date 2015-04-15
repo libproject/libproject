@@ -30,6 +30,7 @@ public:
     Core::IDocument *document() const;
     ProjectExplorer::IProjectManager *projectManager() const;
     ProjectExplorer::ProjectNode *rootProjectNode() const;
+    ProjectFile * getProjectFile() const;
     QStringList files(FilesMode fileMode) const;
     QStringList files() const;
     bool addFiles(const QStringList &filePaths);

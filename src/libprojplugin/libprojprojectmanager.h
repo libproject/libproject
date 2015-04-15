@@ -9,6 +9,7 @@ class Manager : public ProjectExplorer::IProjectManager
 {
     Q_OBJECT
     ProjectExplorer::Project * project;
+    QList<ProjectExplorer::Project *> subprojects;
 public:
     Manager();
 
@@ -17,6 +18,10 @@ public:
 
     void registerProject(ProjectExplorer::Project * Project);
     void unregisterProject(ProjectExplorer::Project * /*Project*/);
+
+    ProjectExplorer::Project * openSubproject(const QString &Filename, QString *ErrorString);
+private:
+    void registerSubproject(ProjectExplorer::Project * Project);
 };
 
 } // namespace Internal

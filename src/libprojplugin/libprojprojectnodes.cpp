@@ -35,13 +35,14 @@ QList<ProjectExplorer::ProjectAction> ProjectNode::supportedActions(Node *node) 
 /*dummies*/
 bool ProjectNode::canAddSubProject(const QString &proFilePath) const
 {
-    qDebug() << "Calling dummy ProjectNode::canAddSubProject()";
+    if (QFileInfo(proFilePath).suffix() == QString("libproject"))
+        return true;
     return false;
 }
 bool ProjectNode::addSubProjects(const QStringList &proFilePaths)
 {
-    qDebug() << "Calling dummy ProjectNode::addSubProjects()";
-    return false;
+    QStringList failedSubprojects;
+    return addFiles(proFilePaths, &failedSubprojects);
 }
 bool ProjectNode::removeSubProjects(const QStringList &proFilePaths)
 {
