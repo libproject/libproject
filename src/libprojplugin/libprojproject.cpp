@@ -114,9 +114,8 @@ bool Project::addFiles(const QStringList &filePaths)
         }
         else if (QFileInfo(path).suffix() == QString("libproject"))
         {
-            AbstractProject * subproject = this->projectManager()->openProject(path, err);
-            subprojectNodes.push_back(new ProjectNode(subproject,
-                                                   qobject_cast<Project *>(subproject)->getProjectFile()));
+            AbstractProject * subproject = manager->openProject(path, err);
+            subprojectNodes.push_back(qobject_cast<Project *>(subproject)->rootProjectNode());
         }
 
     }
@@ -127,6 +126,7 @@ bool Project::addFiles(const QStringList &filePaths)
     if(fileNodes.isEmpty() && subprojectNodes.isEmpty())
         return false;
     return true;
+
 }
 
 ProjectFile * Project::getProjectFile() const

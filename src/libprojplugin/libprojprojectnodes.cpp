@@ -26,13 +26,12 @@ ProjectNode::ProjectNode(AbstractProject * Project, ProjectFile * ProjectFile)
 QList<ProjectExplorer::ProjectAction> ProjectNode::supportedActions(Node *node) const
 {
     qDebug() << "Calling ProjectNode::supportedActions(Node *node) const";
-    Q_UNUSED(node);
+    //Q_UNUSED(node);
     return QList<ProjectAction>()
         << ProjectExplorer::ProjectAction::AddNewFile
         << ProjectExplorer::ProjectAction::AddSubProject;
 }
 
-/*dummies*/
 bool ProjectNode::canAddSubProject(const QString &proFilePath) const
 {
     if (QFileInfo(proFilePath).suffix() == QString("libproject"))
@@ -49,7 +48,6 @@ bool ProjectNode::removeSubProjects(const QStringList &proFilePaths)
     qDebug() << "Calling dummy ProjectNode::removeSubProjects()";
     return false;
 }
-/*dummies*/
 
 bool ProjectNode::addFiles(const QStringList &filePaths, QStringList *notAdded)
 {
