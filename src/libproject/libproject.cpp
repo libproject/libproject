@@ -45,7 +45,6 @@ namespace Interface {
      */
     class JsonFileSetLoader : public FileSetLoader
     {
-        string sContentOfProjectFile;
         const string pathToProjectFile;
         json jContentOfProjectFile;
         json jChangedContentOfProjectFile;
@@ -144,9 +143,8 @@ namespace Interface {
 
         /*!
          * \brief loadSubprojects loads nested subprojects
-         * \return map<string, FileSetLoader*> of interface instances
          */
-        map<std::string, FileSetLoader *> loadSubprojects();
+        void loadSubprojects();
 
     };
 
@@ -166,7 +164,7 @@ namespace Interface {
             throw FileSetRuntimeError(FileSetRuntimeError::IncorrectSource, jContentOfProjectFile["Error"].get<string>());
         } else {
             if (jContentOfProjectFile["subprojects"].is_array()) /// Checking project data for subprojects
-               subprojects = loadSubprojects(); /// If above is true loading subprojects
+               loadSubprojects(); /// If above is true loading subprojects
         }
 
         i.close();
@@ -314,6 +312,9 @@ namespace Interface {
         if (subprojects.empty()) {
             jChangedContentOfProjectFile.erase("subprojects");
         }
+
+        //reload subproject loaders
+        loadSubprojects();
     }
 
     void JsonFileSetLoader::removeSubproject(const std::string &s)
@@ -358,26 +359,32 @@ namespace Interface {
         }
     }
 
-    map<string, FileSetLoader*>
+    void
     JsonFileSetLoader::loadSubprojects()
     {
         try {
-            map<string, FileSetLoader*> subprojectLoaders;
             string pathHead, pathSub, nameOfSubproject;
-            FileSetLoader * loaderOfSubproject;
-            char * cPathToProjectFile, * dname;
+            FileSetLoader * loaderOfSubproject = nullptr;
+            char * cPathToProjectFile = nullptr, * dname = nullptr;
             cPathToProjectFile = strdup(pathToProjectFile.c_str());
             dname = dirname(cPathToProjectFile);
             pathHead = string(dname) + string("/");
-            for (const auto& x: jContentOfProjectFile["subprojects"]) {
-                        pathSub = x.get<string>();
-                        loaderOfSubproject = FileSetFactory::createFileSet(pathHead + pathSub);
-                        loaderOfSubproject->open();
-                        nameOfSubproject = loaderOfSubproject->getProjectName();
-                        subprojectLoaders.emplace(nameOfSubproject, loaderOfSubproject);
+
+
+
+            if (jChangedContentOfProjectFile.count("subprojects") == 1) { //prevent creating "subprojects" key with "null" value
+                for (const auto& x: jChangedContentOfProjectFile["subprojects"]) {
+                            pathSub = x.get<string>();
+                            loaderOfSubproject = FileSetFactory::createFileSet(pathHead + pathSub);
+                            loaderOfSubproject->open();
+                            nameOfSubproject = loaderOfSubproject->getProjectName();
+                            if (subprojects.count(nameOfSubproject) == 1) //because std::map
+                                continue;
+                            subprojects.emplace(nameOfSubproject, loaderOfSubproject);
+                }
             }
 
-            return subprojectLoaders;
+            return;
             } catch (const FileSetRuntimeError& re) {
                 throw FileSetRuntimeError(FileSetRuntimeError::BrokenSubproject, string(re.what()));
             }
