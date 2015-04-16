@@ -47,7 +47,10 @@ bool ProjectFile::isSaveAsAllowed() const
 bool ProjectFile::reload(QString *errorString, ReloadFlag flag, ChangeType type)
 {
     qDebug() << "Calling dummy ProjectFile::reload()";
-    return false;
+    Q_UNUSED(errorString)
+    Q_UNUSED(flag)
+    Q_UNUSED(type)
+    return true;
 }
 /*dummies*/
 

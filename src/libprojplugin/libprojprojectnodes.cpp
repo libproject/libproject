@@ -29,7 +29,8 @@ QList<ProjectExplorer::ProjectAction> ProjectNode::supportedActions(Node *node) 
     //Q_UNUSED(node);
     return QList<ProjectAction>()
         << ProjectExplorer::ProjectAction::AddNewFile
-        << ProjectExplorer::ProjectAction::AddSubProject;
+        << ProjectExplorer::ProjectAction::AddSubProject
+        << ProjectExplorer::ProjectAction::RemoveSubProject;
 }
 
 bool ProjectNode::canAddSubProject(const QString &proFilePath) const
@@ -40,13 +41,12 @@ bool ProjectNode::canAddSubProject(const QString &proFilePath) const
 }
 bool ProjectNode::addSubProjects(const QStringList &proFilePaths)
 {
-    QStringList failedSubprojects;
-    return addFiles(proFilePaths, &failedSubprojects);
+    return qobject_cast<Project*>(project)->addFiles(proFilePaths);
 }
 bool ProjectNode::removeSubProjects(const QStringList &proFilePaths)
 {
-    qDebug() << "Calling dummy ProjectNode::removeSubProjects()";
-    return false;
+    project->rootProjectNode()->removeSubProjects(proFilePaths);
+    return true; //Err check TODO
 }
 
 bool ProjectNode::addFiles(const QStringList &filePaths, QStringList *notAdded)

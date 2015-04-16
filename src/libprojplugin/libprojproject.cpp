@@ -91,6 +91,7 @@ QStringList Project::files(FilesMode fileMode) const{
 
 QStringList Project::files() const
 {
+    qDebug() << "Calling files()";
     QStringList files;
     for (const auto& x : rootNode->fileNodes())
         files << x->displayName();
@@ -110,7 +111,8 @@ bool Project::addFiles(const QStringList &filePaths)
                                              QFileInfo(path).suffix() == QString("cpp")?
                                              FileType::SourceType:
                                              FileType::HeaderType,
-                                             false));
+                                             false)
+                                );
         }
         else if (QFileInfo(path).suffix() == QString("libproject"))
         {
@@ -126,7 +128,6 @@ bool Project::addFiles(const QStringList &filePaths)
     if(fileNodes.isEmpty() && subprojectNodes.isEmpty())
         return false;
     return true;
-
 }
 
 ProjectFile * Project::getProjectFile() const
