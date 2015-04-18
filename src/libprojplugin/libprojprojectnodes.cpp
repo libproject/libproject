@@ -3,6 +3,7 @@
 #include "libprojproject.h"
 #include "libprojplugin.h"
 #include <QFile>
+#include "libprojprojectmanager.h"
 
 typedef ProjectExplorer::Project AbstractProject;
 using ProjectExplorer::FileNode;
@@ -45,7 +46,8 @@ bool ProjectNode::addSubProjects(const QStringList &proFilePaths)
 }
 bool ProjectNode::removeSubProjects(const QStringList &proFilePaths)
 {
-    project->rootProjectNode()->removeSubProjects(proFilePaths);
+    //Manager * m = qobject_cast <Manager *>(project->projectManager());
+    removeProjectNodes(qobject_cast<Project *>(project)->getSubprojectNodes());
     return true; //Err check TODO
 }
 

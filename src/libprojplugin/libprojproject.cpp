@@ -102,7 +102,7 @@ bool Project::addFiles(const QStringList &filePaths)
 {
     qDebug() << "Calling Project::addFiles(const QStringList &filePaths)";
     QList<FileNode *> fileNodes;
-    QList<ProjectExplorer::ProjectNode *> subprojectNodes;
+    QList<ProjectExplorer::ProjectNode *> newSubprojectNodes;
     QString * err = new QString();
     for (const auto& path : filePaths) {
         if (QFileInfo(path).suffix() == QString("h") || QFileInfo(path).suffix() == QString("cpp"))
@@ -117,15 +117,18 @@ bool Project::addFiles(const QStringList &filePaths)
         else if (QFileInfo(path).suffix() == QString("libproject"))
         {
             AbstractProject * subproject = manager->openProject(path, err);
-            subprojectNodes.push_back(qobject_cast<Project *>(subproject)->rootProjectNode());
+            newSubprojectNodes.push_back(subproject->rootProjectNode());
         }
 
     }
     if(!fileNodes.isEmpty())
         rootNode->ProjectNode::addFileNodes(fileNodes);
-    if(!subprojectNodes.isEmpty())
-        rootNode->ProjectNode::addProjectNodes(subprojectNodes);
-    if(fileNodes.isEmpty() && subprojectNodes.isEmpty())
+    if(!newSubprojectNodes.isEmpty())
+    {
+        rootNode->ProjectNode::addProjectNodes(newSubprojectNodes);
+        subprojectNodes += newSubprojectNodes;
+    }
+    if(fileNodes.isEmpty() && newSubprojectNodes.isEmpty())
         return false;
     return true;
 }

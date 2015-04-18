@@ -21,7 +21,8 @@ class Project : public ProjectExplorer::Project
     QString nameOfProject;
     QStringList projectFiles;
     ProjectFile * projectFile;
-    ProjectNode * rootNode;
+    ProjectNode * rootNode; //ProjectExplorer::
+    QList<ProjectExplorer::ProjectNode *> subprojectNodes;
 
 public:
     Project(Manager * Manager, const Interface::FileSetLoader * Loader);
@@ -34,6 +35,7 @@ public:
     QStringList files(FilesMode fileMode) const;
     QStringList files() const;
     bool addFiles(const QStringList &filePaths);
+    /*const*/QList<ProjectExplorer::ProjectNode *>/*&*/ getSubprojectNodes() const { return subprojectNodes; }
 };
 
 } // namespace Internal

@@ -9,7 +9,6 @@ class Manager : public ProjectExplorer::IProjectManager
 {
     Q_OBJECT
     QList<ProjectExplorer::Project *> projects;
-    QList<ProjectExplorer::Project *> subprojects;
 public:
     Manager();
 

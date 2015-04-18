@@ -68,7 +68,7 @@ void Manager::registerProject(AbstractProject * Project)
 void Manager::unregisterProject(AbstractProject * Project)
 {
     qDebug() << "Unregistering project";
-    projects.removeOne(Project);
+    projects.removeOne(/*Project*/ projects.last());
 }
 
 } // namespace Internal
