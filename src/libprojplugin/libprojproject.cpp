@@ -6,9 +6,9 @@
 #include "libprojplugin.h"
 #include "libprojprojectfile.h"
 #include "libprojconstants.h"
-
 #include "libproject.h"
 #include "libproject_error.h"
+#include <vector>
 
 using Core::IDocument;
 using ProjectExplorer::FileNode;
@@ -17,12 +17,14 @@ using Libproj::Internal::Plugin;
 using std::string;
 using LibprojManager::Interface::FileSetLoader;
 using namespace LibprojManager::Interface::Error;
+typedef ProjectExplorer::Project AbstractProject;
+using std::vector;
 
 namespace LibprojManager {
 namespace Internal {
 
-Project::Project(Manager *Manager, const FileSetLoader *Loader)
-    : manager(Manager) {
+Project::Project(Manager *Manager, FileSetLoader *Loader)
+    : manager(Manager), loader(Loader) {
   try {
     qDebug() << "Calling c-tor for Project";
 
@@ -31,9 +33,9 @@ Project::Project(Manager *Manager, const FileSetLoader *Loader)
     setProjectLanguages(Core::Context(ProjectExplorer::Constants::LANG_CXX));
 
     QString pathToRootNode =
-        QString::fromStdString(Loader->getPathToNode());
-    nameOfProject = QString::fromStdString(Loader->getProjectName());
-    for (const auto &filename : Loader->getFileNames())
+        QString::fromStdString(loader->getPathToNode());
+    nameOfProject = QString::fromStdString(loader->getProjectName());
+    for (const auto &filename : loader->getFileNames())
       projectFiles << QString::fromStdString(filename);
 
     projectFile = new ProjectFile(this, pathToRootNode);
@@ -41,15 +43,28 @@ Project::Project(Manager *Manager, const FileSetLoader *Loader)
 
     QList<FileNode *> listOfFileNodes;
     listOfFileNodes.push_back(
-        new FileNode(QString::fromStdString(Loader->getPathToNode()),
+        new FileNode(QString::fromStdString(loader->getPathToNode()),
                      FileType::ProjectFileType, false)); // pr. file itself
     for (const auto &x : projectFiles)
       listOfFileNodes.push_back(new FileNode(
           QFileInfo(pathToRootNode).absolutePath() + QString("/") + x,
           FileType::ProjectFileType, false));
     rootNode->addFileNodes(listOfFileNodes);
+    if(loader->countSubprojects() > 0)
+    {
+        vector<string> paths = loader->getSubprojectsPaths();
+        QStringList subprojects, failed;
+        for (const auto& path : paths)
+        {
+            subprojects.append(QFileInfo(pathToRootNode).absolutePath()
+                               + QString("/")
+                               + QString::fromStdString(path));
+        }
+        rootNode->addFiles(subprojects, &failed);
+    }
     Core::DocumentManager::addDocument(projectFile, false);
     manager->registerProject(this);
+
   } catch (const FileSetRuntimeError & re) {
     qWarning() << re.what();
     throw;
@@ -90,6 +105,7 @@ QStringList Project::files(FilesMode fileMode) const{
 
 QStringList Project::files() const
 {
+    qDebug() << "Calling files()";
     QStringList files;
     for (const auto& x : rootNode->fileNodes())
         files << x->displayName();
@@ -100,19 +116,40 @@ bool Project::addFiles(const QStringList &filePaths)
 {
     qDebug() << "Calling Project::addFiles(const QStringList &filePaths)";
     QList<FileNode *> fileNodes;
-    for (const auto& x : filePaths) {
-        if (QFileInfo(x).suffix() != QString("h") && QFileInfo(x).suffix() != QString("cpp"))
+    QList<ProjectExplorer::ProjectNode *> newSubprojectNodes;
+    QString * err = new QString();
+    for (const auto& path : filePaths) {
+        if (QFileInfo(path).suffix() == QString("h") || QFileInfo(path).suffix() == QString("cpp"))
         {
-            qWarning() << "There are unsupported files";
-            continue;
+            fileNodes.push_back(new FileNode(path,
+                                             QFileInfo(path).suffix() == QString("cpp")?
+                                             FileType::SourceType:
+                                             FileType::HeaderType,
+                                             false)
+                                );
         }
-        fileNodes.push_back(new FileNode(x,
-                                         /*QFileInfo(x).suffix().compare("cpp") == 0 ?
-                                             FileType::SourceType : FileType::HeaderType*/FileType::SourceType,
-                                         false));
+        else if (QFileInfo(path).suffix() == QString("libproject"))
+        {
+            AbstractProject * subproject = manager->openProject(path, err);
+            newSubprojectNodes.push_back(subproject->rootProjectNode());
+        }
+
     }
-    rootNode->ProjectNode::addFileNodes(fileNodes);
+    if(!fileNodes.isEmpty())
+        rootNode->ProjectNode::addFileNodes(fileNodes);
+    if(!newSubprojectNodes.isEmpty())
+    {
+        rootNode->ProjectNode::addProjectNodes(newSubprojectNodes);
+        subprojectNodes += newSubprojectNodes;
+    }
+    if(fileNodes.isEmpty() && newSubprojectNodes.isEmpty())
+        return false;
     return true;
+}
+
+ProjectFile * Project::getProjectFile() const
+{
+    return projectFile;
 }
 
 

@@ -8,7 +8,7 @@ namespace Internal {
 class Manager : public ProjectExplorer::IProjectManager
 {
     Q_OBJECT
-    ProjectExplorer::Project * project;
+    QList<ProjectExplorer::Project *> projects;
 public:
     Manager();
 
@@ -16,7 +16,11 @@ public:
     virtual ProjectExplorer::Project * openProject(const QString &Filename, QString *ErrorString);
 
     void registerProject(ProjectExplorer::Project * Project);
-    void unregisterProject(ProjectExplorer::Project * /*Project*/);
+    void unregisterProject(ProjectExplorer::Project * Project);
+
+    //ProjectExplorer::Project * openSubproject(const QString &Filename, QString *ErrorString);
+private:
+    //void registerSubproject(ProjectExplorer::Project * Project);
 };
 
 } // namespace Internal

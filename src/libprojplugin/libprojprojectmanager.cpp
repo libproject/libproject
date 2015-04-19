@@ -36,28 +36,37 @@ ProjectExplorer::Project * Manager::openProject(const QString &Filename, QString
             throw FileSetRuntimeError(FileSetRuntimeError::UnknownError, "Unsuccessful opening operation");
         return new LibprojManager::Internal::Project(this, loader);
     } catch (const FileSetRuntimeError & re) {
-        if (re.getErrorType() == FileSetRuntimeError::AlreadyLoaded)
+            qWarning() << re.what();
             return nullptr;
-        else
-            throw;
     }
 }
+
+//AbstractProject * Manager::openSubproject(const QString &Filename, QString *ErrorString)
+//{
+//    AbstractProject * subproject = this->openProject(Filename, ErrorString);
+//    this->registerSubproject(subproject);
+//}
 
 void Manager::registerProject(AbstractProject * Project)
 {
     /* TODO
      * project will be projectS there must be function which appends projects to array*/
     qDebug() << "Registering project";
-    project = Project;
+    projects.append(Project);
 
     /*Also project must have been registered in plugin's variable*/
     Libproj::Internal::Plugin::setProject(Project);
 }
 
-void Manager::unregisterProject(AbstractProject * /*Project*/)
+//void Manager::registerSubproject(AbstractProject * Subproject)
+//{
+//    subprojects.append(Subproject);
+//}
+
+void Manager::unregisterProject(AbstractProject * Project)
 {
     qDebug() << "Unregistering project";
-    project = nullptr;
+    projects.removeOne(/*Project*/ projects.last());
 }
 
 } // namespace Internal

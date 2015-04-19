@@ -93,6 +93,13 @@ namespace Interface {
                                                   "Trying to get path to root node on not loaded interface"); }
 
         /*!
+          * \brief Gives std::vector<std::string> of path to subprojects to user
+          * in relative path format (to project)
+          * \return vector of subprojects paths. Zero-sized vector implied
+          */
+        /*virtual*/ const vector<string> getSubprojectsPaths() const;
+
+        /*!
           * \brief Gives number of subprojects to user
           * \return number of subprojects. Zero implied
           */
@@ -109,28 +116,28 @@ namespace Interface {
          * filesystem to cache of .libproject file. But NOT saves it.
          * \param[in] std::vector of pathes to subprojects
          */
-        /*virtual*/ void addSubprojects(const std::vector<std::string> & subp);
+        /*virtual*/ void addSubprojects(const vector<string> & subp);
 
         /*!
          * \brief This function performs adding existing subproject which is present on
          * filesystem to cache of .libproject file. But NOT saves it.
          * \param[in] std::string with path to subproject
          */
-        /*virtual*/ void addSubproject(const std::string & subp);
+        /*virtual*/ void addSubproject(const string & subp);
 
         /*!
          * \brief This function performs removing existing subprojects in cache or in saved
          * .libproject file
          * \param[in] std::vector of pathes to subprojects
          */
-        /*virtual*/ void removeSubprojects(const vector<std::string> & subp);
+        /*virtual*/ void removeSubprojects(const vector<string> & subp);
 
         /*!
          * \brief This function performs removing existing subproject in cache or in saved
          * .libproject file
          * \param[in] std::string with path to subproject
          */
-        /*virtual*/ void removeSubproject(const std::string& s);
+        /*virtual*/ void removeSubproject(const string& s);
 
     private:
 
@@ -139,7 +146,7 @@ namespace Interface {
          * \return Json object within the content of project file or Json object
          * within single key "Error" string value of which contains description of error
          */
-        const json checkProjectFileForErrors(std::ifstream &) const;
+        const json checkProjectFileForErrors(ifstream &) const;
 
         /*!
          * \brief loadSubprojects loads nested subprojects
@@ -204,6 +211,20 @@ namespace Interface {
         if(loaded == false)
             throw FileSetRuntimeError(FileSetRuntimeError::NotLoaded, "Trying to get project name on not loaded interface");
         return jContentOfProjectFile["project"].get<string>();
+    }
+
+    const vector<string>
+    JsonFileSetLoader::getSubprojectsPaths() const
+    {
+        if (loaded == false)
+            throw FileSetRuntimeError(FileSetRuntimeError::NotLoaded, "Trying to get subprojects paths on not loaded interface");
+        auto& subprojects = jChangedContentOfProjectFile["subprojects"];
+        vector<string> paths;
+        for (const auto& path : subprojects)
+        {
+            paths.push_back(path);
+        }
+        return paths;
     }
 
     int JsonFileSetLoader::countSubprojects() const
@@ -317,7 +338,8 @@ namespace Interface {
         loadSubprojects();
     }
 
-    void JsonFileSetLoader::removeSubproject(const std::string &s)
+    void
+    JsonFileSetLoader::removeSubproject(const std::string &s)
     {
         try {
             removeSubprojects({s});
@@ -326,7 +348,8 @@ namespace Interface {
         }
     }
 
-    const json JsonFileSetLoader::checkProjectFileForErrors(ifstream& ifs) const
+    const json
+    JsonFileSetLoader::checkProjectFileForErrors(ifstream& ifs) const
     {
         const string error_code = {"{\"Error\" : \""};
         try {
