@@ -22,21 +22,21 @@ class Project : public ProjectExplorer::Project
     QString nameOfProject;
     QStringList projectFiles;
     ProjectFile * projectFile;
-    ProjectNode * rootNode; //ProjectExplorer::
+    ProjectNode * rootNode;
     QList<ProjectExplorer::ProjectNode *> subprojectNodes;
 
 public:
     Project(Manager * Manager, Interface::FileSetLoader *Loader);
 
     QString displayName() const;
-    Core::IDocument *document() const;
-    ProjectExplorer::IProjectManager *projectManager() const;
-    ProjectExplorer::ProjectNode *rootProjectNode() const;
+    Core::IDocument * document() const;
+    ProjectExplorer::IProjectManager * projectManager() const;
+    ProjectExplorer::ProjectNode * rootProjectNode() const;
     ProjectFile * getProjectFile() const;
     QStringList files(FilesMode fileMode) const;
     QStringList files() const;
-    bool addFiles(const QStringList &filePaths);
-    /*const*/QList<ProjectExplorer::ProjectNode *>/*&*/ getSubprojectNodes() const { return subprojectNodes; }
+    bool addFiles(const QStringList & filePaths);
+    const QList<ProjectExplorer::ProjectNode *> & getSubprojectNodes() const { return subprojectNodes; }
     Interface::FileSetLoader * getLoader() { return loader; }
 };
 

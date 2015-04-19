@@ -33,10 +33,9 @@ ProjectNode::ProjectNode(AbstractProject * Project, ProjectFile * ProjectFile)
     setDisplayName(projectFile->filePath().toFileInfo().completeBaseName());
 }
 
-QList<ProjectExplorer::ProjectAction> ProjectNode::supportedActions(Node *node) const
+QList<ProjectExplorer::ProjectAction> ProjectNode::supportedActions(Node * node) const
 {
-    qDebug() << "Calling ProjectNode::supportedActions(Node *node) const";
-    //Q_UNUSED(node);
+    Q_UNUSED(node);
     return QList<ProjectAction>()
         << ProjectExplorer::ProjectAction::AddNewFile
         << ProjectExplorer::ProjectAction::AddSubProject
@@ -54,26 +53,41 @@ bool ProjectNode::addSubProjects(const QStringList &proFilePaths)
     class subprojectIsntInParentFolder {
     };
     try {
+
+        //adding subprojects only to ProjectExplorer tree
         bool result = qobject_cast<Project*>(project)->addFiles(proFilePaths);
         if (result == false)
             return result;
+
+
         FileSetLoader * loader = qobject_cast<Project*>(project)->getLoader();
         vector<string> subprojectsPaths;
         for (const QString& filePath : proFilePaths)
         {
             char * dirc, * dname, * dircOfRoot, * dnameOfRoot;
+
+            //getting dirnames of subprojects
             dirc = strdup(filePath.toLocal8Bit());
             dname = dirname(dirc);
-            subprojectsPaths.push_back(filePath.toStdString());
+
+            //checking for subproject's membership to folder of parent project
             dircOfRoot = strdup(loader->getPathToNode().c_str());
             dnameOfRoot = dirname(dircOfRoot);
             char * found;
             found = strstr(dircOfRoot, dname);
-            if (found == nullptr)
+            if (found == nullptr) //if there is now membership - we dropping exception
                 throw subprojectIsntInParentFolder();
+
+            //adding path to suproject to vector of correct candidates
+            subprojectsPaths.push_back(filePath.toStdString());
         }
+
+        //performing add subprojects to our API cache
         loader->addSubprojects(subprojectsPaths);
+
+        //writing changes
         loader->save();
+
         return true;
     } catch (const FileSetRuntimeError& re) {
         qWarning() << re.what();
@@ -86,14 +100,13 @@ bool ProjectNode::addSubProjects(const QStringList &proFilePaths)
 }
 bool ProjectNode::removeSubProjects(const QStringList &proFilePaths)
 {
-    //Manager * m = qobject_cast <Manager *>(project->projectManager());
+    // BUG!
     removeProjectNodes(qobject_cast<Project *>(project)->getSubprojectNodes());
     return true; //Err check TODO
 }
 
 bool ProjectNode::addFiles(const QStringList &filePaths, QStringList *notAdded)
 {
-    qDebug() << "Calling ProjectNode::addFiles(const QStringList &filePaths, QStringList *notAdded)";
     Q_UNUSED(notAdded)
     return qobject_cast<Project*>(project)->addFiles(filePaths);
 }
