@@ -6,9 +6,9 @@
 #include "libprojplugin.h"
 #include "libprojprojectfile.h"
 #include "libprojconstants.h"
-
 #include "libproject.h"
 #include "libproject_error.h"
+#include <vector>
 
 using Core::IDocument;
 using ProjectExplorer::FileNode;
@@ -18,12 +18,13 @@ using std::string;
 using LibprojManager::Interface::FileSetLoader;
 using namespace LibprojManager::Interface::Error;
 typedef ProjectExplorer::Project AbstractProject;
+using std::vector;
 
 namespace LibprojManager {
 namespace Internal {
 
-Project::Project(Manager *Manager, const FileSetLoader *Loader)
-    : manager(Manager) {
+Project::Project(Manager *Manager, FileSetLoader *Loader)
+    : manager(Manager), loader(Loader) {
   try {
     qDebug() << "Calling c-tor for Project";
 
@@ -32,9 +33,9 @@ Project::Project(Manager *Manager, const FileSetLoader *Loader)
     setProjectLanguages(Core::Context(ProjectExplorer::Constants::LANG_CXX));
 
     QString pathToRootNode =
-        QString::fromStdString(Loader->getPathToNode());
-    nameOfProject = QString::fromStdString(Loader->getProjectName());
-    for (const auto &filename : Loader->getFileNames())
+        QString::fromStdString(loader->getPathToNode());
+    nameOfProject = QString::fromStdString(loader->getProjectName());
+    for (const auto &filename : loader->getFileNames())
       projectFiles << QString::fromStdString(filename);
 
     projectFile = new ProjectFile(this, pathToRootNode);
@@ -42,15 +43,28 @@ Project::Project(Manager *Manager, const FileSetLoader *Loader)
 
     QList<FileNode *> listOfFileNodes;
     listOfFileNodes.push_back(
-        new FileNode(QString::fromStdString(Loader->getPathToNode()),
+        new FileNode(QString::fromStdString(loader->getPathToNode()),
                      FileType::ProjectFileType, false)); // pr. file itself
     for (const auto &x : projectFiles)
       listOfFileNodes.push_back(new FileNode(
           QFileInfo(pathToRootNode).absolutePath() + QString("/") + x,
           FileType::ProjectFileType, false));
     rootNode->addFileNodes(listOfFileNodes);
+    if(loader->countSubprojects() > 0)
+    {
+        vector<string> paths = loader->getSubprojectsPaths();
+        QStringList subprojects, failed;
+        for (const auto& path : paths)
+        {
+            subprojects.append(QFileInfo(pathToRootNode).absolutePath()
+                               + QString("/")
+                               + QString::fromStdString(path));
+        }
+        rootNode->addFiles(subprojects, &failed);
+    }
     Core::DocumentManager::addDocument(projectFile, false);
     manager->registerProject(this);
+
   } catch (const FileSetRuntimeError & re) {
     qWarning() << re.what();
     throw;

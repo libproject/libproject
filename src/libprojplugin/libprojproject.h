@@ -17,6 +17,7 @@ class ProjectNode;
 class Project : public ProjectExplorer::Project
 {
     Q_OBJECT
+    Interface::FileSetLoader * loader;
     Manager * manager;
     QString nameOfProject;
     QStringList projectFiles;
@@ -25,7 +26,7 @@ class Project : public ProjectExplorer::Project
     QList<ProjectExplorer::ProjectNode *> subprojectNodes;
 
 public:
-    Project(Manager * Manager, const Interface::FileSetLoader * Loader);
+    Project(Manager * Manager, Interface::FileSetLoader *Loader);
 
     QString displayName() const;
     Core::IDocument *document() const;
@@ -36,6 +37,7 @@ public:
     QStringList files() const;
     bool addFiles(const QStringList &filePaths);
     /*const*/QList<ProjectExplorer::ProjectNode *>/*&*/ getSubprojectNodes() const { return subprojectNodes; }
+    Interface::FileSetLoader * getLoader() { return loader; }
 };
 
 } // namespace Internal

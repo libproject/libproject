@@ -4,6 +4,10 @@
 #include "libprojplugin.h"
 #include <QFile>
 #include "libprojprojectmanager.h"
+#include "libproject.h"
+#include "libproject_error.h"
+#include <libgen.h>
+#include <cstring>
 
 typedef ProjectExplorer::Project AbstractProject;
 using ProjectExplorer::FileNode;
@@ -11,6 +15,11 @@ using ProjectExplorer::FileType;
 using Libproj::Internal::Plugin;
 using ProjectExplorer::ProjectAction;
 using LibprojManager::Internal::Project;
+using LibprojManager::Interface::FileSetLoader;
+using LibprojManager::Interface::Error::FileSetRuntimeError;
+using std::vector;
+using std::string;
+using std::strstr;
 
 namespace  LibprojManager {
 namespace Internal {
@@ -42,7 +51,38 @@ bool ProjectNode::canAddSubProject(const QString &proFilePath) const
 }
 bool ProjectNode::addSubProjects(const QStringList &proFilePaths)
 {
-    return qobject_cast<Project*>(project)->addFiles(proFilePaths);
+    class subprojectIsntInParentFolder {
+    };
+    try {
+        bool result = qobject_cast<Project*>(project)->addFiles(proFilePaths);
+        if (result == false)
+            return result;
+        FileSetLoader * loader = qobject_cast<Project*>(project)->getLoader();
+        vector<string> subprojectsPaths;
+        for (const QString& filePath : proFilePaths)
+        {
+            char * dirc, * dname, * dircOfRoot, * dnameOfRoot;
+            dirc = strdup(filePath.toLocal8Bit());
+            dname = dirname(dirc);
+            subprojectsPaths.push_back(filePath.toStdString());
+            dircOfRoot = strdup(loader->getPathToNode().c_str());
+            dnameOfRoot = dirname(dircOfRoot);
+            char * found;
+            found = strstr(dircOfRoot, dname);
+            if (found == nullptr)
+                throw subprojectIsntInParentFolder();
+        }
+        loader->addSubprojects(subprojectsPaths);
+        loader->save();
+        return true;
+    } catch (const FileSetRuntimeError& re) {
+        qWarning() << re.what();
+        return false;
+    } catch (subprojectIsntInParentFolder& ) {
+        qWarning() << "This subproject isn't in parent folder";
+        return false;
+    }
+
 }
 bool ProjectNode::removeSubProjects(const QStringList &proFilePaths)
 {
