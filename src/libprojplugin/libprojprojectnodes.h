@@ -6,6 +6,7 @@ namespace Core { class IDocument; }
 namespace  LibprojManager {
 namespace Internal {
 
+class Project;
 class ProjectFile;
 class ProjectNode : public ProjectExplorer::ProjectNode
 {
@@ -14,12 +15,13 @@ class ProjectNode : public ProjectExplorer::ProjectNode
 public:
     ProjectNode(ProjectExplorer::Project * Project, ProjectFile * ProjectFile);
     QList<ProjectExplorer::ProjectAction> supportedActions(Node * node) const;
-    virtual bool canAddSubProject(const QString &proFilePath) const;
-    virtual bool addSubProjects(const QStringList &proFilePaths);
-    virtual bool removeSubProjects(const QStringList &proFilePaths);
+    virtual bool canAddSubProject(const QString & proFilePath) const;
+    virtual bool addSubProjects(const QStringList & proFilePaths);
+    virtual bool removeSubProjects(const QStringList & proFilePaths);
 
 public:
-    bool addFiles(const QStringList &filePaths, QStringList *notAdded);
+    bool addFiles(const QStringList & filePaths, QStringList * notAdded);
+    const QString& getProjectPath() const;
 };
 
 } // namespace Internal

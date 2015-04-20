@@ -13,14 +13,10 @@ public:
     Manager();
 
     virtual QString mimeType() const;
-    virtual ProjectExplorer::Project * openProject(const QString &Filename, QString *ErrorString);
+    virtual ProjectExplorer::Project * openProject(const QString & Filename, QString * ErrorString);
 
     void registerProject(ProjectExplorer::Project * Project);
     void unregisterProject(ProjectExplorer::Project * Project);
-
-    //ProjectExplorer::Project * openSubproject(const QString &Filename, QString *ErrorString);
-private:
-    //void registerSubproject(ProjectExplorer::Project * Project);
 };
 
 } // namespace Internal

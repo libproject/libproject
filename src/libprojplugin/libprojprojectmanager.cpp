@@ -16,16 +16,16 @@ namespace Internal {
 
 Manager::Manager()
 {
-            qDebug() << "Calling c-tor for Manager";
+    qDebug() << "Calling c-tor for Manager";
 }
 
 QString Manager::mimeType() const
 {
-            qDebug() << "Comparing with own mime type";
-            return QString(Constants::LIBPROJPROJECTMIMETYPE);
+    qDebug() << "Comparing with own mime type";
+    return QString(Constants::LIBPROJPROJECTMIMETYPE);
 }
 
-ProjectExplorer::Project * Manager::openProject(const QString &Filename, QString *ErrorString)
+ProjectExplorer::Project * Manager::openProject(const QString & Filename, QString * ErrorString)
 {
     Q_UNUSED(ErrorString);
     FileSetLoader * loader = FileSetFactory::createFileSet(Filename.toStdString());
@@ -41,16 +41,8 @@ ProjectExplorer::Project * Manager::openProject(const QString &Filename, QString
     }
 }
 
-//AbstractProject * Manager::openSubproject(const QString &Filename, QString *ErrorString)
-//{
-//    AbstractProject * subproject = this->openProject(Filename, ErrorString);
-//    this->registerSubproject(subproject);
-//}
-
 void Manager::registerProject(AbstractProject * Project)
 {
-    /* TODO
-     * project will be projectS there must be function which appends projects to array*/
     qDebug() << "Registering project";
     projects.append(Project);
 
@@ -58,15 +50,10 @@ void Manager::registerProject(AbstractProject * Project)
     Libproj::Internal::Plugin::setProject(Project);
 }
 
-//void Manager::registerSubproject(AbstractProject * Subproject)
-//{
-//    subprojects.append(Subproject);
-//}
-
 void Manager::unregisterProject(AbstractProject * Project)
 {
     qDebug() << "Unregistering project";
-    projects.removeOne(/*Project*/ projects.last());
+    projects.removeOne(Project);
 }
 
 } // namespace Internal

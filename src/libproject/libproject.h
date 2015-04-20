@@ -42,6 +42,7 @@ public:
     virtual void addSubproject(const std::string&) = 0;
     virtual void removeSubprojects(const std::vector<std::string>&) = 0;
     virtual void removeSubproject(const std::string&) = 0;
+    virtual FileSetLoader * findSubprojectByPath(const std::string&) const = 0;
 
 };
 

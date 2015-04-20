@@ -848,7 +848,9 @@ TEST_F(TestRemoveSubprojects, Remove_on_not_loaded_interface) {
 //}
 
 //TODO test with pair broken path and regular
+
 //TODO Add tests for function getSubprojectsPaths() !!!!!!!!!!!!
+//TODO Add tests fot findSubprojectByPath() !!!!!!!!!!!!
 
 } // namespace FileSetTests
 
