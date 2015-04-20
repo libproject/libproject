@@ -95,7 +95,7 @@ void Plugin::triggerOpenProjectAction()
     QString fileName =
             QFileDialog::getOpenFileName(0, QString("Open File"));
     if (!(project =
-          qobject_cast<Project*>(ProjectExplorer::ProjectExplorerPlugin::openProject(fileName, &errorString))))
+          qobject_cast<Project *>(ProjectExplorer::ProjectExplorerPlugin::openProject(fileName, &errorString))))
             qWarning() << "Manager can not open project";
 }
 

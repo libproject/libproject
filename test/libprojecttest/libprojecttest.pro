@@ -17,6 +17,7 @@ else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../../src/libprojec
 else:unix: LIBS += -L$$OUT_PWD/../../src/libproject/ -lproject
 
 INCLUDEPATH += $$PWD/../../src/libproject \
+               ../../tools/json/src \
                $$GMOCK_HOME/include \
                $$GMOCK_HOME/gtest/include \
                $$GMOCK_HOME/gtest \
@@ -24,7 +25,7 @@ INCLUDEPATH += $$PWD/../../src/libproject \
 
 DEPENDPATH += $$PWD/../../src/libproject
 
-QMAKE_CXXFLAGS += -std=c++11
+QMAKE_CXXFLAGS += -std=c++11 -O0
 QMAKE_CXXFLAGS += -lpthread
 
 copydata.commands = $(COPY_DIR) $$PWD/project_files $$OUT_PWD

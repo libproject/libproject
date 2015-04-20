@@ -1,0 +1,4 @@
+{
+	"project": "added by test runtime",
+	"files": ["main.cpp", "foo.cpp"]
+}

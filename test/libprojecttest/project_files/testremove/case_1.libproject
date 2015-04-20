@@ -1,0 +1,5 @@
+{
+	"project": "try to remove",
+	"files": ["main.cpp", "Test.h", "Test.cpp"],
+	"subprojects": ["sub/s1.libproject", "sub/s2.libproject"]
+}
