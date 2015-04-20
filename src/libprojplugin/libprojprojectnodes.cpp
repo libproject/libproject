@@ -107,47 +107,51 @@ bool ProjectNode::removeSubProjects(const QStringList &proFilePaths)
 {
     FileSetLoader * loader = qobject_cast<Project*>(project)->getLoader();
 
-    vector<string> candidatesToRemove;
-    for (const auto& path : proFilePaths)
-        candidatesToRemove.push_back(path.toStdString());
-
-    vector<string> presentSubprojectPaths = loader->getSubprojectsPaths();
-
-    vector<string> approvedToRemove;
-    back_insert_iterator<vector<string>> it(approvedToRemove);
-
     //checking for correctness of paths
-    set_intersection(candidatesToRemove.cbegin(), candidatesToRemove.cend(),
-                     presentSubprojectPaths.cbegin(), presentSubprojectPaths.cend(),
-                     it);
-
-    if (candidatesToRemove.size() == approvedToRemove.size())
+    for (const auto& proFilePath : proFilePaths)
     {
-        QList<ProjectExplorer::ProjectNode *>
-                nodesToRemove,
-                currentNodes = qobject_cast<Project *>(project)->getSubprojectNodes();
-        for (const string & pathToRemove : approvedToRemove) {
-            for (ProjectExplorer::ProjectNode * node : currentNodes)
+        try
+        {
+            string path = loader->findSubprojectByPath(proFilePath.toStdString())->getPathToNode();
+        }
+        catch (const FileSetRuntimeError& re)
+        {
+
+            //if the path isn't found
+            if (re.getErrorType() == FileSetRuntimeError::SubprojectsIncongruity)
             {
-                if (pathToRemove == qobject_cast<Project *>(project)->getPathToNode().toStdString())
-                    nodesToRemove.append(node);
+                qWarning() << QString(re.what()) + proFilePath;
+                return false;
             }
         }
-
-        this->removeProjectNodes(nodesToRemove);
-
-        //this is where friend function in Project class performs action
-        for (ProjectExplorer::ProjectNode * node : nodesToRemove)
-            qobject_cast<Project*>(project)->subprojectNodes.removeOne(node) ;
-
-        //removing subprojects from API
-        loader->removeSubprojects(approvedToRemove);
-
-        //writing changes
-        loader->save();
-        return true;
     }
-    return false;
+
+    QList<ProjectExplorer::ProjectNode *>
+            nodesToRemove,
+            currentNodes = qobject_cast<Project *>(project)->getSubprojectNodes();
+    for (const QString & proFilePath : proFilePaths) {
+        for (ProjectExplorer::ProjectNode * node : currentNodes)
+        {
+            if (proFilePath == dynamic_cast<ProjectNode *>(node)->getProjectPath())
+                nodesToRemove.append(node);
+        }
+    }
+
+    this->removeProjectNodes(nodesToRemove);
+
+    //this is where friend function in Project class performs action
+    for (ProjectExplorer::ProjectNode * node : nodesToRemove)
+        qobject_cast<Project*>(project)->subprojectNodes.removeOne(node) ;
+
+    //removing subprojects from API
+    vector<string> v;
+    for (const auto& path : proFilePaths)
+          v.push_back(path.toStdString());
+    loader->removeSubprojects(v);
+
+    //writing changes
+    loader->save();
+    return true;
 }
 
 bool ProjectNode::addFiles(const QStringList &filePaths, QStringList *notAdded)
