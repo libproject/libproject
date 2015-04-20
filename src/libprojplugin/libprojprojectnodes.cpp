@@ -144,10 +144,14 @@ bool ProjectNode::removeSubProjects(const QStringList &proFilePaths)
         qobject_cast<Project*>(project)->subprojectNodes.removeOne(node) ;
 
     //removing subprojects from API
-    vector<string> v;
-    for (const auto& path : proFilePaths)
-          v.push_back(path.toStdString());
-    loader->removeSubprojects(v);
+    vector<string> relativePaths;
+    string directoryOfParent = QFileInfo(getProjectPath()).absolutePath().toStdString();
+    for (const QString& path : proFilePaths)
+    {
+        string relativePath = path.toStdString().substr(directoryOfParent.length() + 1);
+        relativePaths.push_back(relativePath);
+    }
+    loader->removeSubprojects(relativePaths);
 
     //writing changes
     loader->save();
