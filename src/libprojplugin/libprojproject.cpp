@@ -48,9 +48,8 @@ Project::Project(Manager *Manager, FileSetLoader *Loader)
     rootNode = new ProjectNode(this, projectFile);
 
     //creating project file FileNode instance
-    QList<FileNode *> listOfFileNodes;
-    listOfFileNodes.push_back(
-        new FileNode(pathToNode, FileType::ProjectFileType, false)); // pr. file itself
+    FileNode * projectFileNode = new FileNode(pathToNode, FileType::ProjectFileType, false);
+    rootNode->addFileNodes(QList<FileNode *>() << projectFileNode);
 
     //creating FileNode instances for project files
     list<string> filesToAdd = loader->getFileNames();
