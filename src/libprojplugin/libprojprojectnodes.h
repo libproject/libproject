@@ -6,6 +6,7 @@ namespace Core { class IDocument; }
 namespace  LibprojManager {
 namespace Internal {
 
+class Project;
 class ProjectFile;
 class ProjectNode : public ProjectExplorer::ProjectNode
 {
@@ -20,6 +21,7 @@ public:
 
 public:
     bool addFiles(const QStringList & filePaths, QStringList * notAdded);
+    const QString& getProjectPath() const;
 };
 
 } // namespace Internal

@@ -35,14 +35,14 @@ Project::Project(Manager *Manager, FileSetLoader *Loader)
     setProjectLanguages(Core::Context(ProjectExplorer::Constants::LANG_CXX));
 
     //getting path to node
-    QString pathToRootNode =
+    pathToNode =
         QString::fromStdString(loader->getPathToNode());
 
     //getting name of project
     nameOfProject = QString::fromStdString(loader->getProjectName());
 
     //init ProjectFile instance
-    projectFile = new ProjectFile(this, pathToRootNode);
+    projectFile = new ProjectFile(this, pathToNode);
 
     //init ProjectNode instance
     rootNode = new ProjectNode(this, projectFile);
@@ -50,15 +50,14 @@ Project::Project(Manager *Manager, FileSetLoader *Loader)
     //creating project file FileNode instance
     QList<FileNode *> listOfFileNodes;
     listOfFileNodes.push_back(
-        new FileNode(QString::fromStdString(loader->getPathToNode()),
-                     FileType::ProjectFileType, false)); // pr. file itself
+        new FileNode(pathToNode, FileType::ProjectFileType, false)); // pr. file itself
 
     //creating FileNode instances for project files
     list<string> filesToAdd = loader->getFileNames();
     QStringList files, failed;
     for (const auto& file : filesToAdd)
     {
-        files.append(QFileInfo(pathToRootNode).absolutePath()
+        files.append(QFileInfo(pathToNode).absolutePath()
                      + QString("/")
                      + QString::fromStdString(file));
     }
@@ -71,7 +70,7 @@ Project::Project(Manager *Manager, FileSetLoader *Loader)
         QStringList subprojects;
         for (const auto& path : paths)
         {
-            subprojects.append(QFileInfo(pathToRootNode).absolutePath()
+            subprojects.append(QFileInfo(pathToNode).absolutePath()
                                + QString("/")
                                + QString::fromStdString(path));
         }

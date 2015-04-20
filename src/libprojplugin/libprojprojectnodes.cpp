@@ -8,6 +8,8 @@
 #include "libproject_error.h"
 #include <libgen.h>
 #include <cstring>
+#include <algorithm>
+#include <iterator>
 
 typedef ProjectExplorer::Project AbstractProject;
 using ProjectExplorer::FileNode;
@@ -20,6 +22,9 @@ using LibprojManager::Interface::Error::FileSetRuntimeError;
 using std::vector;
 using std::string;
 using std::strstr;
+using std::set_intersection;
+using std::back_insert_iterator;
+
 
 namespace  LibprojManager {
 namespace Internal {
@@ -82,7 +87,7 @@ bool ProjectNode::addSubProjects(const QStringList &proFilePaths)
             subprojectsPaths.push_back(filePath.toStdString());
         }
 
-        //performing add subprojects to our API cache
+        //adding subprojects to API cache
         loader->addSubprojects(subprojectsPaths);
 
         //writing changes
@@ -100,15 +105,60 @@ bool ProjectNode::addSubProjects(const QStringList &proFilePaths)
 }
 bool ProjectNode::removeSubProjects(const QStringList &proFilePaths)
 {
-    // BUG!
-    removeProjectNodes(qobject_cast<Project *>(project)->getSubprojectNodes());
-    return true; //Err check TODO
+    FileSetLoader * loader = qobject_cast<Project*>(project)->getLoader();
+
+    vector<string> candidatesToRemove;
+    for (const auto& path : proFilePaths)
+        candidatesToRemove.push_back(path.toStdString());
+
+    vector<string> presentSubprojectPaths = loader->getSubprojectsPaths();
+
+    vector<string> approvedToRemove;
+    back_insert_iterator<vector<string>> it(approvedToRemove);
+
+    //checking for correctness of paths
+    set_intersection(candidatesToRemove.cbegin(), candidatesToRemove.cend(),
+                     presentSubprojectPaths.cbegin(), presentSubprojectPaths.cend(),
+                     it);
+
+    if (candidatesToRemove.size() == approvedToRemove.size())
+    {
+        QList<ProjectExplorer::ProjectNode *>
+                nodesToRemove,
+                currentNodes = qobject_cast<Project *>(project)->getSubprojectNodes();
+        for (const string & pathToRemove : approvedToRemove) {
+            for (ProjectExplorer::ProjectNode * node : currentNodes)
+            {
+                if (pathToRemove == qobject_cast<Project *>(project)->getPathToNode().toStdString())
+                    nodesToRemove.append(node);
+            }
+        }
+
+        this->removeProjectNodes(nodesToRemove);
+
+        //this is where friend function in Project class performs action
+        for (ProjectExplorer::ProjectNode * node : nodesToRemove)
+            qobject_cast<Project*>(project)->subprojectNodes.removeOne(node) ;
+
+        //removing subprojects from API
+        loader->removeSubprojects(approvedToRemove);
+
+        //writing changes
+        loader->save();
+        return true;
+    }
+    return false;
 }
 
 bool ProjectNode::addFiles(const QStringList &filePaths, QStringList *notAdded)
 {
     Q_UNUSED(notAdded)
     return qobject_cast<Project*>(project)->addFiles(filePaths);
+}
+
+const QString& ProjectNode::getProjectPath() const
+{
+    return qobject_cast<Project *>(project)->getPathToNode();
 }
 
 } // namespace Internal
