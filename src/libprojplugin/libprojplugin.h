@@ -1,6 +1,6 @@
 #pragma once
 #include <extensionsystem/iplugin.h>
-#include <QVector>
+//#include <QVector>
 #include "libprojprojectnodes.h"
 #include <string>
 #include "libprojconstants.h"
@@ -18,7 +18,7 @@ class Plugin : public ExtensionSystem::IPlugin
 public:
     Plugin();
     virtual ~Plugin();
-    virtual bool initialize(const QStringList &Arguments, QString *ErrorString);
+    virtual bool initialize(const QStringList & Arguments, QString * ErrorString);
     virtual void extensionsInitialized();
     virtual ShutdownFlag aboutToShutdown();
     static void setProject(ProjectExplorer::Project * ProjectToSet);

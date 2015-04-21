@@ -8,15 +8,15 @@ namespace Internal {
 class Manager : public ProjectExplorer::IProjectManager
 {
     Q_OBJECT
-    ProjectExplorer::Project * project;
+    QList<ProjectExplorer::Project *> projects;
 public:
     Manager();
 
     virtual QString mimeType() const;
-    virtual ProjectExplorer::Project * openProject(const QString &Filename, QString *ErrorString);
+    virtual ProjectExplorer::Project * openProject(const QString & Filename, QString * ErrorString);
 
     void registerProject(ProjectExplorer::Project * Project);
-    void unregisterProject(ProjectExplorer::Project * /*Project*/);
+    void unregisterProject(ProjectExplorer::Project * Project);
 };
 
 } // namespace Internal

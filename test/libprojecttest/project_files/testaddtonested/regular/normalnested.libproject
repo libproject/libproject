@@ -1,0 +1,5 @@
+{
+	"project": "added by test runtime",
+	"files": ["main.cpp", "foo.cpp"],
+	"subprojects": ["nested/one.libproject", "nested/two.libproject"]
+}

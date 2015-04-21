@@ -1,0 +1,4 @@
+{
+	"project": "there must be subprojects",
+	"files": ["main.cpp", "Test.h"]
+}

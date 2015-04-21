@@ -16,18 +16,18 @@ namespace Internal {
 
 Manager::Manager()
 {
-            qDebug() << "Calling c-tor for Manager";
+    qDebug() << "Calling c-tor for Manager";
 }
 
 QString Manager::mimeType() const
 {
-            qDebug() << "Comparing with own mime type";
-            return QString(Constants::LIBPROJPROJECTMIMETYPE);
+    qDebug() << "Comparing with own mime type";
+    return QString(Constants::LIBPROJPROJECTMIMETYPE);
 }
 
-ProjectExplorer::Project * Manager::openProject(const QString &Filename, QString *ErrorString)
+ProjectExplorer::Project * Manager::openProject(const QString & Filename, QString * ErrorString)
 {
-
+    Q_UNUSED(ErrorString);
     FileSetLoader * loader = FileSetFactory::createFileSet(Filename.toStdString());
     try {
         bool open_result = false;
@@ -36,28 +36,24 @@ ProjectExplorer::Project * Manager::openProject(const QString &Filename, QString
             throw FileSetRuntimeError(FileSetRuntimeError::UnknownError, "Unsuccessful opening operation");
         return new LibprojManager::Internal::Project(this, loader);
     } catch (const FileSetRuntimeError & re) {
-        if (re.getErrorType() == FileSetRuntimeError::AlreadyLoaded)
+            qWarning() << re.what();
             return nullptr;
-        else
-            throw;
     }
 }
 
 void Manager::registerProject(AbstractProject * Project)
 {
-    /* TODO
-     * project will be projectS there must be function which appends projects to array*/
     qDebug() << "Registering project";
-    project = Project;
+    projects.append(Project);
 
     /*Also project must have been registered in plugin's variable*/
     Libproj::Internal::Plugin::setProject(Project);
 }
 
-void Manager::unregisterProject(AbstractProject * /*Project*/)
+void Manager::unregisterProject(AbstractProject * Project)
 {
     qDebug() << "Unregistering project";
-    project = nullptr;
+    projects.removeOne(Project);
 }
 
 } // namespace Internal

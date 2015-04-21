@@ -13,13 +13,12 @@ class ProjectFile : public Core::IDocument
 public:
     ProjectFile(ProjectExplorer::Project * Parent, const QString & Filename);
 
-public /*dummies*/:
-    virtual bool save(QString *errorString, const QString &fileName, bool autoSave);
+    virtual bool save(QString * errorString, const QString & fileName, bool autoSave);
     virtual QString defaultPath() const;
     virtual QString suggestedFileName() const;
     virtual bool isModified() const;
     virtual bool isSaveAsAllowed() const;
-    virtual bool reload(QString *errorString, ReloadFlag flag, ChangeType type);
+    virtual bool reload(QString * errorString, ReloadFlag flag, ChangeType type);
 
 };
 
