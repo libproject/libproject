@@ -1,6 +1,6 @@
 cmake_minimum_required (VERSION 2.8)
 
-cmake_policy(SET CMP0015 OLD)
+#cmake_policy(SET CMP0015 OLD)
 
 #setting name
 project (libproject_test)
@@ -25,18 +25,11 @@ include_directories (../../tools/json/src/
 add_executable (libproject_test ${SOURCES_TEST})
 
 #searching for shared library
-find_library(LIBPROJECT project HINTS "${CMAKE_CURRENT_SOURCE_DIR}/../src/build")
-if(NOT LIBPROJECT)
-	message(FATAL_ERROR "File libproject.so not found in `../src/build`")
-endif()
-target_link_libraries (libproject_test ${LIBPROJECT})
-
-#setting compiler flags
-set(EXECUTABLE_OUTPUT_PATH ${CMAKE_CURRENT_SOURCE_DIR}/build)
+target_link_libraries (libproject_test project)
 
 #preparing test environments
 execute_process (
-	COMMAND cp ${CMAKE_CURRENT_SOURCE_DIR}/project_files ${EXECUTABLE_OUTPUT_PATH} -R
+	COMMAND cp ${CMAKE_CURRENT_SOURCE_DIR}/project_files ${CMAKE_CURRENT_BINARY_DIR} -R
 	)
 
 #setting flags
