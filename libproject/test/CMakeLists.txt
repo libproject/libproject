@@ -1,20 +1,19 @@
 cmake_minimum_required (VERSION 2.8)
 
+cmake_policy(SET CMP0015 OLD)
+
+#setting name
 project (libproject_test)
 
+#setting sources
 set (GMOCK_DIR
 	"../../../gmock")
-
 set (SOURCES_TEST
-#	../src/libproject.cpp
 	libprojecttest.cpp
 	${GMOCK_DIR}/src/gmock-all.cc
 	${GMOCK_DIR}/gtest/src/gtest-all.cc)
 
-set (SOURCES_LIB
-	../src/libproject.cpp)
-
-
+#setting necessary headers
 include_directories (../../tools/json/src/
 	../src
 	${GMOCK_DIR}/gtest/include
@@ -22,18 +21,28 @@ include_directories (../../tools/json/src/
 	${GMOCK_DIR}/gtest
 	${GMOCK_DIR})
 
-add_library (project SHARED ${SOURCES_LIB})
-
+#setting what to build
 add_executable (libproject_test ${SOURCES_TEST})
 
-target_link_libraries(libproject_test project)
+#searching for shared library
+find_library(LIBPROJECT project HINTS "${CMAKE_CURRENT_SOURCE_DIR}/../src/build")
+if(NOT LIBPROJECT)
+	message(FATAL_ERROR "File libproject.so not found in `../src/build`")
+endif()
+target_link_libraries (libproject_test ${LIBPROJECT})
 
+#setting compiler flags
+set(EXECUTABLE_OUTPUT_PATH ${CMAKE_CURRENT_SOURCE_DIR}/build)
+
+#preparing test environments
 execute_process (
-	COMMAND cp ${CMAKE_SOURCE_DIR}/project_files ${CMAKE_BINARY_DIR} -R
+	COMMAND cp ${CMAKE_CURRENT_SOURCE_DIR}/project_files ${EXECUTABLE_OUTPUT_PATH} -R
 	)
 
+#setting flags
 set (CMAKE_CXX_FLAGS
-	"${CMAKE_CXX_FLAGS} -std=c++11 -pthread -O0 -fprofile-arcs -ftest-coverage -fprofile-dir=${CMAKE_BINARY_DIR}")
-
+	"${CMAKE_CXX_FLAGS} -std=c++11 -pthread -g -O0")
+set (CMAKE_C_FLAGS
+	"${CMAKE_C_FLAGS} -std=c++11 -pthread -g -O0")
 set (CMAKE_EXE_LINKER_FLAGS
-	"${CMAKE_EXE_LINKER_FLAGS} -std=c++11 -pthread -O0 -fprofile-arcs -ftest-coverage -fprofile-dir=${CMAKE_BINARY_DIR}")
+	"${CMAKE_EXE_LINKER_FLAGS} -std=c++11 -pthread -g -O0")
