@@ -8,6 +8,7 @@ add_subdirectory ( src )
 add_subdirectory ( test )
 
 add_custom_target(coverage
-		COMMAND touch ${CMAKE_BINARY_DIR}/test
-		# ...
+	COMMAND sh ${CMAKE_SOURCE_DIR}/do_coverage.sh
 	)
+
+#add_dependencies (coverage src)
