@@ -8,7 +8,11 @@ add_subdirectory ( src )
 add_subdirectory ( test )
 
 add_custom_target(coverage
-	COMMAND sh ${CMAKE_SOURCE_DIR}/do_coverage.sh
+	WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/test
+	COMMAND libproject_test
+	COMMAND gcov -o ../src/CMakeFiles/project.dir/libproject.cpp.gcno ../../src/libproject.cpp
+	COMMAND mkdir ../coverage_report
+	COMMAND gcovr --object-directory= ../src -r ../../src/ --html --html-details -o ../coverage_report/report.html
 	)
 
 add_dependencies(coverage libproject_test)
