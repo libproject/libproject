@@ -15,6 +15,7 @@
 #include <cstring>
 #include <vector>
 #include <algorithm>
+#include <set>
 
 using std::ifstream;
 using std::ostringstream;
@@ -25,7 +26,8 @@ using namespace LibprojManager::Interface::Error;
 using std::map;
 using std::ofstream;
 using std::vector;
-using std::remove_if;
+using std::set;
+
 /*!
  * \brief Covers all classes of present project except Qt creator plugin
  * instance
@@ -262,7 +264,7 @@ namespace Interface {
         cPathToProjectFile = strdup(pathToProjectFile.c_str());
         dname = dirname(cPathToProjectFile);
         int whereRelativePathStarts = string(dname).length() + 1; // +1 because we need to skip "/" symbol
-        vector<string> candidates;
+        set<string> candidates;
         for(const auto& sp : subp) {
             string relativePath = sp.substr(whereRelativePathStarts);
 
@@ -280,14 +282,16 @@ namespace Interface {
                 }
             }
 
-            candidates.push_back(relativePath);
+            auto result = candidates.insert(relativePath);
+            if(result.second == false)
+                throw FileSetRuntimeError(FileSetRuntimeError::SubprojectsIncongruity, "Trying to add duplicated subprojects");
         }
 
-        if (candidates.size() > 1)
-            for (size_t i = 0; i < candidates.size(); ++i)
-                for (size_t ii = i + 1; ii < candidates.size(); ++ii)
-                    if (candidates[ii] == candidates[i])
-                        throw FileSetRuntimeError(FileSetRuntimeError::SubprojectsIncongruity,"Trying to add duplicated subprojects");
+        // if (candidates.size() > 1)
+        //     for (size_t i = 0; i < candidates.size(); ++i)
+        //         for (size_t ii = i + 1; ii < candidates.size(); ++ii)
+        //             if (candidates[ii] == candidates[i])
+        //                 throw FileSetRuntimeError(FileSetRuntimeError::SubprojectsIncongruity,"Trying to add duplicated subprojects");
 
         if (jChangedContentOfProjectFile.count("subprojects") == 0)
             jChangedContentOfProjectFile["subprojects"] = { };
