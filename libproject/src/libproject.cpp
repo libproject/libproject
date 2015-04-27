@@ -8,19 +8,16 @@
 #include "libproject.h"
 #include <fstream>
 #include <sstream>
-#include <list>
 #include "json.hpp"
 #include "libproject_error.h"
 #include <libgen.h>
 #include <cstring>
-#include <vector>
-#include <algorithm>
 #include <set>
 
+typedef LibprojManager::Interface::FileSetLoader::StrContainer StrContainer;
 using std::ifstream;
 using std::ostringstream;
 using std::string;
-using std::list;
 using nlohmann::json;
 using namespace LibprojManager::Interface::Error;
 using std::map;
@@ -69,10 +66,10 @@ namespace Interface {
         /*virtual*/ bool open();
 
         /*!
-         * \brief Gives to user list<string> of filenames
-         * \return list<string> of filenames of project or drops exception if project wasn't loaded
+         * \brief Gives to user StrContainer of filenames
+         * \return StrContainer of filenames of project or drops exception if project wasn't loaded
          */
-        /*virtual*/ const list<string> getFileNames() const;
+        /*virtual*/ const StrContainer getFileNames() const;
 
         /*!
          * \brief Saves changes of .libproject file to it
@@ -95,11 +92,11 @@ namespace Interface {
                                                   "Trying to get path to root node on not loaded interface"); }
 
         /*!
-          * \brief Gives std::vector<std::string> of path to subprojects to user
+          * \brief Gives StrContainer of path to subprojects to user
           * in relative path format (to project)
-          * \return vector of subprojects paths. Zero-sized vector implied
+          * \return StrContainer of subprojects paths. Zero-sized vector implied
           */
-        /*virtual*/ const vector<string> getSubprojectsPaths() const;
+        /*virtual*/ const StrContainer getSubprojectsPaths() const;
 
         /*!
           * \brief Gives number of subprojects to user
@@ -116,9 +113,9 @@ namespace Interface {
         /*!
          * \brief This function performs adding existing subprojects which are present on
          * filesystem to cache of .libproject file. But NOT saves it.
-         * \param[in] std::vector of pathes to subprojects
+         * \param[in] StrContainer of pathes to subprojects
          */
-        /*virtual*/ void addSubprojects(const vector<string> & subp);
+        /*virtual*/ void addSubprojects(const StrContainer & subp);
 
         /*!
          * \brief This function performs adding existing subproject which is present on
@@ -130,9 +127,9 @@ namespace Interface {
         /*!
          * \brief This function performs removing existing subprojects in cache or in saved
          * .libproject file
-         * \param[in] std::vector of pathes to subprojects
+         * \param[in] StrContainer of pathes to subprojects
          */
-        /*virtual*/ void removeSubprojects(const vector<string> & subp);
+        /*virtual*/ void removeSubprojects(const StrContainer & subp);
 
         /*!
          * \brief This function performs removing existing subproject in cache or in saved
@@ -203,16 +200,16 @@ namespace Interface {
         return;
     }
 
-    const list<string>
+    const StrContainer
     JsonFileSetLoader::getFileNames() const
     {
         if(loaded == false)
             throw FileSetRuntimeError(FileSetRuntimeError::NotLoaded, "Trying to get file names on not loaded interface");
-        list<string> listOfFiles;
+        StrContainer files;
         for(const auto& item : jContentOfProjectFile["files"]) {
-            listOfFiles.push_back(item.get<string>());
+            files.push_back(item.get<string>());
         }
-        return listOfFiles;
+        return files;
     }
 
     const string
@@ -223,13 +220,13 @@ namespace Interface {
         return jContentOfProjectFile["project"].get<string>();
     }
 
-    const vector<string>
+    const StrContainer
     JsonFileSetLoader::getSubprojectsPaths() const
     {
         if (loaded == false)
             throw FileSetRuntimeError(FileSetRuntimeError::NotLoaded, "Trying to get subprojects paths on not loaded interface");
         auto& subprojects = jChangedContentOfProjectFile["subprojects"];
-        vector<string> paths;
+        StrContainer paths;
         for (const auto& path : subprojects)
         {
             paths.push_back(path);
@@ -255,7 +252,7 @@ namespace Interface {
     }
 
     void
-    JsonFileSetLoader::addSubprojects(const std::vector<std::string> &subp)
+    JsonFileSetLoader::addSubprojects(const StrContainer & subp)
     {
         if(loaded == false)
             throw FileSetRuntimeError(FileSetRuntimeError::NotLoaded, "Trying to add subprojects on not loaded interface");
@@ -307,14 +304,14 @@ namespace Interface {
     }
 
     void
-    JsonFileSetLoader::removeSubprojects(const vector<string>& subp)
+    JsonFileSetLoader::removeSubprojects(const StrContainer & subp)
     {
 
         if(loaded == false)
             throw FileSetRuntimeError(FileSetRuntimeError::NotLoaded, "Trying to remove subprojects on not loaded interface");
 
         //find duplicates
-        vector<string> sorted = subp;
+        StrContainer sorted = subp;
         std::sort(sorted.begin(), sorted.end());
         for (auto it = sorted.begin() + 1; it != sorted.end(); ++it)
             if (*it == *(it - 1))
