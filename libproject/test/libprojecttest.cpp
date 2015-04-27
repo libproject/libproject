@@ -9,7 +9,7 @@
 #include <fstream>
 #include <sstream>
 
-typedef LibprojManager::Interface::FileSetLoader::StrContainer StrContainer;
+typedef LibprojManager::Interface::FileSetLoader::FilePaths FilePaths;
 using std::string;
 using std::list;
 using LibprojManager::Interface::FileSetFactory;
@@ -57,7 +57,7 @@ class TestRegularSingle : public TestSkeleton {
 protected:
   string PathToFile;
   string projectNameRef;
-  StrContainer projectFilesRef;
+  FilePaths projectFilesRef;
 
   void SetUp() {
     TestSkeleton::SetUp();
@@ -82,10 +82,10 @@ protected:
   string PathToFile;
   string dirPath;
   string projectNameRef;
-  StrContainer projectFilesRef;
+  FilePaths projectFilesRef;
   int subprojectsCount;
-  StrContainer subprojectsFilesRef;
-  StrContainer subprojectsNamesRef;
+  FilePaths subprojectsFilesRef;
+  FilePaths subprojectsNamesRef;
 
   void SetUp() {
     TestSkeleton::SetUp();
@@ -113,7 +113,7 @@ protected:
 
     string pathToOneRegularSingleSubproject;
     string pathToOneRegularNestedSubproject;
-    StrContainer pathToBrokenSubproject;
+    FilePaths pathToBrokenSubproject;
     void SetUp() {
         pathToMainFile = R"(project_files/testaddtosingle/mainproject_addsingle.libproject)";
         pathToMainFileWhichIsTargetForAddBrokenSubproject = R"(project_files/testaddtosingle/mainproject_addbroken.libproject)";
@@ -181,11 +181,11 @@ protected:
 
     string pathToOneRegularSingleSubproject;
     string pathToOneRegularNestedSubproject;
-    StrContainer pathToBrokenSubproject;
-    StrContainer pathsToPairOfRegularSubprojects;
-    StrContainer pathsToPairOfRegularAndBrokenSubprojects;
-    StrContainer pathsToPairOfBrokenSubprojects;
-    StrContainer pathsToPairOfRegularAndEmptySubprojects;
+    FilePaths pathToBrokenSubproject;
+    FilePaths pathsToPairOfRegularSubprojects;
+    FilePaths pathsToPairOfRegularAndBrokenSubprojects;
+    FilePaths pathsToPairOfBrokenSubprojects;
+    FilePaths pathsToPairOfRegularAndEmptySubprojects;
 
     void SetUp() {
         pathToMainFile = R"(project_files/testaddtonested/mainproject_addnested.libproject)";
@@ -290,9 +290,9 @@ protected:
 
     string pathToPresentSubproject;
     string pathToNonPresentSubproject;
-    StrContainer pathsToNonPresentSubprojects;
-    StrContainer pathsDuplicated;
-    StrContainer pathsToPresentAndNonPresentSubprojects;
+    FilePaths pathsToNonPresentSubprojects;
+    FilePaths pathsDuplicated;
+    FilePaths pathsToPresentAndNonPresentSubprojects;
 
     void SetUp() {
         pathToMainFileWhereNeedToRemoveOneSubprojectInArrayOfTwo =
@@ -334,9 +334,9 @@ protected:
 
         pathToPresentSubproject = "sub/s1.libproject";
         pathToNonPresentSubproject = "subs/s1.libproject";
-        pathsToNonPresentSubprojects = StrContainer({ pathToNonPresentSubproject, "sub/nonexistent.libproject" });
-        pathsDuplicated = StrContainer({ pathToPresentSubproject, pathToPresentSubproject });
-        pathsToPresentAndNonPresentSubprojects = StrContainer({ pathToPresentSubproject, "sub/nonexistent.libproject" });
+        pathsToNonPresentSubprojects = FilePaths({ pathToNonPresentSubproject, "sub/nonexistent.libproject" });
+        pathsDuplicated = FilePaths({ pathToPresentSubproject, pathToPresentSubproject });
+        pathsToPresentAndNonPresentSubprojects = FilePaths({ pathToPresentSubproject, "sub/nonexistent.libproject" });
 
         //backup content of case 0
         ifstream in(pathToMainFileWhereNeedToRemoveOneSubprojectInArrayOfTwo);
@@ -622,7 +622,7 @@ TEST_F(TestAddRegularSubprojectsToNested, Add_one_regular_single_which_already_p
 }
 
 TEST_F(TestAddRegularSubprojectsToNested, Add_already_cached_and_present_subprojects) {
-    StrContainer subprojectsToAdd = {pathToOneRegularNestedSubproject, pathToPresentSubproject};
+    FilePaths subprojectsToAdd = {pathToOneRegularNestedSubproject, pathToPresentSubproject};
 
     ASSERT_NO_THROW({
                         loader = FileSetFactory::createFileSet(pathToMainFile);
@@ -695,7 +695,7 @@ TEST_F(TestAddRegularSubprojectsToNested, Add_empty_vector_of_subprojects) {
     ASSERT_NO_THROW({
                         loader = FileSetFactory::createFileSet(pathToMainFile);
                         loader->open();
-                        loader->addSubprojects(StrContainer());
+                        loader->addSubprojects(FilePaths());
                         loader->save();
                         ifstream i(pathToMainFile);
                         fileToTest << i;
