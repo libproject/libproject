@@ -7,6 +7,7 @@
 #include <vector>
 #include "json.hpp"
 #include <fstream>
+#include <sstream>
 
 using std::string;
 using std::list;
@@ -17,6 +18,8 @@ using std::map;
 using std::vector;
 using nlohmann::json;
 using std::ifstream;
+using std::ostringstream;
+using std::ofstream;
 
 namespace {
 list<string> pathsToSingleAbnormal = {
@@ -98,20 +101,26 @@ protected:
 class TestAddRegularSubprojectsToSingle : public TestSkeleton {
 protected:
     json fileToTest = { };
-    string pathToMainFileWhereWillBeSingleSubproject;
-    string pathToMainFileWhereWillBeNestedSubproject;
+    string pathToMainFile;
+    string contentBackup;
+
     string pathToMainFileWhichIsTargetForAddBrokenSubproject;
     json contentReferenceWithSingle;
     json contentReferenceWithNested;
+    json contentReference;
     json contentReferenceForTryToAddBroken;
 
     string pathToOneRegularSingleSubproject;
     string pathToOneRegularNestedSubproject;
     vector<string> pathToBrokenSubproject;
     void SetUp() {
-        pathToMainFileWhereWillBeSingleSubproject = R"(project_files/testaddtosingle/mainproject_addsingle.libproject)";
-        pathToMainFileWhereWillBeNestedSubproject = R"(project_files/testaddtosingle/mainproject_addnested.libproject)";
+        pathToMainFile = R"(project_files/testaddtosingle/mainproject_addsingle.libproject)";
         pathToMainFileWhichIsTargetForAddBrokenSubproject = R"(project_files/testaddtosingle/mainproject_addbroken.libproject)";
+        contentReference = {
+          { "project", "there must be subprojects" },
+
+          { "files", { "main.cpp", "Test.h" } }
+        };
         contentReferenceWithSingle = {
           { "project", "there must be subprojects" },
 
@@ -126,11 +135,7 @@ protected:
 
           { "subprojects", {"regular/normalnested.libproject"} }
         };
-        contentReferenceForTryToAddBroken = {
-          { "project", "here must not be any subproject field" },
 
-          { "files", { "main.cpp", "Test.h" } }
-        };
         pathToOneRegularSingleSubproject =
             R"(project_files/testaddtosingle/regular/normalsingle.libproject)";
 
@@ -141,32 +146,37 @@ protected:
             "project_files/testaddtosingle/broken/broken.libproject"
         };
 
+        ifstream in(pathToMainFile);
+        ostringstream os;
+        char buf;
+        while(in.get(buf))
+          os << buf;
+        in.close();
+        contentBackup = os.str();
+
         TestSkeleton::SetUp(); }
-    void TearDown() {}
+
+    void TearDown() {
+      ofstream out (pathToMainFile);
+      for (const auto& sym : contentBackup)
+        out << sym;
+      out.close();
+    }
 };
 
 class TestAddRegularSubprojectsToNested : public TestSkeleton {
 protected:
     json fileToTest = { };
-    string pathToMainFileWhereWillBeSingleSubproject;
-    string pathToMainFileWhereWillBeNestedSubproject;
-    string pathToMainFileForTestWithVectorFullOfPresentSubprojects;
-    string pathToMainFileWhichIsTargetForAddBrokenSubproject;
-    string pathToPresentSubproject;
-    string pathToMainFileWhereMustBeTwoNewRegularSubprojects;
-    string pathToMainFileForTestWithRegularAndBrokenSubprojects;
-    string pathToMainFileForTestWithTwoBrokenSubprojects;
-    string pathToMainFileForTestWithRegularAndEmptySubprojects;
-    string pathToMainFileForTestWithEmptyVector;
+    string pathToMainFile;
+    string contentBackup;
 
-    json contentReferenceWithSingle;
-    json contentReferenceWithNested;
-    json contentReferenceForTryToAddBroken;
-    json contentReferenceForTestToAddPairOfRegularSubprojects;
-    json contentReferenceForTestToAddPairOfRegularAndBrokenSubprojects;
-    json contentReferenceForTestToAddPairOfBrokenSubprojects;
-    json contentReferenceForTestToAddPairOfRegularAndEmptySubprojects;
-    json contentReferenceForTestWithEmptyVector;
+    string pathToPresentSubproject;
+
+    json contentReferenceWithNewSingle;
+    json contentReferenceWithNewNested;
+    json contentReference;
+    json contentReferenceWithPairOfNewRegularSubprojects;
+
 
     string pathToOneRegularSingleSubproject;
     string pathToOneRegularNestedSubproject;
@@ -177,24 +187,11 @@ protected:
     vector<string> pathsToPairOfRegularAndEmptySubprojects;
 
     void SetUp() {
-        pathToMainFileWhereWillBeSingleSubproject = R"(project_files/testaddtonested/mainproject_addsingle.libproject)";
-        pathToMainFileWhereWillBeNestedSubproject = R"(project_files/testaddtonested/mainproject_addnested.libproject)";
-        pathToMainFileWhichIsTargetForAddBrokenSubproject = R"(project_files/testaddtonested/mainproject_addbroken.libproject)";
-        pathToMainFileForTestWithVectorFullOfPresentSubprojects =
-                R"(project_files/testaddtonested/mainproject_addnested_double_add.libproject)";
+        pathToMainFile = R"(project_files/testaddtonested/mainproject_addnested.libproject)";
         pathToPresentSubproject = R"(project_files/testaddtonested/presentsubproject/sub.libproject)";
-        pathToMainFileWhereMustBeTwoNewRegularSubprojects =
-                R"(project_files/testaddtonested/mainproject_addtworegularsubprojects.libproject)";
-        pathToMainFileForTestWithRegularAndBrokenSubprojects =
-                R"(project_files/testaddtonested/mainproject_addpairofregularandbroken.libproject)";
-        pathToMainFileForTestWithTwoBrokenSubprojects =
-                R"(project_files/testaddtonested/mainproject_addtwobrokensubprojects.libproject)";
-        pathToMainFileForTestWithRegularAndEmptySubprojects =
-                R"(project_files/testaddtonested/mainproject_addpairofregularandempty.libproject)";
-        pathToMainFileForTestWithEmptyVector =
-                R"(project_files/testaddtonested/mainproject_emptyvector.libproject)";
 
-        contentReferenceWithSingle = {
+
+        contentReferenceWithNewSingle = {
           { "project", "there must be subprojects" },
 
           { "files", { "main.cpp", "Test.h" } },
@@ -202,7 +199,7 @@ protected:
           { "subprojects", {"presentsubproject/sub.libproject",
                             "regular/normalsingle.libproject"} }
         };
-        contentReferenceWithNested = {
+        contentReferenceWithNewNested = {
           { "project", "there must be subprojects" },
 
           { "files", { "main.cpp", "Test.h" } },
@@ -210,12 +207,14 @@ protected:
           { "subprojects", {"presentsubproject/sub.libproject",
                             "regular/normalnested.libproject"} }
         };
-        contentReferenceForTryToAddBroken = {
-          { "project", "here must not be any subproject field" },
+        contentReference = {
+          { "project", "there must be subprojects" },
 
-          { "files", { "main.cpp", "Test.h" } }
+          { "files", { "main.cpp", "Test.h" } },
+
+          { "subprojects", {"presentsubproject/sub.libproject"} }
         };
-        contentReferenceForTestToAddPairOfRegularSubprojects = {
+        contentReferenceWithPairOfNewRegularSubprojects = {
             { "project", "there must be subprojects" },
 
             { "files", { "main.cpp", "Test.h" } },
@@ -224,37 +223,6 @@ protected:
                               "fortestwithtworegularsubprojects/single.libproject",
                               "fortestwithtworegularsubprojects/nested.libproject"} }
         };
-        contentReferenceForTestToAddPairOfRegularAndBrokenSubprojects = {
-            { "project", "there must be subprojects" },
-
-            { "files", { "main.cpp", "Test.h" } },
-
-            { "subprojects", {"presentsubproject/sub.libproject",
-                              "fortestwithonebrokenandoneregularsubprojects/normal.libproject"} }
-        };
-        contentReferenceForTestToAddPairOfBrokenSubprojects = {
-            { "project", "there mustn't be subprojects" },
-
-            { "files", { "main.cpp", "Test.h" } },
-
-            { "subprojects", {"presentsubproject/sub.libproject"} }
-        };
-        contentReferenceForTestToAddPairOfRegularAndEmptySubprojects = {
-          { "project", "there must be subprojects" },
-
-          { "files", { "main.cpp", "Test.h" } },
-
-          { "subprojects", {"presentsubproject/sub.libproject",
-                            "fortestwithoneregularandemptysubprojects/regular.libproject"} }
-        };
-        contentReferenceForTestWithEmptyVector = {
-            { "project", "foo" },
-
-            { "files", { "main.cpp", "Test.h" } },
-
-            { "subprojects", {"presentsubproject/sub.libproject"} }
-        };
-
         pathToOneRegularSingleSubproject =
             R"(project_files/testaddtonested/regular/normalsingle.libproject)";
 
@@ -281,9 +249,23 @@ protected:
             "project_files/testaddtonested/fortestwithoneregularandemptysubprojects/empty.libproject"
         };
 
+        ifstream in(pathToMainFile);
+        ostringstream os;
+        char buf;
+        while(in.get(buf))
+          os << buf;
+        in.close();
+        contentBackup = os.str();
+
         TestSkeleton::SetUp();
     }
-    void TearDown() {}
+
+    void TearDown() {
+      ofstream out (pathToMainFile);
+      for (const auto& sym : contentBackup)
+        out << sym;
+      out.close();
+    }
 };
 
 class TestRemoveSubprojects : public TestSkeleton {
@@ -297,6 +279,9 @@ protected:
     case_5_pathToMainFileWhereNeedToRemoveOneExistentAndOneNonExistentSubprojects,
     case_6_pathToMainFileWhichWillNotBeLoaded,
     case_7_pathToMainFileWhereWillBeRemoveAndCountActions;
+
+    string case_0_contentBackup,
+    case_4_contentBackup;
 
     json contentReference_case0,
     contentReference_case1,
@@ -361,9 +346,42 @@ protected:
         path_case4 = "sub/s1.libproject";
         path_case5 = vector<string>({ path_case0, "sub/nonexistent.libproject" });
 
+        //backup content of case 0
+        ifstream in(case_0_pathToMainFileWhereNeedToRemoveOneSubprojectInArrayOfTwo);
+        ostringstream os_case_0;
+        char buf;
+        while(in.get(buf))
+          os_case_0 << buf;
+        in.close();
+        case_0_contentBackup = os_case_0.str();
+
+        //backup content of case 4
+        //in.get();
+        in.open(case_4_pathToMainFileWhereIsOneSubprojectWithWillBeRemoved);
+        ostringstream os_case_4;
+        buf = 0;
+        while(in.get(buf))
+          os_case_4 << buf;
+        in.close();
+        case_4_contentBackup = os_case_4.str();
+
         TestSkeleton::SetUp();
     }
-    void TearDown() {}
+    void TearDown() {
+
+      //reverting backups:
+      //case 0
+      ofstream out_case_0 (case_0_pathToMainFileWhereNeedToRemoveOneSubprojectInArrayOfTwo);
+      for (const auto& sym : case_0_contentBackup)
+        out_case_0 << sym;
+      out_case_0.close();
+
+      //case 4
+      ofstream out_case_4 (case_4_pathToMainFileWhereIsOneSubprojectWithWillBeRemoved);
+      for (const auto& sym : case_4_contentBackup)
+        out_case_4 << sym;
+      out_case_4.close();
+    }
 };
 
 TEST_F(TestRegularSingle, Open_file) {
@@ -415,7 +433,7 @@ TEST_P(TestAbnormalSingles, Set_of_attempts_to_open_abnormal_files) {
                  loader = FileSetFactory::createFileSet(GetParam());
                  loader->open();
                },
-               FileSetRuntimeError);
+               std::exception);
 }
 
 TEST_F(TestRegularSingle, Get_path_to_root_node) {
@@ -499,11 +517,11 @@ TEST_F(TestRegularSingle, Count_subprojects_of_sinlge_not_loaded) {
 
 TEST_F(TestAddRegularSubprojectsToSingle, Add_one_regular_single_subproject) {
     ASSERT_NO_THROW({
-                        loader = FileSetFactory::createFileSet(pathToMainFileWhereWillBeSingleSubproject);
+                        loader = FileSetFactory::createFileSet(pathToMainFile);
                         loader->open();
                         loader->addSubproject(pathToOneRegularSingleSubproject);
                         loader->save();
-                        ifstream i(pathToMainFileWhereWillBeSingleSubproject);
+                        ifstream i(pathToMainFile);
                         fileToTest << i;
                  });
     ASSERT_EQ(contentReferenceWithSingle.dump(4), fileToTest.dump(4));
@@ -511,11 +529,11 @@ TEST_F(TestAddRegularSubprojectsToSingle, Add_one_regular_single_subproject) {
 
 TEST_F(TestAddRegularSubprojectsToSingle, Add_one_regular_nested_subproject) {
     ASSERT_NO_THROW({
-                        loader = FileSetFactory::createFileSet(pathToMainFileWhereWillBeNestedSubproject);
+                        loader = FileSetFactory::createFileSet(pathToMainFile);
                         loader->open();
                         loader->addSubproject(pathToOneRegularNestedSubproject);
                         loader->save();
-                        ifstream i(pathToMainFileWhereWillBeNestedSubproject);
+                        ifstream i(pathToMainFile);
                         fileToTest << i;
                  });
     ASSERT_EQ(contentReferenceWithNested.dump(4), fileToTest.dump(4));
@@ -523,26 +541,26 @@ TEST_F(TestAddRegularSubprojectsToSingle, Add_one_regular_nested_subproject) {
 
 TEST_F(TestAddRegularSubprojectsToSingle, Add_broken_subproject) {
     ASSERT_THROW({
-                        loader = FileSetFactory::createFileSet(pathToMainFileWhichIsTargetForAddBrokenSubproject);
+                        loader = FileSetFactory::createFileSet(pathToMainFile);
                         loader->open();
                         loader->addSubprojects(pathToBrokenSubproject);
-                 }, FileSetRuntimeError);
+                 }, std::exception);
     loader->save();
-    ifstream i(pathToMainFileWhichIsTargetForAddBrokenSubproject);
+    ifstream i(pathToMainFile);
     fileToTest << i;
 
-    ASSERT_EQ(contentReferenceForTryToAddBroken.dump(4), fileToTest.dump(4));
+    ASSERT_EQ(contentReference.dump(4), fileToTest.dump(4));
 }
 
 TEST_F(TestAddRegularSubprojectsToSingle, Add_one_regular_single_which_already_cached) {
     ASSERT_THROW({
-                        loader = FileSetFactory::createFileSet(pathToMainFileWhereWillBeSingleSubproject);
+                        loader = FileSetFactory::createFileSet(pathToMainFile);
                         loader->open();
                         loader->addSubproject(pathToOneRegularSingleSubproject);
                         loader->addSubproject(pathToOneRegularSingleSubproject);
                  }, FileSetRuntimeError);
     loader->save();
-    ifstream i(pathToMainFileWhereWillBeSingleSubproject);
+    ifstream i(pathToMainFile);
     fileToTest << i;
 
     ASSERT_EQ(contentReferenceWithSingle.dump(4), fileToTest.dump(4));
@@ -550,148 +568,150 @@ TEST_F(TestAddRegularSubprojectsToSingle, Add_one_regular_single_which_already_c
 
 TEST_F(TestAddRegularSubprojectsToNested, Add_one_regular_single_subproject) {
     ASSERT_NO_THROW({
-                        loader = FileSetFactory::createFileSet(pathToMainFileWhereWillBeSingleSubproject);
+                        loader = FileSetFactory::createFileSet(pathToMainFile);
                         loader->open();
                         loader->addSubproject(pathToOneRegularSingleSubproject);
                         loader->save();
-                        ifstream i(pathToMainFileWhereWillBeSingleSubproject);
+                        ifstream i(pathToMainFile);
                         fileToTest << i;
                  });
 
-    ASSERT_EQ(contentReferenceWithSingle.dump(4), fileToTest.dump(4));
+    ASSERT_EQ(contentReferenceWithNewSingle.dump(4), fileToTest.dump(4));
 }
 
 TEST_F(TestAddRegularSubprojectsToNested, Add_one_regular_nested_subproject) {
     ASSERT_NO_THROW({
-                        loader = FileSetFactory::createFileSet(pathToMainFileWhereWillBeNestedSubproject);
+                        loader = FileSetFactory::createFileSet(pathToMainFile);
                         loader->open();
                         loader->addSubproject(pathToOneRegularNestedSubproject);
                         loader->save();
-                        ifstream i(pathToMainFileWhereWillBeNestedSubproject);
+                        ifstream i(pathToMainFile);
                         fileToTest << i;
                  });
-    ASSERT_EQ(contentReferenceWithNested.dump(4), fileToTest.dump(4));
+    ASSERT_EQ(contentReferenceWithNewNested.dump(4), fileToTest.dump(4));
 }
 
 TEST_F(TestAddRegularSubprojectsToNested, Add_broken_subproject) {
     ASSERT_THROW({
-                        loader = FileSetFactory::createFileSet(pathToMainFileWhichIsTargetForAddBrokenSubproject);
+                        loader = FileSetFactory::createFileSet(pathToMainFile);
                         loader->open();
                         loader->addSubprojects(pathToBrokenSubproject);
-                 }, FileSetRuntimeError);
+                 }, std::exception);
     loader->save();
-    ifstream i(pathToMainFileWhichIsTargetForAddBrokenSubproject);
+    ifstream i(pathToMainFile);
     fileToTest << i;
 
-    ASSERT_EQ(contentReferenceForTryToAddBroken.dump(4), fileToTest.dump(4));
+    ASSERT_EQ(contentReference.dump(4), fileToTest.dump(4));
 }
 
 TEST_F(TestAddRegularSubprojectsToNested, Add_one_regular_single_which_already_cached) {
     ASSERT_THROW({
-                        loader = FileSetFactory::createFileSet(pathToMainFileWhereWillBeSingleSubproject);
+                        loader = FileSetFactory::createFileSet(pathToMainFile);
                         loader->open();
                         loader->addSubproject(pathToOneRegularSingleSubproject);
                         loader->addSubproject(pathToOneRegularSingleSubproject);
                  }, FileSetRuntimeError);
-    loader->save();
-    ifstream i(pathToMainFileWhereWillBeSingleSubproject);
+    ifstream i(pathToMainFile);
     fileToTest << i;
 
-    ASSERT_EQ(contentReferenceWithSingle.dump(4), fileToTest.dump(4));
+    ASSERT_EQ(contentReference.dump(4), fileToTest.dump(4));
 }
 
 TEST_F(TestAddRegularSubprojectsToNested, Add_one_regular_single_which_already_present_in_project_file) {
     ASSERT_THROW({
-                        loader = FileSetFactory::createFileSet(pathToMainFileWhereWillBeSingleSubproject);
+                        loader = FileSetFactory::createFileSet(pathToMainFile);
                         loader->open();
                         loader->addSubproject(pathToOneRegularSingleSubproject);
                         loader->save();
                         loader->addSubproject(pathToOneRegularSingleSubproject);
                     }, FileSetRuntimeError);
     loader->save();
-    ifstream i(pathToMainFileWhereWillBeSingleSubproject);
+    ifstream i(pathToMainFile);
     fileToTest << i;
 
-    ASSERT_EQ(contentReferenceWithSingle.dump(4), fileToTest.dump(4));
+    ASSERT_EQ(contentReferenceWithNewSingle.dump(4), fileToTest.dump(4));
 }
 
 TEST_F(TestAddRegularSubprojectsToNested, Add_already_cached_and_present_subprojects) {
     vector<string> subprojectsToAdd = {pathToOneRegularNestedSubproject, pathToPresentSubproject};
 
-    ASSERT_THROW({
-                        loader = FileSetFactory::createFileSet(pathToMainFileForTestWithVectorFullOfPresentSubprojects);
+    ASSERT_NO_THROW({
+                        loader = FileSetFactory::createFileSet(pathToMainFile);
                         loader->open();
                         loader->addSubproject(pathToOneRegularNestedSubproject);
+                        loader->save();
+                      });
+    ASSERT_THROW({
                         loader->addSubprojects(subprojectsToAdd);
                  }, FileSetRuntimeError);
     loader->save();
-    ifstream i(pathToMainFileForTestWithVectorFullOfPresentSubprojects);
+    ifstream i(pathToMainFile);
     fileToTest << i;
 
-    ASSERT_EQ(contentReferenceWithNested.dump(4), fileToTest.dump(4));
+    ASSERT_EQ(contentReferenceWithNewNested.dump(4), fileToTest.dump(4));
 }
 
 TEST_F(TestAddRegularSubprojectsToNested, Add_two_regular_subprojects) {
     ASSERT_NO_THROW({
-                        loader = FileSetFactory::createFileSet(pathToMainFileWhereMustBeTwoNewRegularSubprojects);
+                        loader = FileSetFactory::createFileSet(pathToMainFile);
                         loader->open();
                         loader->addSubprojects(pathsToPairOfRegularSubprojects);
                         loader->save();
-                        ifstream i(pathToMainFileWhereMustBeTwoNewRegularSubprojects);
+                        ifstream i(pathToMainFile);
                         fileToTest << i;
                  });
-    ASSERT_EQ(contentReferenceForTestToAddPairOfRegularSubprojects.dump(4), fileToTest.dump(4));
+    ASSERT_EQ(contentReferenceWithPairOfNewRegularSubprojects.dump(4), fileToTest.dump(4));
 }
 
 TEST_F(TestAddRegularSubprojectsToNested, Add_regular_and_broken_subprojects) {
     ASSERT_THROW({
-                        loader = FileSetFactory::createFileSet(pathToMainFileForTestWithRegularAndBrokenSubprojects);
+                        loader = FileSetFactory::createFileSet(pathToMainFile);
                         loader->open();
                         loader->addSubprojects(pathsToPairOfRegularAndBrokenSubprojects);
-                 }, FileSetRuntimeError);
+                 }, std::exception);
     loader->save();
-    ifstream i(pathToMainFileForTestWithRegularAndBrokenSubprojects);
+    ifstream i(pathToMainFile);
     fileToTest << i;
 
-    ASSERT_EQ(contentReferenceForTestToAddPairOfRegularAndBrokenSubprojects.dump(4), fileToTest.dump(4));
+    ASSERT_EQ(contentReference.dump(4), fileToTest.dump(4));
 }
 
 TEST_F(TestAddRegularSubprojectsToNested, Add_pair_of_broken_subprojects) {
     ASSERT_THROW({
-                        loader = FileSetFactory::createFileSet(pathToMainFileForTestWithTwoBrokenSubprojects);
+                        loader = FileSetFactory::createFileSet(pathToMainFile);
                         loader->open();
                         loader->addSubprojects(pathsToPairOfBrokenSubprojects);
-                 }, FileSetRuntimeError);
+                 }, std::exception);
     loader->save();
-    ifstream i(pathToMainFileForTestWithTwoBrokenSubprojects);
+    ifstream i(pathToMainFile);
     fileToTest << i;
 
-    ASSERT_EQ(contentReferenceForTestToAddPairOfBrokenSubprojects.dump(4), fileToTest.dump(4));
+    ASSERT_EQ(contentReference.dump(4), fileToTest.dump(4));
 }
 
 TEST_F(TestAddRegularSubprojectsToNested, Add_regular_and_empty_subprojects) {
     ASSERT_THROW({
-                        loader = FileSetFactory::createFileSet(pathToMainFileForTestWithRegularAndEmptySubprojects);
+                        loader = FileSetFactory::createFileSet(pathToMainFile);
                         loader->open();
                         loader->addSubprojects(pathsToPairOfRegularAndEmptySubprojects);
-                    }, FileSetRuntimeError);
+                    }, std::exception);
     loader->save();
-    ifstream i(pathToMainFileForTestWithRegularAndEmptySubprojects);
+    ifstream i(pathToMainFile);
     fileToTest << i;
 
-    ASSERT_EQ(contentReferenceForTestToAddPairOfRegularAndEmptySubprojects.dump(4), fileToTest.dump(4));
+    ASSERT_EQ(contentReference.dump(4), fileToTest.dump(4));
 }
 
 TEST_F(TestAddRegularSubprojectsToNested, Add_empty_vector_of_subprojects) {
     ASSERT_NO_THROW({
-                        loader = FileSetFactory::createFileSet(pathToMainFileForTestWithEmptyVector);
+                        loader = FileSetFactory::createFileSet(pathToMainFile);
                         loader->open();
                         loader->addSubprojects(vector<string>());
                         loader->save();
-                        ifstream i(pathToMainFileForTestWithEmptyVector);
+                        ifstream i(pathToMainFile);
                         fileToTest << i;
                     });
-    ASSERT_EQ(contentReferenceForTestWithEmptyVector.dump(4), fileToTest.dump(4));
+    ASSERT_EQ(contentReference.dump(4), fileToTest.dump(4));
 }
 
 TEST_F(TestRemoveSubprojects, Remove_one_subproject_from_file_with_two) {
@@ -706,7 +726,7 @@ TEST_F(TestRemoveSubprojects, Remove_one_subproject_from_file_with_two) {
     ASSERT_EQ(contentReference_case0.dump(4), fileToTest.dump(4));
 }
 
-TEST_F(TestRemoveSubprojects, Remove_last_subproject) {
+TEST_F(TestRemoveSubprojects, Remove_lone_subproject) {
     ASSERT_NO_THROW({
                         loader = FileSetFactory::createFileSet(case_4_pathToMainFileWhereIsOneSubprojectWithWillBeRemoved);
                         loader->open();
