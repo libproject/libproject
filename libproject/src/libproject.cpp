@@ -14,7 +14,7 @@
 #include <cstring>
 #include <set>
 
-typedef LibprojManager::Interface::FileSetLoader::FilePaths FilePaths;
+using namespace LibprojManager::Interface;
 using std::ifstream;
 using std::ostringstream;
 using std::string;
@@ -66,10 +66,10 @@ namespace Interface {
         /*virtual*/ bool open();
 
         /*!
-         * \brief Gives to user FilePaths of filenames
-         * \return FilePaths of filenames of project or drops exception if project wasn't loaded
+         * \brief Gives to user filepaths of files
+         * \return Files(typedef-ed container) of project or drops exception if project wasn't loaded
          */
-        /*virtual*/ const FilePaths getFileNames() const;
+        /*virtual*/ const FileSetLoader::Files getFileNames() const;
 
         /*!
          * \brief Saves changes of .libproject file to it
@@ -92,11 +92,11 @@ namespace Interface {
                                                   "Trying to get path to root node on not loaded interface"); }
 
         /*!
-          * \brief Gives FilePaths of path to subprojects to user
+          * \brief Gives paths to subprojects to user
           * in relative path format (to project)
-          * \return FilePaths of subprojects paths. Zero-sized vector implied
+          * \return Subprojects(typedef-ed container) of subprojects paths. Zero-sized vector implied
           */
-        /*virtual*/ const FilePaths getSubprojectsPaths() const;
+        /*virtual*/ const FileSetLoader::Subprojects getSubprojectsPaths() const;
 
         /*!
           * \brief Gives number of subprojects to user
@@ -113,30 +113,30 @@ namespace Interface {
         /*!
          * \brief This function performs adding existing subprojects which are present on
          * filesystem to cache of .libproject file. But NOT saves it.
-         * \param[in] FilePaths of pathes to subprojects
+         * \param[in] Subprojects
          */
-        /*virtual*/ void addSubprojects(const FilePaths & subp);
+        /*virtual*/ void addSubprojects(const FileSetLoader::Subprojects & subp);
 
         /*!
          * \brief This function performs adding existing subproject which is present on
          * filesystem to cache of .libproject file. But NOT saves it.
          * \param[in] std::string with path to subproject
          */
-        /*virtual*/ void addSubproject(const string & subp);
+        /*virtual*/ void addSubproject(const FileSetLoader::Path & subp);
 
         /*!
          * \brief This function performs removing existing subprojects in cache or in saved
          * .libproject file
-         * \param[in] FilePaths of pathes to subprojects
+         * \param[in] Subprojects
          */
-        /*virtual*/ void removeSubprojects(const FilePaths & subp);
+        /*virtual*/ void removeSubprojects(const FileSetLoader::Subprojects & subp);
 
         /*!
          * \brief This function performs removing existing subproject in cache or in saved
          * .libproject file
          * \param[in] std::string with path to subproject
          */
-        /*virtual*/ void removeSubproject(const string& s);
+        /*virtual*/ void removeSubproject(const FileSetLoader::Path & s);
 
         /*!
          * \brief This function performs searching existing subproject loader by path to
@@ -144,7 +144,7 @@ namespace Interface {
          * \param[in] std::string with path to subproject
          * \return loader of subproject
          */
-        /*virtual*/ FileSetLoader * findSubprojectByPath(const std::string & path) const;
+        /*virtual*/ FileSetLoader * findSubprojectByPath(const FileSetLoader::Path & path) const;
 
     private:
 
@@ -200,12 +200,12 @@ namespace Interface {
         return;
     }
 
-    const FilePaths
+    const FileSetLoader::Files
     JsonFileSetLoader::getFileNames() const
     {
         if(loaded == false)
             throw FileSetRuntimeError(FileSetRuntimeError::NotLoaded, "Trying to get file names on not loaded interface");
-        FilePaths files;
+        FileSetLoader::Files files;
         for(const auto& item : jContentOfProjectFile["files"]) {
             files.push_back(item.get<string>());
         }
@@ -220,13 +220,13 @@ namespace Interface {
         return jContentOfProjectFile["project"].get<string>();
     }
 
-    const FilePaths
+    const FileSetLoader::Subprojects
     JsonFileSetLoader::getSubprojectsPaths() const
     {
         if (loaded == false)
             throw FileSetRuntimeError(FileSetRuntimeError::NotLoaded, "Trying to get subprojects paths on not loaded interface");
         auto& subprojects = jChangedContentOfProjectFile["subprojects"];
-        FilePaths paths;
+        FileSetLoader::Subprojects paths;
         for (const auto& path : subprojects)
         {
             paths.push_back(path);
@@ -252,7 +252,7 @@ namespace Interface {
     }
 
     void
-    JsonFileSetLoader::addSubprojects(const FilePaths & subp)
+    JsonFileSetLoader::addSubprojects(const FileSetLoader::Subprojects & subp)
     {
         if(loaded == false)
             throw FileSetRuntimeError(FileSetRuntimeError::NotLoaded, "Trying to add subprojects on not loaded interface");
@@ -304,14 +304,14 @@ namespace Interface {
     }
 
     void
-    JsonFileSetLoader::removeSubprojects(const FilePaths & subp)
+    JsonFileSetLoader::removeSubprojects(const FileSetLoader::Subprojects & subp)
     {
 
         if(loaded == false)
             throw FileSetRuntimeError(FileSetRuntimeError::NotLoaded, "Trying to remove subprojects on not loaded interface");
 
         //find duplicates
-        FilePaths sorted = subp;
+        FileSetLoader::Subprojects sorted = subp;
         std::sort(sorted.begin(), sorted.end());
         for (auto it = sorted.begin() + 1; it != sorted.end(); ++it)
             if (*it == *(it - 1))
