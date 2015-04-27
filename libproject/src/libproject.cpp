@@ -258,14 +258,23 @@ namespace Interface {
         if(loaded == false)
             throw FileSetRuntimeError(FileSetRuntimeError::NotLoaded, "Trying to add subprojects on not loaded interface");
 
-        jChangedContentOfProjectFile = jContentOfProjectFile;
+        //jChangedContentOfProjectFile = jContentOfProjectFile;
 
         char * cPathToProjectFile, * dname;
         cPathToProjectFile = strdup(pathToProjectFile.c_str());
         dname = dirname(cPathToProjectFile);
         int whereRelativePathStarts = string(dname).length() + 1; // +1 because we need to skip "/" symbol
+        vector<string> candidates;
         for(const auto& sp : subp) {
             string relativePath = sp.substr(whereRelativePathStarts);
+            std::cout << "relative: " << relativePath << std::endl;
+
+            ifstream checkSubprojectsStream;
+            checkSubprojectsStream.open(string(dname)+string("/")+relativePath);
+            json check = checkProjectFileForErrors(checkSubprojectsStream);
+            if (check.count("Error") != 0)
+                throw FileSetRuntimeError(FileSetRuntimeError::BrokenSubproject, "Trying to add broken subproject(s)");
+            checkSubprojectsStream.close();
 
             if(jChangedContentOfProjectFile.count("subprojects") != 0) {
                 for (const auto& cachedSubproject : jChangedContentOfProjectFile["subprojects"]) {
@@ -273,25 +282,28 @@ namespace Interface {
                         throw FileSetRuntimeError(FileSetRuntimeError::SubprojectsIncongruity,"Trying to add subproject(s) which already exists in cache");
                 }
             }
-            if(jContentOfProjectFile.count("subprojects") != 0) {
-                for (const auto& cachedSubproject : jChangedContentOfProjectFile["subprojects"]) {
-                    if (relativePath == cachedSubproject)
-                        throw FileSetRuntimeError(FileSetRuntimeError::SubprojectsIncongruity, "Trying to add subproject(s) which already exists in project file");
-                }
-            }
-
-            ifstream checkSubprojectsStream;
-            checkSubprojectsStream.open((string)dname+string("/")+relativePath);
-            json check = checkProjectFileForErrors(checkSubprojectsStream);
-            if (check.count("Error") != 0)
-                throw FileSetRuntimeError(FileSetRuntimeError::BrokenSubproject, "Trying to add broken subproject(s)");
-            checkSubprojectsStream.close();
-
-            if(jChangedContentOfProjectFile.count("subprojects") == 0)
-                jChangedContentOfProjectFile["subprojects"] = { };
-            jChangedContentOfProjectFile["subprojects"].push_back(relativePath);
+//            if(jContentOfProjectFile.count("subprojects") != 0) {
+//                for (const auto& cachedSubproject : jContentOfProjectFile["subprojects"]) {
+//                    if (relativePath == cachedSubproject)
+//                        throw FileSetRuntimeError(FileSetRuntimeError::SubprojectsIncongruity, "Trying to add subproject(s) which already exists in project file");
+//                }
+//            }
+            candidates.push_back(relativePath);
         }
 
+        if (candidates.size() > 1)
+            for (size_t i = 0; i < candidates.size(); ++i)
+                for (size_t ii = i + 1; ii < candidates.size(); ++ii)
+                    if (candidates[ii] == candidates[i]) {
+                        std::cout << "bbbbbbooooommmmmm_________" << std::endl;
+                        throw FileSetRuntimeError(FileSetRuntimeError::SubprojectsIncongruity,"Trying to add duplicated subprojects");
+                    }
+
+        if (jChangedContentOfProjectFile.count("subprojects") == 0)
+            jChangedContentOfProjectFile["subprojects"] = { };
+
+        for(const auto& candidate : candidates)
+            jChangedContentOfProjectFile["subprojects"].push_back(candidate);
         // TODO check for already added subprojects
 
     }
@@ -386,7 +398,8 @@ namespace Interface {
 
             return j;
         } catch (const std::exception& e) {
-            throw FileSetRuntimeError(FileSetRuntimeError::UnknownError, (string)"Error gathered from json API: " + (string)e.what());
+            std::cout << e.what() << std::endl;
+            return json::parse(error_code + string("Error gathered from json API: ") + string(e.what()));
         }
     }
 
