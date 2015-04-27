@@ -8,19 +8,16 @@
 #include "libproject.h"
 #include <fstream>
 #include <sstream>
-#include <list>
 #include "json.hpp"
 #include "libproject_error.h"
 #include <libgen.h>
 #include <cstring>
-#include <vector>
-#include <algorithm>
 #include <set>
 
+using namespace LibprojManager::Interface;
 using std::ifstream;
 using std::ostringstream;
 using std::string;
-using std::list;
 using nlohmann::json;
 using namespace LibprojManager::Interface::Error;
 using std::map;
@@ -69,10 +66,10 @@ namespace Interface {
         /*virtual*/ bool open();
 
         /*!
-         * \brief Gives to user list<string> of filenames
-         * \return list<string> of filenames of project or drops exception if project wasn't loaded
+         * \brief Gives to user filepaths of files
+         * \return return collection of files of project, in case of failure throws exception
          */
-        /*virtual*/ const list<string> getFileNames() const;
+        /*virtual*/ const FileSetLoader::Files getFileNames() const;
 
         /*!
          * \brief Saves changes of .libproject file to it
@@ -95,11 +92,11 @@ namespace Interface {
                                                   "Trying to get path to root node on not loaded interface"); }
 
         /*!
-          * \brief Gives std::vector<std::string> of path to subprojects to user
+          * \brief Gives paths to subprojects to user
           * in relative path format (to project)
-          * \return vector of subprojects paths. Zero-sized vector implied
+          * \return return collection of subprojects of project. Zero-sized vector implied
           */
-        /*virtual*/ const vector<string> getSubprojectsPaths() const;
+        /*virtual*/ const FileSetLoader::Subprojects getSubprojectsPaths() const;
 
         /*!
           * \brief Gives number of subprojects to user
@@ -116,30 +113,30 @@ namespace Interface {
         /*!
          * \brief This function performs adding existing subprojects which are present on
          * filesystem to cache of .libproject file. But NOT saves it.
-         * \param[in] std::vector of pathes to subprojects
+         * \param[in] Subprojects
          */
-        /*virtual*/ void addSubprojects(const vector<string> & subp);
+        /*virtual*/ void addSubprojects(const FileSetLoader::Subprojects & subp);
 
         /*!
          * \brief This function performs adding existing subproject which is present on
          * filesystem to cache of .libproject file. But NOT saves it.
          * \param[in] std::string with path to subproject
          */
-        /*virtual*/ void addSubproject(const string & subp);
+        /*virtual*/ void addSubproject(const FileSetLoader::Path & subp);
 
         /*!
          * \brief This function performs removing existing subprojects in cache or in saved
          * .libproject file
-         * \param[in] std::vector of pathes to subprojects
+         * \param[in] Subprojects
          */
-        /*virtual*/ void removeSubprojects(const vector<string> & subp);
+        /*virtual*/ void removeSubprojects(const FileSetLoader::Subprojects & subp);
 
         /*!
          * \brief This function performs removing existing subproject in cache or in saved
          * .libproject file
          * \param[in] std::string with path to subproject
          */
-        /*virtual*/ void removeSubproject(const string& s);
+        /*virtual*/ void removeSubproject(const FileSetLoader::Path & s);
 
         /*!
          * \brief This function performs searching existing subproject loader by path to
@@ -147,7 +144,7 @@ namespace Interface {
          * \param[in] std::string with path to subproject
          * \return loader of subproject
          */
-        /*virtual*/ FileSetLoader * findSubprojectByPath(const std::string & path) const;
+        /*virtual*/ FileSetLoader * findSubprojectByPath(const FileSetLoader::Path & path) const;
 
     private:
 
@@ -203,16 +200,16 @@ namespace Interface {
         return;
     }
 
-    const list<string>
+    const FileSetLoader::Files
     JsonFileSetLoader::getFileNames() const
     {
         if(loaded == false)
             throw FileSetRuntimeError(FileSetRuntimeError::NotLoaded, "Trying to get file names on not loaded interface");
-        list<string> listOfFiles;
+        FileSetLoader::Files files;
         for(const auto& item : jContentOfProjectFile["files"]) {
-            listOfFiles.push_back(item.get<string>());
+            files.push_back(item.get<string>());
         }
-        return listOfFiles;
+        return files;
     }
 
     const string
@@ -223,13 +220,13 @@ namespace Interface {
         return jContentOfProjectFile["project"].get<string>();
     }
 
-    const vector<string>
+    const FileSetLoader::Subprojects
     JsonFileSetLoader::getSubprojectsPaths() const
     {
         if (loaded == false)
             throw FileSetRuntimeError(FileSetRuntimeError::NotLoaded, "Trying to get subprojects paths on not loaded interface");
         auto& subprojects = jChangedContentOfProjectFile["subprojects"];
-        vector<string> paths;
+        FileSetLoader::Subprojects paths;
         for (const auto& path : subprojects)
         {
             paths.push_back(path);
@@ -255,7 +252,7 @@ namespace Interface {
     }
 
     void
-    JsonFileSetLoader::addSubprojects(const std::vector<std::string> &subp)
+    JsonFileSetLoader::addSubprojects(const FileSetLoader::Subprojects & subp)
     {
         if(loaded == false)
             throw FileSetRuntimeError(FileSetRuntimeError::NotLoaded, "Trying to add subprojects on not loaded interface");
@@ -307,14 +304,14 @@ namespace Interface {
     }
 
     void
-    JsonFileSetLoader::removeSubprojects(const vector<string>& subp)
+    JsonFileSetLoader::removeSubprojects(const FileSetLoader::Subprojects & subp)
     {
 
         if(loaded == false)
             throw FileSetRuntimeError(FileSetRuntimeError::NotLoaded, "Trying to remove subprojects on not loaded interface");
 
         //find duplicates
-        vector<string> sorted = subp;
+        FileSetLoader::Subprojects sorted = subp;
         std::sort(sorted.begin(), sorted.end());
         for (auto it = sorted.begin() + 1; it != sorted.end(); ++it)
             if (*it == *(it - 1))
