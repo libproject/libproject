@@ -67,7 +67,7 @@ namespace Interface {
 
         /*!
          * \brief Gives to user filepaths of files
-         * \return Files(typedef-ed container) of project or drops exception if project wasn't loaded
+         * \return return collection of files of project, in case of failure throws exception
          */
         /*virtual*/ const FileSetLoader::Files getFileNames() const;
 
@@ -94,7 +94,7 @@ namespace Interface {
         /*!
           * \brief Gives paths to subprojects to user
           * in relative path format (to project)
-          * \return Subprojects(typedef-ed container) of subprojects paths. Zero-sized vector implied
+          * \return return collection of subprojects of project. Zero-sized vector implied
           */
         /*virtual*/ const FileSetLoader::Subprojects getSubprojectsPaths() const;
 
