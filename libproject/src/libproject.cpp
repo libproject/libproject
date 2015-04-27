@@ -258,8 +258,6 @@ namespace Interface {
         if(loaded == false)
             throw FileSetRuntimeError(FileSetRuntimeError::NotLoaded, "Trying to add subprojects on not loaded interface");
 
-        //jChangedContentOfProjectFile = jContentOfProjectFile;
-
         char * cPathToProjectFile, * dname;
         cPathToProjectFile = strdup(pathToProjectFile.c_str());
         dname = dirname(cPathToProjectFile);
@@ -282,22 +280,15 @@ namespace Interface {
                         throw FileSetRuntimeError(FileSetRuntimeError::SubprojectsIncongruity,"Trying to add subproject(s) which already exists in cache");
                 }
             }
-//            if(jContentOfProjectFile.count("subprojects") != 0) {
-//                for (const auto& cachedSubproject : jContentOfProjectFile["subprojects"]) {
-//                    if (relativePath == cachedSubproject)
-//                        throw FileSetRuntimeError(FileSetRuntimeError::SubprojectsIncongruity, "Trying to add subproject(s) which already exists in project file");
-//                }
-//            }
+
             candidates.push_back(relativePath);
         }
 
         if (candidates.size() > 1)
             for (size_t i = 0; i < candidates.size(); ++i)
                 for (size_t ii = i + 1; ii < candidates.size(); ++ii)
-                    if (candidates[ii] == candidates[i]) {
-                        std::cout << "bbbbbbooooommmmmm_________" << std::endl;
+                    if (candidates[ii] == candidates[i])
                         throw FileSetRuntimeError(FileSetRuntimeError::SubprojectsIncongruity,"Trying to add duplicated subprojects");
-                    }
 
         if (jChangedContentOfProjectFile.count("subprojects") == 0)
             jChangedContentOfProjectFile["subprojects"] = { };

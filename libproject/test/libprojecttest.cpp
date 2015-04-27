@@ -103,7 +103,7 @@ protected:
     json fileToTest = { };
     string pathToMainFile;
     string contentBackup;
-    //string pathToMainFileWhereWillBeNestedSubproject;
+
     string pathToMainFileWhichIsTargetForAddBrokenSubproject;
     json contentReferenceWithSingle;
     json contentReferenceWithNested;
@@ -115,7 +115,6 @@ protected:
     vector<string> pathToBrokenSubproject;
     void SetUp() {
         pathToMainFile = R"(project_files/testaddtosingle/mainproject_addsingle.libproject)";
-        //pathToMainFileWhereWillBeNestedSubproject = R"(project_files/testaddtosingle/mainproject_addnested.libproject)";
         pathToMainFileWhichIsTargetForAddBrokenSubproject = R"(project_files/testaddtosingle/mainproject_addbroken.libproject)";
         contentReference = {
           { "project", "there must be subprojects" },
@@ -136,11 +135,7 @@ protected:
 
           { "subprojects", {"regular/normalnested.libproject"} }
         };
-        // contentReferenceForTryToAddBroken = {
-        //   { "project", "here must not be any subproject field" },
 
-        //   { "files", { "main.cpp", "Test.h" } }
-        // };
         pathToOneRegularSingleSubproject =
             R"(project_files/testaddtosingle/regular/normalsingle.libproject)";
 
@@ -172,7 +167,6 @@ protected:
 class TestAddRegularSubprojectsToNested : public TestSkeleton {
 protected:
     json fileToTest = { };
-    //string pathToMainFileWhereWillBeSingleSubproject;
     string pathToMainFile;
     string contentBackup;
     string pathToMainFileForTestWithVectorFullOfPresentSubprojects;
@@ -202,7 +196,6 @@ protected:
     vector<string> pathsToPairOfRegularAndEmptySubprojects;
 
     void SetUp() {
-        //pathToMainFileWhereWillBeSingleSubproject = R"(project_files/testaddtonested/mainproject_addsingle.libproject)";
         pathToMainFile = R"(project_files/testaddtonested/mainproject_addnested.libproject)";
         pathToMainFileWhichIsTargetForAddBrokenSubproject = R"(project_files/testaddtonested/mainproject_addbroken.libproject)";
         pathToMainFileForTestWithVectorFullOfPresentSubprojects =
