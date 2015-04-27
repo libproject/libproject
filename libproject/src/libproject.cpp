@@ -15,6 +15,7 @@
 #include <cstring>
 #include <vector>
 #include <algorithm>
+#include <set>
 
 using std::ifstream;
 using std::ostringstream;
@@ -25,7 +26,8 @@ using namespace LibprojManager::Interface::Error;
 using std::map;
 using std::ofstream;
 using std::vector;
-using std::remove_if;
+using std::set;
+
 /*!
  * \brief Covers all classes of present project except Qt creator plugin
  * instance
@@ -258,14 +260,20 @@ namespace Interface {
         if(loaded == false)
             throw FileSetRuntimeError(FileSetRuntimeError::NotLoaded, "Trying to add subprojects on not loaded interface");
 
-        jChangedContentOfProjectFile = jContentOfProjectFile;
-
         char * cPathToProjectFile, * dname;
         cPathToProjectFile = strdup(pathToProjectFile.c_str());
         dname = dirname(cPathToProjectFile);
         int whereRelativePathStarts = string(dname).length() + 1; // +1 because we need to skip "/" symbol
+        set<string> candidates;
         for(const auto& sp : subp) {
             string relativePath = sp.substr(whereRelativePathStarts);
+
+            ifstream checkSubprojectsStream;
+            checkSubprojectsStream.open(string(dname)+string("/")+relativePath);
+            json check = checkProjectFileForErrors(checkSubprojectsStream);
+            if (check.count("Error") != 0)
+                throw FileSetRuntimeError(FileSetRuntimeError::BrokenSubproject, "Trying to add broken subproject(s)");
+            checkSubprojectsStream.close();
 
             if(jChangedContentOfProjectFile.count("subprojects") != 0) {
                 for (const auto& cachedSubproject : jChangedContentOfProjectFile["subprojects"]) {
@@ -273,25 +281,17 @@ namespace Interface {
                         throw FileSetRuntimeError(FileSetRuntimeError::SubprojectsIncongruity,"Trying to add subproject(s) which already exists in cache");
                 }
             }
-            if(jContentOfProjectFile.count("subprojects") != 0) {
-                for (const auto& cachedSubproject : jChangedContentOfProjectFile["subprojects"]) {
-                    if (relativePath == cachedSubproject)
-                        throw FileSetRuntimeError(FileSetRuntimeError::SubprojectsIncongruity, "Trying to add subproject(s) which already exists in project file");
-                }
-            }
 
-            ifstream checkSubprojectsStream;
-            checkSubprojectsStream.open((string)dname+string("/")+relativePath);
-            json check = checkProjectFileForErrors(checkSubprojectsStream);
-            if (check.count("Error") != 0)
-                throw FileSetRuntimeError(FileSetRuntimeError::BrokenSubproject, "Trying to add broken subproject(s)");
-            checkSubprojectsStream.close();
-
-            if(jChangedContentOfProjectFile.count("subprojects") == 0)
-                jChangedContentOfProjectFile["subprojects"] = { };
-            jChangedContentOfProjectFile["subprojects"].push_back(relativePath);
+            auto result = candidates.insert(relativePath);
+            if(result.second == false)
+                throw FileSetRuntimeError(FileSetRuntimeError::SubprojectsIncongruity, "Trying to add duplicated subprojects");
         }
 
+        if (jChangedContentOfProjectFile.count("subprojects") == 0)
+            jChangedContentOfProjectFile["subprojects"] = { };
+
+        for(const auto& candidate : candidates)
+            jChangedContentOfProjectFile["subprojects"].push_back(candidate);
         // TODO check for already added subprojects
 
     }
@@ -386,7 +386,8 @@ namespace Interface {
 
             return j;
         } catch (const std::exception& e) {
-            throw FileSetRuntimeError(FileSetRuntimeError::UnknownError, (string)"Error gathered from json API: " + (string)e.what());
+            std::cout << e.what() << std::endl;
+            return json::parse(error_code + string("Error gathered from json API: ") + string(e.what()));
         }
     }
 
