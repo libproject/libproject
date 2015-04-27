@@ -287,12 +287,6 @@ namespace Interface {
                 throw FileSetRuntimeError(FileSetRuntimeError::SubprojectsIncongruity, "Trying to add duplicated subprojects");
         }
 
-        // if (candidates.size() > 1)
-        //     for (size_t i = 0; i < candidates.size(); ++i)
-        //         for (size_t ii = i + 1; ii < candidates.size(); ++ii)
-        //             if (candidates[ii] == candidates[i])
-        //                 throw FileSetRuntimeError(FileSetRuntimeError::SubprojectsIncongruity,"Trying to add duplicated subprojects");
-
         if (jChangedContentOfProjectFile.count("subprojects") == 0)
             jChangedContentOfProjectFile["subprojects"] = { };
 
