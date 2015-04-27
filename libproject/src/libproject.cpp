@@ -8,7 +8,6 @@
 #include "libproject.h"
 #include <fstream>
 #include <sstream>
-#include <list>
 #include "json.hpp"
 #include "libproject_error.h"
 #include <libgen.h>
@@ -20,7 +19,6 @@
 using std::ifstream;
 using std::ostringstream;
 using std::string;
-using std::list;
 using nlohmann::json;
 using namespace LibprojManager::Interface::Error;
 using std::map;
@@ -69,10 +67,10 @@ namespace Interface {
         /*virtual*/ bool open();
 
         /*!
-         * \brief Gives to user list<string> of filenames
-         * \return list<string> of filenames of project or drops exception if project wasn't loaded
+         * \brief Gives to user vector<string> of filenames
+         * \return vector<string> of filenames of project or drops exception if project wasn't loaded
          */
-        /*virtual*/ const list<string> getFileNames() const;
+        /*virtual*/ const vector<string> getFileNames() const;
 
         /*!
          * \brief Saves changes of .libproject file to it
@@ -203,16 +201,16 @@ namespace Interface {
         return;
     }
 
-    const list<string>
+    const vector<string>
     JsonFileSetLoader::getFileNames() const
     {
         if(loaded == false)
             throw FileSetRuntimeError(FileSetRuntimeError::NotLoaded, "Trying to get file names on not loaded interface");
-        list<string> listOfFiles;
+        vector<string> files;
         for(const auto& item : jContentOfProjectFile["files"]) {
-            listOfFiles.push_back(item.get<string>());
+            files.push_back(item.get<string>());
         }
-        return listOfFiles;
+        return files;
     }
 
     const string

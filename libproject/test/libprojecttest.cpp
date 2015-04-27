@@ -56,7 +56,7 @@ class TestRegularSingle : public TestSkeleton {
 protected:
   string PathToFile;
   string projectNameRef;
-  list<string> projectFilesRef;
+  vector<string> projectFilesRef;
 
   void SetUp() {
     TestSkeleton::SetUp();
@@ -81,7 +81,7 @@ protected:
   string PathToFile;
   string dirPath;
   string projectNameRef;
-  list<string> projectFilesRef;
+  vector<string> projectFilesRef;
   int subprojectsCount;
   vector<string> subprojectsFilesRef;
   vector<string> subprojectsNamesRef;
@@ -445,7 +445,7 @@ TEST_F(TestRegularNested, Get_path_to_2n_subnode) {
     loader->open();
     map<string, FileSetLoader *> msl = loader->getSubprojectLoaders();
     map<string, FileSetLoader *>::const_reverse_iterator it = msl.crbegin();
-    //crbegin because we have only 2 item in list
+    //crbegin because we have only 2 item in map
     string path = (*it).second->getPathToNode();
     ASSERT_EQ(dirPath + subprojectsFilesRef.at(1), path);
 }
@@ -478,7 +478,7 @@ TEST_F(TestRegularNested, Get_project_name_for_1st_subproject) {
 TEST_F(TestRegularSingle, Get_list_of_files) {
   loader = FileSetFactory::createFileSet(PathToFile);
   loader->open();
-  EXPECT_EQ(true, loader->getFileNames() == projectFilesRef);
+  EXPECT_EQ(loader->getFileNames(), projectFilesRef);
 }
 
 TEST_F(TestRegularSingle, Get_list_of_files_for_not_loaded) {
