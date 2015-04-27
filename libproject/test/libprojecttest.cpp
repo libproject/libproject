@@ -169,23 +169,14 @@ protected:
     json fileToTest = { };
     string pathToMainFile;
     string contentBackup;
-    string pathToMainFileForTestWithVectorFullOfPresentSubprojects;
-    string pathToMainFileWhichIsTargetForAddBrokenSubproject;
+
     string pathToPresentSubproject;
-    string pathToMainFileWhereMustBeTwoNewRegularSubprojects;
-    string pathToMainFileForTestWithRegularAndBrokenSubprojects;
-    string pathToMainFileForTestWithTwoBrokenSubprojects;
-    string pathToMainFileForTestWithRegularAndEmptySubprojects;
-    string pathToMainFileForTestWithEmptyVector;
 
     json contentReferenceWithNewSingle;
     json contentReferenceWithNewNested;
     json contentReference;
     json contentReferenceWithPairOfNewRegularSubprojects;
-    json contentReferenceForTestToAddPairOfRegularAndBrokenSubprojects;
-    json contentReferenceForTestToAddPairOfBrokenSubprojects;
-    json contentReferenceForTestToAddPairOfRegularAndEmptySubprojects;
-    json contentReferenceForTestWithEmptyVector;
+
 
     string pathToOneRegularSingleSubproject;
     string pathToOneRegularNestedSubproject;
@@ -197,20 +188,8 @@ protected:
 
     void SetUp() {
         pathToMainFile = R"(project_files/testaddtonested/mainproject_addnested.libproject)";
-        pathToMainFileWhichIsTargetForAddBrokenSubproject = R"(project_files/testaddtonested/mainproject_addbroken.libproject)";
-        pathToMainFileForTestWithVectorFullOfPresentSubprojects =
-                R"(project_files/testaddtonested/mainproject_addnested_double_add.libproject)";
         pathToPresentSubproject = R"(project_files/testaddtonested/presentsubproject/sub.libproject)";
-        pathToMainFileWhereMustBeTwoNewRegularSubprojects =
-                R"(project_files/testaddtonested/mainproject_addtworegularsubprojects.libproject)";
-        pathToMainFileForTestWithRegularAndBrokenSubprojects =
-                R"(project_files/testaddtonested/mainproject_addpairofregularandbroken.libproject)";
-        pathToMainFileForTestWithTwoBrokenSubprojects =
-                R"(project_files/testaddtonested/mainproject_addtwobrokensubprojects.libproject)";
-        pathToMainFileForTestWithRegularAndEmptySubprojects =
-                R"(project_files/testaddtonested/mainproject_addpairofregularandempty.libproject)";
-        pathToMainFileForTestWithEmptyVector =
-                R"(project_files/testaddtonested/mainproject_emptyvector.libproject)";
+
 
         contentReferenceWithNewSingle = {
           { "project", "there must be subprojects" },
@@ -244,37 +223,6 @@ protected:
                               "fortestwithtworegularsubprojects/single.libproject",
                               "fortestwithtworegularsubprojects/nested.libproject"} }
         };
-        contentReferenceForTestToAddPairOfRegularAndBrokenSubprojects = {
-            { "project", "there must be subprojects" },
-
-            { "files", { "main.cpp", "Test.h" } },
-
-            { "subprojects", {"presentsubproject/sub.libproject",
-                              "fortestwithonebrokenandoneregularsubprojects/normal.libproject"} }
-        };
-        contentReferenceForTestToAddPairOfBrokenSubprojects = {
-            { "project", "there mustn't be subprojects" },
-
-            { "files", { "main.cpp", "Test.h" } },
-
-            { "subprojects", {"presentsubproject/sub.libproject"} }
-        };
-        contentReferenceForTestToAddPairOfRegularAndEmptySubprojects = {
-          { "project", "there must be subprojects" },
-
-          { "files", { "main.cpp", "Test.h" } },
-
-          { "subprojects", {"presentsubproject/sub.libproject",
-                            "fortestwithoneregularandemptysubprojects/regular.libproject"} }
-        };
-        contentReferenceForTestWithEmptyVector = {
-            { "project", "foo" },
-
-            { "files", { "main.cpp", "Test.h" } },
-
-            { "subprojects", {"presentsubproject/sub.libproject"} }
-        };
-
         pathToOneRegularSingleSubproject =
             R"(project_files/testaddtonested/regular/normalsingle.libproject)";
 
@@ -416,7 +364,6 @@ protected:
           os_case_4 << buf;
         in.close();
         case_4_contentBackup = os_case_4.str();
-        std::cout << case_4_contentBackup << std::endl;
 
         TestSkeleton::SetUp();
     }

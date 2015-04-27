@@ -265,7 +265,6 @@ namespace Interface {
         vector<string> candidates;
         for(const auto& sp : subp) {
             string relativePath = sp.substr(whereRelativePathStarts);
-            std::cout << "relative: " << relativePath << std::endl;
 
             ifstream checkSubprojectsStream;
             checkSubprojectsStream.open(string(dname)+string("/")+relativePath);
