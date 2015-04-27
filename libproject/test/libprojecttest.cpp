@@ -9,6 +9,7 @@
 #include <fstream>
 #include <sstream>
 
+typedef LibprojManager::Interface::FileSetLoader::FilePaths FilePaths;
 using std::string;
 using std::list;
 using LibprojManager::Interface::FileSetFactory;
@@ -56,7 +57,7 @@ class TestRegularSingle : public TestSkeleton {
 protected:
   string PathToFile;
   string projectNameRef;
-  list<string> projectFilesRef;
+  FilePaths projectFilesRef;
 
   void SetUp() {
     TestSkeleton::SetUp();
@@ -81,10 +82,10 @@ protected:
   string PathToFile;
   string dirPath;
   string projectNameRef;
-  list<string> projectFilesRef;
+  FilePaths projectFilesRef;
   int subprojectsCount;
-  vector<string> subprojectsFilesRef;
-  vector<string> subprojectsNamesRef;
+  FilePaths subprojectsFilesRef;
+  FilePaths subprojectsNamesRef;
 
   void SetUp() {
     TestSkeleton::SetUp();
@@ -112,7 +113,7 @@ protected:
 
     string pathToOneRegularSingleSubproject;
     string pathToOneRegularNestedSubproject;
-    vector<string> pathToBrokenSubproject;
+    FilePaths pathToBrokenSubproject;
     void SetUp() {
         pathToMainFile = R"(project_files/testaddtosingle/mainproject_addsingle.libproject)";
         pathToMainFileWhichIsTargetForAddBrokenSubproject = R"(project_files/testaddtosingle/mainproject_addbroken.libproject)";
@@ -180,11 +181,11 @@ protected:
 
     string pathToOneRegularSingleSubproject;
     string pathToOneRegularNestedSubproject;
-    vector<string> pathToBrokenSubproject;
-    vector<string> pathsToPairOfRegularSubprojects;
-    vector<string> pathsToPairOfRegularAndBrokenSubprojects;
-    vector<string> pathsToPairOfBrokenSubprojects;
-    vector<string> pathsToPairOfRegularAndEmptySubprojects;
+    FilePaths pathToBrokenSubproject;
+    FilePaths pathsToPairOfRegularSubprojects;
+    FilePaths pathsToPairOfRegularAndBrokenSubprojects;
+    FilePaths pathsToPairOfBrokenSubprojects;
+    FilePaths pathsToPairOfRegularAndEmptySubprojects;
 
     void SetUp() {
         pathToMainFile = R"(project_files/testaddtonested/mainproject_addnested.libproject)";
@@ -289,9 +290,9 @@ protected:
 
     string pathToPresentSubproject;
     string pathToNonPresentSubproject;
-    vector<string> pathsToNonPresentSubprojects;
-    vector<string> pathsDuplicated;
-    vector<string> pathsToPresentAndNonPresentSubprojects;
+    FilePaths pathsToNonPresentSubprojects;
+    FilePaths pathsDuplicated;
+    FilePaths pathsToPresentAndNonPresentSubprojects;
 
     void SetUp() {
         pathToMainFileWhereNeedToRemoveOneSubprojectInArrayOfTwo =
@@ -333,9 +334,9 @@ protected:
 
         pathToPresentSubproject = "sub/s1.libproject";
         pathToNonPresentSubproject = "subs/s1.libproject";
-        pathsToNonPresentSubprojects = vector<string>({ pathToNonPresentSubproject, "sub/nonexistent.libproject" });
-        pathsDuplicated = vector<string>({ pathToPresentSubproject, pathToPresentSubproject });
-        pathsToPresentAndNonPresentSubprojects = vector<string>({ pathToPresentSubproject, "sub/nonexistent.libproject" });
+        pathsToNonPresentSubprojects = FilePaths({ pathToNonPresentSubproject, "sub/nonexistent.libproject" });
+        pathsDuplicated = FilePaths({ pathToPresentSubproject, pathToPresentSubproject });
+        pathsToPresentAndNonPresentSubprojects = FilePaths({ pathToPresentSubproject, "sub/nonexistent.libproject" });
 
         //backup content of case 0
         ifstream in(pathToMainFileWhereNeedToRemoveOneSubprojectInArrayOfTwo);
@@ -445,7 +446,7 @@ TEST_F(TestRegularNested, Get_path_to_2n_subnode) {
     loader->open();
     map<string, FileSetLoader *> msl = loader->getSubprojectLoaders();
     map<string, FileSetLoader *>::const_reverse_iterator it = msl.crbegin();
-    //crbegin because we have only 2 item in list
+    //crbegin because we have only 2 item in map
     string path = (*it).second->getPathToNode();
     ASSERT_EQ(dirPath + subprojectsFilesRef.at(1), path);
 }
@@ -478,7 +479,7 @@ TEST_F(TestRegularNested, Get_project_name_for_1st_subproject) {
 TEST_F(TestRegularSingle, Get_list_of_files) {
   loader = FileSetFactory::createFileSet(PathToFile);
   loader->open();
-  EXPECT_EQ(true, loader->getFileNames() == projectFilesRef);
+  EXPECT_EQ(loader->getFileNames(), projectFilesRef);
 }
 
 TEST_F(TestRegularSingle, Get_list_of_files_for_not_loaded) {
@@ -621,7 +622,7 @@ TEST_F(TestAddRegularSubprojectsToNested, Add_one_regular_single_which_already_p
 }
 
 TEST_F(TestAddRegularSubprojectsToNested, Add_already_cached_and_present_subprojects) {
-    vector<string> subprojectsToAdd = {pathToOneRegularNestedSubproject, pathToPresentSubproject};
+    FilePaths subprojectsToAdd = {pathToOneRegularNestedSubproject, pathToPresentSubproject};
 
     ASSERT_NO_THROW({
                         loader = FileSetFactory::createFileSet(pathToMainFile);
@@ -694,7 +695,7 @@ TEST_F(TestAddRegularSubprojectsToNested, Add_empty_vector_of_subprojects) {
     ASSERT_NO_THROW({
                         loader = FileSetFactory::createFileSet(pathToMainFile);
                         loader->open();
-                        loader->addSubprojects(vector<string>());
+                        loader->addSubprojects(FilePaths());
                         loader->save();
                         ifstream i(pathToMainFile);
                         fileToTest << i;
