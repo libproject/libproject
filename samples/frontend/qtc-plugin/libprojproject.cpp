@@ -52,7 +52,7 @@ Project::Project(Manager *Manager, FileSetLoader *Loader)
     rootNode->addFileNodes(QList<FileNode *>() << projectFileNode);
 
     //creating FileNode instances for project files
-    list<string> filesToAdd = loader->getFileNames();
+    vector<string> filesToAdd = loader->getFileNames();
     QStringList files, failed;
     for (const auto& file : filesToAdd)
     {
