@@ -4,7 +4,7 @@
 #include <coreplugin/actionmanager/actionmanager.h>
 #include <coreplugin/actionmanager/actioncontainer.h>
 #include <coreplugin/coreconstants.h>
-#include <coreplugin/mimedatabase.h>
+//#include <coreplugin/mimedatabase.h>
 #include <coreplugin/idocument.h>
 #include <projectexplorer/projectexplorer.h>
 #include "libprojprojectmanager.h"
@@ -13,9 +13,11 @@
 #include "libprojprojectnodes.h"
 #include "libproj_global.h"
 #include "libprojproject.h"
-#include <coreplugin/mimedatabase.h>
+//#include <coreplugin/mimedatabase.h>
 #include <extensionsystem/pluginmanager.h>
 #include <projectexplorer/iprojectmanager.h>
+#include <utils/mimetypes/mimedatabase.h>
+#include <utils/fileutils.h>
 
 typedef ProjectExplorer::Project AbstractProject;
 using ProjectExplorer::FileType;
@@ -23,7 +25,7 @@ using ProjectExplorer::FileNode;
 using namespace Libproj::Internal;
 using std::string;
 using LibprojManager::Internal::Project;
-
+using Utils::FileName;
 AbstractProject * Plugin::project = nullptr;
 
 Plugin::Plugin() {
@@ -37,12 +39,8 @@ bool Plugin::initialize(const QStringList &Arguments, QString *ErrorString)
     Q_UNUSED(Arguments)
 
     /* Registering own mime-type */
-    const QLatin1String mimeTypes(":libprojplugin/libprojplugin.mimetypes.xml");
-    if (!Core::MimeDatabase::addMimeTypes(mimeTypes, ErrorString))
-    {
-        qWarning() << ("Error with registering MIME-type");
-        return false;
-    }
+    const QString mimeTypes(":libprojplugin/libprojplugin.mimetypes.xml");
+    Utils::MimeDatabase::addMimeTypes(mimeTypes);
 
     /* Adding Manager to managers pool */
     LibprojManager::Internal::Manager * manager = new LibprojManager::Internal::Manager();
