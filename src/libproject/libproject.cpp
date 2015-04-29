@@ -52,11 +52,11 @@ namespace Interface {
         bool loaded; //! flag which becoming true condition when instance is busy
 
         //description constants:
-        const char * const filesDescr = "files";
-        const char * const subprojectsDescr = "subprojects";
-        const char * const authorDescr = "author";
-        const char * const projectDescr = "project";
-        const char * const errorDescr = "Error";
+        const char * const FILES_DESCR = "files";
+        const char * const SUBPR_DESCR = "subprojects";
+        const char * const AUTHOR_DESCR = "author";
+        const char * const PROJECT_DESCR = "project";
+        const char * const ERROR_DESCR = "Error";
 
     public:
         /*!
@@ -181,11 +181,11 @@ namespace Interface {
 
         jChangedContentOfProjectFile = jContentOfProjectFile = checkProjectFileForErrors(i); /// Checking JSON-data for consistentness, correctness and reading it
 
-        if (jContentOfProjectFile.count(errorDescr) != 0) { /// Checking data for higher abstract errors - project level errors
+        if (jContentOfProjectFile.count(ERROR_DESCR) != 0) { /// Checking data for higher abstract errors - project level errors
             loaded = false;
-            throw FileSetRuntimeError(FileSetRuntimeError::IncorrectSource, jContentOfProjectFile[errorDescr].get<string>());
+            throw FileSetRuntimeError(FileSetRuntimeError::IncorrectSource, jContentOfProjectFile[ERROR_DESCR].get<string>());
         } else {
-            if (jContentOfProjectFile[subprojectsDescr].is_array()) /// Checking project data for subprojects
+            if (jContentOfProjectFile[SUBPR_DESCR].is_array()) /// Checking project data for subprojects
                loadSubprojects(); /// If above is true loading subprojects
         }
 
@@ -214,7 +214,7 @@ namespace Interface {
         if(loaded == false)
             throw FileSetRuntimeError(FileSetRuntimeError::NotLoaded, "Trying to get file names on not loaded interface");
         list<string> listOfFiles;
-        for(const auto& item : jContentOfProjectFile[filesDescr]) {
+        for(const auto& item : jContentOfProjectFile[FILES_DESCR]) {
             listOfFiles.push_back(item.get<string>());
         }
         return listOfFiles;
@@ -225,7 +225,7 @@ namespace Interface {
     {
         if(loaded == false)
             throw FileSetRuntimeError(FileSetRuntimeError::NotLoaded, "Trying to get project name on not loaded interface");
-        return jContentOfProjectFile[projectDescr].get<string>();
+        return jContentOfProjectFile[PROJECT_DESCR].get<string>();
     }
 
     const vector<string>
@@ -233,7 +233,7 @@ namespace Interface {
     {
         if (loaded == false)
             throw FileSetRuntimeError(FileSetRuntimeError::NotLoaded, "Trying to get subprojects paths on not loaded interface");
-        auto& subprojects = jChangedContentOfProjectFile[subprojectsDescr];
+        auto& subprojects = jChangedContentOfProjectFile[SUBPR_DESCR];
         vector<string> paths;
         for (const auto& path : subprojects)
         {
@@ -275,13 +275,13 @@ namespace Interface {
             string relativePath = sp.substr(whereRelativePathStarts);
 
             if(jChangedContentOfProjectFile.count("subprojects") != 0) {
-                for (const auto& cachedSubproject : jChangedContentOfProjectFile[subprojectsDescr]) {
+                for (const auto& cachedSubproject : jChangedContentOfProjectFile[SUBPR_DESCR]) {
                     if (relativePath == cachedSubproject)
                         throw FileSetRuntimeError(FileSetRuntimeError::SubprojectsIncongruity,"Trying to add subproject(s) which already exists in cache");
                 }
             }
             if(jContentOfProjectFile.count("subprojects") != 0) {
-                for (const auto& cachedSubproject : jChangedContentOfProjectFile[subprojectsDescr]) {
+                for (const auto& cachedSubproject : jChangedContentOfProjectFile[SUBPR_DESCR]) {
                     if (relativePath == cachedSubproject)
                         throw FileSetRuntimeError(FileSetRuntimeError::SubprojectsIncongruity, "Trying to add subproject(s) which already exists in project file");
                 }
@@ -295,8 +295,8 @@ namespace Interface {
             checkSubprojectsStream.close();
 
             if(jChangedContentOfProjectFile.count("subprojects") == 0)
-                jChangedContentOfProjectFile[subprojectsDescr] = { };
-            jChangedContentOfProjectFile[subprojectsDescr].push_back(relativePath);
+                jChangedContentOfProjectFile[SUBPR_DESCR] = { };
+            jChangedContentOfProjectFile[SUBPR_DESCR].push_back(relativePath);
         }
 
         // TODO check for already added subprojects
@@ -329,7 +329,7 @@ namespace Interface {
                                           "Duplicate found in candidates to remove");
 
         //get reference for subprojects array
-        auto& subprojects = jChangedContentOfProjectFile[subprojectsDescr];
+        auto& subprojects = jChangedContentOfProjectFile[SUBPR_DESCR];
 
         //find nonexistent subprojects
         vector<json::iterator> candidates;
@@ -366,7 +366,7 @@ namespace Interface {
     const json
     JsonFileSetLoader::checkProjectFileForErrors(ifstream& ifs) const
     {
-        const string error_code = string("{\"") + string(errorDescr) + string("\" : \"");
+        const string error_code = string("{\"") + string(ERROR_DESCR) + string("\" : \"");
         try {
             json j;
             j << ifs;
@@ -376,18 +376,18 @@ namespace Interface {
             if (j.is_null())
                 return json::parse(error_code + "Empty or broken file!\"}");
 
-            if (j[projectDescr].is_string() == false)
+            if (j[PROJECT_DESCR].is_string() == false)
                 return json::parse(error_code + "Corrupted or absent project key!\"}");
 
-            if (j[filesDescr].is_array() == false)
+            if (j[FILES_DESCR].is_array() == false)
                 return json::parse(error_code + "Corrupted or absent files key!\"}");
-            else if (j[filesDescr].at(0).is_string() == false)
+            else if (j[FILES_DESCR].at(0).is_string() == false)
                 return json::parse(error_code + "Wrong values type of files key!\"}");
 
-            if (j[subprojectsDescr].is_array()) {
-                if (j[subprojectsDescr].at(0).is_string() == false)
+            if (j[SUBPR_DESCR].is_array()) {
+                if (j[SUBPR_DESCR].at(0).is_string() == false)
                     return json::parse(error_code + "Wrong values type of subprojects key!\"}");
-            } else if (!j[subprojectsDescr].is_null() && !j[subprojectsDescr].is_array()) {
+            } else if (!j[SUBPR_DESCR].is_null() && !j[SUBPR_DESCR].is_array()) {
                 return json::parse(error_code + "Corrupted or absent subprojects key!\"}");
             }
 
@@ -411,7 +411,7 @@ namespace Interface {
 
 
             if (jChangedContentOfProjectFile.count("subprojects") == 1) { //prevent creating "subprojects" key with "null" value
-                for (const auto& x: jChangedContentOfProjectFile[subprojectsDescr]) {
+                for (const auto& x: jChangedContentOfProjectFile[SUBPR_DESCR]) {
                             pathSub = x.get<string>();
                             loaderOfSubproject = FileSetFactory::createFileSet(pathHead + pathSub);
                             loaderOfSubproject->open();
