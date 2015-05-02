@@ -7,6 +7,9 @@ set(CMAKE_SKIP_RPATH FALSE)
 add_subdirectory ( libproject/src )
 add_subdirectory ( libproject/test )
 
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libproject/src/libproject.so
+	DESTINATION /usr/lib)
+
 SET(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 find_package( GCOV )
