@@ -6,6 +6,7 @@ set(CMAKE_SKIP_RPATH FALSE)
 
 add_subdirectory ( libproject/src )
 add_subdirectory ( libproject/test )
+add_subdirectory ( libproject/doc )
 
 SET(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules")
 
