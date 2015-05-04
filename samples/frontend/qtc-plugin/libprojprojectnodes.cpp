@@ -30,12 +30,12 @@ namespace  LibprojManager {
 namespace Internal {
 
 ProjectNode::ProjectNode(AbstractProject * Project, ProjectFile * ProjectFile)
-    : ProjectExplorer::ProjectNode(ProjectFile->filePath().toString()),
+    : ProjectExplorer::ProjectNode(ProjectFile->filePath()/*.toString()*/),
       project(Project),
       projectFile(ProjectFile)
 {
     qDebug() << "Calling c-tor for ProjectNode";
-    setDisplayName(projectFile->filePath().toFileInfo().completeBaseName());
+    setDisplayName(projectFile->filePath()/*.toFileInfo().completeBaseName()*/);
 }
 
 QList<ProjectExplorer::ProjectAction> ProjectNode::supportedActions(Node * node) const
