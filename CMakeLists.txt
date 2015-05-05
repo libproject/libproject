@@ -14,7 +14,7 @@ find_package( GCOV )
 find_package( GCOVR )
 
 add_custom_target(coverage
-	WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/test
+	WORKING_DIRECTORY test
 	COMMAND libproject_test
 	COMMAND ${GCOV} -o ../src/CMakeFiles/project.dir/libproject.cpp.gcno ../../src/libproject.cpp
 	COMMAND ${CMAKE_COMMAND} -E make_directory ../coverage_report
