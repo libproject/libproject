@@ -8,7 +8,7 @@ set (SOURCES
 	libproject.cpp)
 
 #setting necessary headers
-include_directories (../../tools/json/src/)
+include_directories (../tools/json/src/)
 
 #setting what to build
 add_library(project SHARED ${SOURCES})

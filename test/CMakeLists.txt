@@ -7,14 +7,14 @@ project (libproject_test)
 
 #setting sources
 set (GMOCK_DIR
-	"../../../gmock")
+	"../../gmock")
 set (SOURCES_TEST
 	libprojecttest.cpp
 	${GMOCK_DIR}/src/gmock-all.cc
 	${GMOCK_DIR}/gtest/src/gtest-all.cc)
 
 #setting necessary headers
-include_directories (../../tools/json/src/
+include_directories (../tools/json/src/
 	../src
 	${GMOCK_DIR}/gtest/include
 	${GMOCK_DIR}/include
