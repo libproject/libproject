@@ -2,6 +2,12 @@ cmake_minimum_required (VERSION 2.8)
 
 project (LPROJ_main)
 
+#setting necessary headers
+include_directories (
+	${PROJECT_SOURCE_DIR}/tools/json/src
+	${PROJECT_SOURCE_DIR}/src/include
+)
+
 set(CMAKE_SKIP_RPATH FALSE)
 
 add_subdirectory ( src )

@@ -14,8 +14,7 @@ set (SOURCES_TEST
 	${GMOCK_DIR}/gtest/src/gtest-all.cc)
 
 #setting necessary headers
-include_directories (../tools/json/src/
-	../src
+include_directories (
 	${GMOCK_DIR}/gtest/include
 	${GMOCK_DIR}/include
 	${GMOCK_DIR}/gtest

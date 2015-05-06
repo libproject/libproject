@@ -1,8 +1,8 @@
 ﻿#include <string>
 #include <list>
 #include <gtest/gtest.h>
-#include "libproject.h"
-#include "libproject_error.h"
+#include "libproject/libproject.h"
+#include "libproject/libproject_error.h"
 #include <map>
 #include <vector>
 #include "json.hpp"

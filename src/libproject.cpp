@@ -5,11 +5,11 @@
 * Here is located JSON-like realization of abstract input interface
 */
 
-#include "libproject.h"
+#include "libproject/libproject.h"
 #include <fstream>
 #include <sstream>
 #include "json.hpp"
-#include "libproject_error.h"
+#include "libproject/libproject_error.h"
 #include <libgen.h>
 #include <cstring>
 #include <set>

@@ -7,9 +7,6 @@ project (libproject)
 set (SOURCES
 	libproject.cpp)
 
-#setting necessary headers
-include_directories (../tools/json/src/)
-
 #setting what to build
 add_library(project SHARED ${SOURCES})
 
@@ -19,7 +16,7 @@ install(TARGETS project
 	DESTINATION lib
 	)
 
-INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/libproject.h
+INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/include/libproject/libproject.h
         DESTINATION include
         )
 
