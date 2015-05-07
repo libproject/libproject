@@ -16,8 +16,9 @@ install(TARGETS project
 	DESTINATION lib
 	)
 
-INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/include/libproject/libproject.h
-        DESTINATION include
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/libproject/
+        DESTINATION include/libproject
+        FILES_MATCHING PATTERN "*.h"
         )
 
 #setting flags
