@@ -16,11 +16,6 @@ install(TARGETS project
 	DESTINATION lib
 	)
 
-install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/libproject/
-        DESTINATION include/libproject
-        FILES_MATCHING PATTERN "*.h"
-        )
-
 #setting flags
 set (CMAKE_CXX_FLAGS
 	"${CMAKE_CXX_FLAGS} -std=c++11 -g -O0 -fprofile-arcs -ftest-coverage")

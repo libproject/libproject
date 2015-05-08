@@ -5,11 +5,12 @@ project (LPROJ_main)
 #setting necessary headers
 include_directories (
 	${PROJECT_SOURCE_DIR}/tools/json/src
-	${PROJECT_SOURCE_DIR}/src/include
+	${PROJECT_SOURCE_DIR}/include
 )
 
 set(CMAKE_SKIP_RPATH FALSE)
 
+add_subdirectory ( include )
 add_subdirectory ( src )
 add_subdirectory ( test )
 add_subdirectory ( doc )
