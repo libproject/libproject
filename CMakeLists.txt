@@ -27,4 +27,5 @@ add_custom_target(coverage
 	COMMAND ${CMAKE_COMMAND} -E make_directory ../coverage_report
 	COMMAND ${GCOVR_EXECUTABLE} --object-directory= ../src -r ../../src/ --html --html-details -o ../coverage_report/report.html
 	)
+
 add_dependencies(coverage libproject_test)
