@@ -10,6 +10,7 @@ include_directories (
 
 set(CMAKE_SKIP_RPATH FALSE)
 
+#setting subprojects
 add_subdirectory ( include )
 add_subdirectory ( src )
 add_subdirectory ( test )
@@ -20,6 +21,7 @@ SET(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules")
 find_package( GCOV )
 find_package( GCOVR )
 
+#configuring `coverage` target
 add_custom_target(coverage
 	WORKING_DIRECTORY test
 	COMMAND libproject_test
@@ -27,14 +29,13 @@ add_custom_target(coverage
 	COMMAND ${CMAKE_COMMAND} -E make_directory ../coverage_report
 	COMMAND ${GCOVR_EXECUTABLE} --object-directory= ../src -r ../../src/ --html --html-details -o ../coverage_report/report.html
 	)
-
 add_dependencies(coverage libproject_test)
 
-# uninstall target
+#configuring `uninstall` target
 configure_file(
     "${CMAKE_CURRENT_SOURCE_DIR}/cmake_uninstall.cmake.in"
     "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake"
     IMMEDIATE @ONLY)
-
 add_custom_target(uninstall
     COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)
+    

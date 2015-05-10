@@ -13,6 +13,7 @@ if(DOXYGEN_FOUND)
                 SOURCES Doxyfile.in
                 )
 
+		#part of configuring `install` target (documentation)
         install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/html_doc/
         		DESTINATION share/doc/libproject
         )

@@ -10,7 +10,7 @@ set (SOURCES
 #setting what to build
 add_library(project SHARED ${SOURCES})
 
-#configuring `install` target
+#part of configuring `install` target (library)
 install(TARGETS project
 	LIBRARY
 	DESTINATION lib
