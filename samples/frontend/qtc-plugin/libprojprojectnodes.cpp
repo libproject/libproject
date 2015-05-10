@@ -4,8 +4,8 @@
 #include "libprojplugin.h"
 #include <QFile>
 #include "libprojprojectmanager.h"
-#include "libproject.h"
-#include "libproject_error.h"
+#include "libproject/libproject.h"
+#include "libproject/libproject_error.h"
 #include <libgen.h>
 #include <cstring>
 #include <algorithm>

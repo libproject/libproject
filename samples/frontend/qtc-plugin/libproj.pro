@@ -46,20 +46,11 @@ RESOURCES += \
     libprojplugin.qrc
 
 OTHER_FILES += \
-    ../libprojw/wizard.json \
-#    ../libprojw/file.libproject \
-#    ../libprojw/file.h \
-#    ../libprojw/main.cpp
+    wizard/wizard.json
 
-win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../../build/libproject/src/release/ -lproject
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../../build/libproject/src/debug/ -lproject
-else:unix: LIBS += -L$$PWD/../../../build/libproject/src/ -lproject
+LIBS += -lproject
 
-INCLUDEPATH += $$PWD/../../../libproject/src
-DEPENDPATH += $$PWD/../../../libproject/src
-
-copydata.commands = $(COPY_DIR) $$PWD/../libprojw $$IDE_BUILD_TREE/share/qtcreator/templates/wizards/projects/ ; \
-                $(COPY) $$PWD/../../../build/libproject/src/libproject.so $$IDE_BUILD_TREE/lib/qtcreator/plugins/libproject.so
+copydata.commands = $(COPY_DIR) $$PWD/wizard $$IDE_BUILD_TREE/share/qtcreator/templates/wizards/projects/libprojw
 
 first.depends = $(first) copydata
 export(first.depends)
