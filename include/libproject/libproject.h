@@ -27,22 +27,25 @@ namespace Interface {
 class FileSetLoader
 {
 public:
+    typedef std::string Path;
+    typedef std::vector<Path> Files;
+    typedef std::vector<Path> Subprojects;
 
     virtual ~FileSetLoader() { }
 
     virtual bool open() = 0;
     virtual void save() = 0;
-    virtual const std::list<std::string> getFileNames() const = 0;
+    virtual const Files getFileNames() const = 0;
     virtual const std::string getProjectName() const = 0;
     virtual const std::string getPathToNode() const = 0;
-    virtual const std::vector<std::string> getSubprojectsPaths() const = 0;
+    virtual const Subprojects getSubprojectsPaths() const = 0;
     virtual int countSubprojects() const = 0;
     virtual std::map<std::string, FileSetLoader *> getSubprojectLoaders() = 0;
-    virtual void addSubprojects(const std::vector<std::string>&) = 0;
-    virtual void addSubproject(const std::string&) = 0;
-    virtual void removeSubprojects(const std::vector<std::string>&) = 0;
-    virtual void removeSubproject(const std::string&) = 0;
-    virtual FileSetLoader * findSubprojectByPath(const std::string&) const = 0;
+    virtual void addSubprojects(const Subprojects&) = 0;
+    virtual void addSubproject(const Path&) = 0;
+    virtual void removeSubprojects(const Subprojects&) = 0;
+    virtual void removeSubproject(const Path&) = 0;
+    virtual FileSetLoader * findSubprojectByPath(const Path&) const = 0;
 
 };
 

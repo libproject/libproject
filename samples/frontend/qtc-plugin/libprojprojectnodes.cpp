@@ -4,8 +4,8 @@
 #include "libprojplugin.h"
 #include <QFile>
 #include "libprojprojectmanager.h"
-#include "libproject.h"
-#include "libproject_error.h"
+#include "libproject/libproject.h"
+#include "libproject/libproject_error.h"
 #include <libgen.h>
 #include <cstring>
 #include <algorithm>
@@ -30,12 +30,12 @@ namespace  LibprojManager {
 namespace Internal {
 
 ProjectNode::ProjectNode(AbstractProject * Project, ProjectFile * ProjectFile)
-    : ProjectExplorer::ProjectNode(ProjectFile->filePath().toString()),
+    : ProjectExplorer::ProjectNode(ProjectFile->filePath()/*.toString()*/),
       project(Project),
       projectFile(ProjectFile)
 {
     qDebug() << "Calling c-tor for ProjectNode";
-    setDisplayName(projectFile->filePath().toFileInfo().completeBaseName());
+    setDisplayName(projectFile->filePath()/*.toFileInfo().completeBaseName()*/);
 }
 
 QList<ProjectExplorer::ProjectAction> ProjectNode::supportedActions(Node * node) const

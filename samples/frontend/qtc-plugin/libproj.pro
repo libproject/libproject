@@ -1,5 +1,3 @@
-#TARGET = libproj
-#TEMPLATE = lib
 
 DEFINES += PROJ_LIBRARY
 
@@ -28,17 +26,6 @@ message(Path to QtC build: $$QTCREATOR_SOURCES)
 IDE_BUILD_TREE = $$(QTC_BUILD)
 isEmpty(IDE_BUILD_TREE):IDE_BUILD_TREE=/home/drew/QtCreatorProjects/QTC-GCC-BUILD
 message(Path to QtC build: $$IDE_BUILD_TREE)
-## uncomment to build plugin into user config directory
-## <localappdata>/plugins/<ideversion>
-##    where <localappdata> is e.g.
-##    "%LOCALAPPDATA%\QtProject\qtcreator" on Windows Vista and later
-##    "$XDG_DATA_HOME/data/QtProject/qtcreator" or "~/.local/share/data/QtProject/qtcreator" on Linux
-##    "~/Library/Application Support/QtProject/Qt Creator" on Mac
-# USE_USER_DESTDIR = yes
-
-###### If the plugin can be depended upon by other plugins, this code needs to be outsourced to
-###### <dirname>_dependencies.pri, where <dirname> is the name of the directory containing the
-###### plugin's sources.
 
 QTC_PLUGIN_NAME = proj
 QTC_LIB_DEPENDS += \
@@ -59,20 +46,11 @@ RESOURCES += \
     libprojplugin.qrc
 
 OTHER_FILES += \
-    ../libprojw/wizard.json \
-#    ../libprojw/file.libproject \
-#    ../libprojw/file.h \
-#    ../libprojw/main.cpp
+    wizard/wizard.json
 
-win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../libproject/release/ -lproject
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../libproject/debug/ -lproject
-else:unix: LIBS += -L$$OUT_PWD/../libproject/ -lproject
+LIBS += -lproject
 
-INCLUDEPATH += $$PWD/../libproject
-DEPENDPATH += $$PWD/../libproject
-
-copydata.commands = $(COPY_DIR) $$PWD/../libprojw $$IDE_BUILD_TREE/share/qtcreator/templates/wizards/projects/ ; \
-                $(COPY) $$OUT_PWD/../libproject/libproject.so.1.0.0 $$IDE_BUILD_TREE/lib/qtcreator/plugins/libproject.so.1
+copydata.commands = $(COPY_DIR) $$PWD/wizard $$IDE_BUILD_TREE/share/qtcreator/templates/wizards/projects/libprojw
 
 first.depends = $(first) copydata
 export(first.depends)

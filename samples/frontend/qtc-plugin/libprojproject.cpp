@@ -1,13 +1,13 @@
 #include <coreplugin/documentmanager.h>
 #include <projectexplorer/projectexplorerconstants.h>
 #include <coreplugin/icontext.h>
+#include "libproject/libproject.h"
+#include "libproject/libproject_error.h"
 #include "libprojproject.h"
 #include "libprojprojectmanager.h"
 #include "libprojplugin.h"
 #include "libprojprojectfile.h"
 #include "libprojconstants.h"
-#include "libproject.h"
-#include "libproject_error.h"
 #include <vector>
 #include <list>
 
@@ -25,65 +25,65 @@ using std::list;
 namespace LibprojManager {
 namespace Internal {
 
-Project::Project(Manager *Manager, FileSetLoader *Loader)
-    : manager(Manager), loader(Loader) {
-  try {
-    qDebug() << "Calling c-tor for Project";
+Project::Project(Manager *manager, FileSetLoader *Loader)
+    : manager_(manager), loader(Loader) {
+    try {
+        qDebug() << "Calling c-tor for Project";
 
-    setId(LibprojManager::Constants::LIBPROJPROJECT_ID);
-    setProjectContext(Core::Context(LibprojManager::Constants::PROJECTCONTEXT));
-    setProjectLanguages(Core::Context(ProjectExplorer::Constants::LANG_CXX));
+        setId(LibprojManager::Constants::LIBPROJPROJECT_ID);
+        setProjectContext(Core::Context(LibprojManager::Constants::PROJECTCONTEXT));
+        setProjectLanguages(Core::Context(ProjectExplorer::Constants::LANG_CXX));
 
-    //getting path to node
-    pathToNode =
-        QString::fromStdString(loader->getPathToNode());
+        //getting path to node
+        pathToNode =
+                QString::fromStdString(loader->getPathToNode());
 
-    //getting name of project
-    nameOfProject = QString::fromStdString(loader->getProjectName());
+        //getting name of project
+        nameOfProject = QString::fromStdString(loader->getProjectName());
 
-    //init ProjectFile instance
-    projectFile = new ProjectFile(this, pathToNode);
+        //init ProjectFile instance
+        projectFile = new ProjectFile(this, pathToNode);
 
-    //init ProjectNode instance
-    rootNode = new ProjectNode(this, projectFile);
+        //init ProjectNode instance
+        rootNode = new ProjectNode(this, projectFile);
 
-    //creating project file FileNode instance
-    FileNode * projectFileNode = new FileNode(pathToNode, FileType::ProjectFileType, false);
-    rootNode->addFileNodes(QList<FileNode *>() << projectFileNode);
+        //creating project file FileNode instance
+        FileNode * projectFileNode = new FileNode(pathToNode, FileType::ProjectFileType, false);
+        rootNode->addFileNodes(QList<FileNode *>() << projectFileNode);
 
-    //creating FileNode instances for project files
-    list<string> filesToAdd = loader->getFileNames();
-    QStringList files, failed;
-    for (const auto& file : filesToAdd)
-    {
-        files.append(QFileInfo(pathToNode).absolutePath()
-                     + QString("/")
-                     + QString::fromStdString(file));
-    }
-    rootNode->addFiles(files, &failed);
-
-    //creating subproject instances
-    if(loader->countSubprojects() > 0)
-    {
-        vector<string> paths = loader->getSubprojectsPaths();
-        QStringList subprojects;
-        for (const auto& path : paths)
+        //creating FileNode instances for project files
+        vector<string> filesToAdd = loader->getFileNames();
+        QStringList files, failed;
+        for (const auto& file : filesToAdd)
         {
-            subprojects.append(QFileInfo(pathToNode).absolutePath()
-                               + QString("/")
-                               + QString::fromStdString(path));
+            files.append(QFileInfo(pathToNode).absolutePath()
+                         + QString("/")
+                         + QString::fromStdString(file));
         }
-        rootNode->addFiles(subprojects, &failed);
+        rootNode->addFiles(files, &failed);
+
+        //creating subproject instances
+        if(loader->countSubprojects() > 0)
+        {
+            vector<string> paths = loader->getSubprojectsPaths();
+            QStringList subprojects;
+            for (const auto& path : paths)
+            {
+                subprojects.append(QFileInfo(pathToNode).absolutePath()
+                                   + QString("/")
+                                   + QString::fromStdString(path));
+            }
+            rootNode->addFiles(subprojects, &failed);
+        }
+
+        //i don't clearly understand this stuff yet
+        Core::DocumentManager::addDocument(projectFile, false);
+        manager->registerProject(this);
+
+    } catch (const FileSetRuntimeError & re) {
+        qWarning() << re.what();
+        throw;
     }
-
-    //i don't clearly understand this stuff yet
-    Core::DocumentManager::addDocument(projectFile, false);
-    manager->registerProject(this);
-
-  } catch (const FileSetRuntimeError & re) {
-    qWarning() << re.what();
-    throw;
-  }
 }
 
 QString Project::displayName() const
@@ -98,7 +98,7 @@ IDocument * Project::document() const
 
 ProjectExplorer::IProjectManager * Project::projectManager() const
 {
-    return manager;
+    return manager_;
 }
 
 ProjectExplorer::ProjectNode * Project::rootProjectNode() const
@@ -146,7 +146,7 @@ bool Project::addFiles(const QStringList &filePaths)
         //because node of main project has been added in Project c-tor
         else if (QFileInfo(path).suffix() == QString("libproject"))
         {
-            AbstractProject * subproject = manager->openProject(path, err);
+            AbstractProject * subproject = manager_->openProject(path, err);
             newSubprojectNodes.push_back(subproject->rootProjectNode());
         }
     }

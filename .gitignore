@@ -1,1 +1,4 @@
 *.pro.user
+libproject/.idea
+.idea
+*.txt.user
