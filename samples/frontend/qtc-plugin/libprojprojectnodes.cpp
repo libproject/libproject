@@ -35,7 +35,7 @@ ProjectNode::ProjectNode(AbstractProject * Project, ProjectFile * ProjectFile)
       projectFile(ProjectFile)
 {
     qDebug() << "Calling c-tor for ProjectNode";
-    setDisplayName(projectFile->filePath()/*.toFileInfo().completeBaseName()*/);
+    setDisplayName(qobject_cast<LibprojManager::Internal::Project *>(project)->displayName());
 }
 
 QList<ProjectExplorer::ProjectAction> ProjectNode::supportedActions(Node * node) const

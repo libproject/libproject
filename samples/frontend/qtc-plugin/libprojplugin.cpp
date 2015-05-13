@@ -105,7 +105,7 @@ void Plugin::triggerAddNewFileAction()
    }
    case QMessageBox::StandardButton::No:
    {
-       QString newFilename (QFileDialog::getSaveFileName(nullptr, tr("Where you want to save new file?"), project->document()->filePath()/*.toFileInfo().dir().path()*/));
+       QString newFilename (QFileDialog::getSaveFileName(nullptr, tr("Where you want to save new file?"), project->document()->filePath().toString()));
        QFile newFile (newFilename);
        if (!newFile.exists())
            newFile.open(QIODevice::ReadWrite | QIODevice::Text);

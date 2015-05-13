@@ -16,7 +16,7 @@ ProjectFile::ProjectFile(AbstractProject * Parent, const QString &Filename)
     qDebug() << "Calling c-tor for ProjectFile";
     setId("Libproj.ProjectFile");
     setMimeType(QLatin1String(Constants::LIBPROJPROJECTMIMETYPE));
-    setFilePath(/*Utils::FileName::fromString(*/Filename/*)*/);
+    setFilePath(Utils::FileName::fromString(Filename));
 }
 
 bool ProjectFile::save(QString *errorString, const QString &fileName, bool autoSave)

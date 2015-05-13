@@ -48,7 +48,7 @@ Project::Project(Manager *manager, FileSetLoader *Loader)
         rootNode = new ProjectNode(this, projectFile);
 
         //creating project file FileNode instance
-        FileNode * projectFileNode = new FileNode(pathToNode, FileType::ProjectFileType, false);
+        FileNode * projectFileNode = new FileNode(Utils::FileName::fromString(pathToNode), FileType::ProjectFileType, false);
         rootNode->addFileNodes(QList<FileNode *>() << projectFileNode);
 
         //creating FileNode instances for project files
@@ -134,7 +134,7 @@ bool Project::addFiles(const QStringList &filePaths)
         //here we preparing to add nodes of source files
         if (QFileInfo(path).suffix() == QString("h") || QFileInfo(path).suffix() == QString("cpp"))
         {
-            fileNodes.push_back(new FileNode(path,
+            fileNodes.push_back(new FileNode(Utils::FileName::fromString(path),
                                              QFileInfo(path).suffix() == QString("cpp")?
                                              FileType::SourceType:
                                              FileType::HeaderType,

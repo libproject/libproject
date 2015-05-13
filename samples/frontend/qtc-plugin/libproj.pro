@@ -24,7 +24,7 @@ isEmpty(QTCREATOR_SOURCES):QTCREATOR_SOURCES=/home/drew/Git/qt-creator
 message(Path to QtC build: $$QTCREATOR_SOURCES)
 ## set the QTC_BUILD environment variable to override the setting here
 IDE_BUILD_TREE = $$(QTC_BUILD)
-isEmpty(IDE_BUILD_TREE):IDE_BUILD_TREE=/home/drew/QtCreatorProjects/QTC-GCC-BUILD
+isEmpty(IDE_BUILD_TREE):IDE_BUILD_TREE=/home/drew/QtCreatorProjects/QTC34-GCC-BUILD
 message(Path to QtC build: $$IDE_BUILD_TREE)
 
 QTC_PLUGIN_NAME = proj
@@ -33,7 +33,8 @@ QTC_LIB_DEPENDS += \
 
 QTC_PLUGIN_DEPENDS += \
     coreplugin \
-    projectexplorer
+    projectexplorer \
+    qtsupport ###
 
 QTC_PLUGIN_RECOMMENDS += \
     # optional plugin dependencies. nothing here at this time
