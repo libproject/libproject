@@ -3,6 +3,7 @@
 #include <QDebug>
 #include "libprojconstants.h"
 
+
 typedef ProjectExplorer::Project AbstractProject;
 
 namespace LibprojManager{
