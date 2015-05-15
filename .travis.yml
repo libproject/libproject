@@ -1,0 +1,23 @@
+language: cpp
+
+branches:
+  only:
+    - LPROJ-22__RE_integrating_linux_build_on_travis_ci
+
+compiler:
+  - gcc
+
+before_install:
+  - sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
+  - sudo apt-get update -qq
+  - sudo apt-get install -qq g++-4.9
+  - export CXX="g++-4.9" CC="gcc-4.9"
+  - mkdir build
+
+script:
+  - cd build
+  - cmake ..
+  - make
+
+after_success:
+  - make coverage
