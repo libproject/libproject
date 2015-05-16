@@ -13,9 +13,9 @@ before_install:
   - sudo apt-get install -qq g++-4.9 doxygen python3-setuptools
   - sudo easy_install3 pip
   - sudo pip install gcovr
-  - wget https://googletest.googlecode.com/files/gtest-1.7.0.zip -O ../gmock.zip
+  - wget https://googlemock.googlecode.com/files/gmock-1.7.0.zip -O ../gmock.zip
   - unzip ../gmock.zip -d ..
-  - mv ../gtest-1.7.0 ../gmock
+  - mv ../gmock-1.7.0 ../gmock
   - export CXX="g++-4.9" CC="gcc-4.9"
 
 script:
