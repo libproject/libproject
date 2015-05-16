@@ -14,7 +14,7 @@ Initially it's just an educational project for @drewpts and others.
 Main target which we strave for - it's obtain portable, extensible and easy to use library, for managing source code projects.
 
 ## Installation
-Download latest version of gmock.
+Download latest version of [gmock](https://code.google.com/p/googlemock/downloads/detail?name=gmock-1.7.0.zip&can=2&q=).
 Extract it at one level with downloaded project source folder, to *gmock* directory.
 Then use code below, to build project:
 ```
@@ -37,9 +37,9 @@ cd <build-directory>/tests
 ## What is ready
 * Build system skeleton
 * Some mockup implementation for API(json based)
-* qtc(qt-creator) plugin, which integrates API usage in Qt creator
+* qtc(qt-creator) [plugin](https://github.com/drewpts/LPROJ-main/tree/develop/samples/frontend/qtc-plugin), which integrates API usage in Qt creator
 * Draft of API(it's fully unstable, and will mutate)
-* Some documentation's draft
+* Some documentation's [draft](https://github.com/drewpts/LPROJ-main/wiki/Index)
 
 ## Roadmap
 * [Feature fullness](http://fake.org)
