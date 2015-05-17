@@ -1,4 +1,4 @@
-# - Find gcovr scrip 
+# - Find gcovr script
 # Will define:
 #
 # GCOVR_EXECUTABLE - the gcovr script
@@ -22,10 +22,15 @@
 #
 
 INCLUDE(FindPackageHandleStandardArgs)
-
 FIND_PROGRAM(GCOVR_EXECUTABLE gcovr HINTS ${GCOVR_ROOT})
-
 FIND_PACKAGE_HANDLE_STANDARD_ARGS(gcovr DEFAULT_MSG GCOVR_EXECUTABLE)
-
 # only visible in advanced view
 MARK_AS_ADVANCED(GCOVR_EXECUTABLE)
+
+#drewpts' modifications
+if(NOT GCOVR_EXECUTABLE)
+ set(GCOVR_FOUND FALSE)
+ message("gcovr not found! You can't perform coverage tests...")
+elseif(NOT GCOVR_EXECUTABLE)
+ set(GCOVR_FOUND TRUE)
+endif()

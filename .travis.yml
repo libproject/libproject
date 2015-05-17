@@ -11,8 +11,7 @@ before_install:
   - sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
   - sudo apt-get update -qq
   - sudo apt-get install -qq g++-4.9 doxygen python3-setuptools
-  - sudo easy_install3 pip
-  - sudo pip install gcovr
+  - sudo easy_install3 gcovr
   - wget https://googlemock.googlecode.com/files/gmock-1.7.0.zip -O ../gmock.zip
   - unzip ../gmock.zip -d ..
   - mv ../gmock-1.7.0 ../gmock
