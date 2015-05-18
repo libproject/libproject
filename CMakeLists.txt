@@ -10,13 +10,15 @@ include_directories (
 
 set(CMAKE_SKIP_RPATH FALSE)
 
+SET(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/Modules/")
+
 #setting subprojects
 add_subdirectory ( include )
 add_subdirectory ( src )
 add_subdirectory ( test )
 add_subdirectory ( doc )
 
-SET(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules")
+
 
 find_package( GCOV )
 find_package( GCOVR )
