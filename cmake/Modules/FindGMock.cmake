@@ -1,7 +1,9 @@
 # Finds GMock source and provide function which includes them as subproject
 # Input:
 # GMOCK_ROOT - should point to gmock source package root, can be setted as environment variable
-# environment variable will be preffered
+# environment variable will be preffered. If no one is set also CMAKE_PREFIX_PATH will be used and
+#  ../gmock path revieved
+#
 # Provides:
 # GMOCK_FOUND - setted true if GMock was found
 # include_gmock() function - includes GMock source as CMake's subproject
@@ -78,19 +80,25 @@ endfunction()
 
 set (CMAKE_ROOT "" CACHE PATH "Path to GMock source directory")
 
-if ($ENV{GMOCK_ROOT})
+if (NOT $ENV{GMOCK_ROOT} STREQUAL "")
+    message (FATAL "ENV")
     set (GMOCK_ROOT $ENV{GMOCK_ROOT})
-endif ($ENV{GMOCK_ROOT})
+endif (NOT $ENV{GMOCK_ROOT} STREQUAL "")
+
+set (gmock_search_path ${GMOCK_ROOT})
 
 if (NOT GMOCK_ROOT)
     message("GMOCK_ROOT isn't set, so we'll try to find GMock anywhere...")
+    set (gmock_search_path "<Anywhere>")
 endif(NOT GMOCK_ROOT)
 
-message (STATUS "Searching GMock source at: '${GMOCK_ROOT}'...")
+
+message (STATUS "Searching GMock source at: '${gmock_search_path}'...")
 
 find_path(GMOCK_SOURCE src/gmock-all.cc
     HINTS
         ${GMOCK_ROOT}
+        "${CMAKE_SOURCE_DIR}/../gmock"
 )
 
 message (STATUS "Gmock source is ${GMOCK_SOURCE}")

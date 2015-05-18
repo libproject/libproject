@@ -9,7 +9,6 @@ set (SOURCES_TEST
 )
 
 #setup tests
-set (GMOCK_ROOT "../../gmock")
 find_package(GMock)
 
 if (GMOCK_FOUND)
