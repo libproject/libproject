@@ -1,6 +1,7 @@
 cmake_minimum_required (VERSION 2.8)
 
 #configuring `documentation` target
+find_package(Doxygen)
 if(DOXYGEN_FOUND)
         set(DOXY_SRC_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../src)
         configure_file(Doxyfile.in doc/Doxyfile)
@@ -16,5 +17,7 @@ if(DOXYGEN_FOUND)
         install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/html_doc/
         		DESTINATION share/doc/libproject
         )
+elseif(DOXYGEN_FOUND)
+        message("Doxygen not found! You can't generate documentation...")
 endif(DOXYGEN_FOUND)
 
