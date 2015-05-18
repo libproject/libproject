@@ -36,3 +36,22 @@ set (CMAKE_C_FLAGS
 	"${CMAKE_C_FLAGS} -std=c++11 -pthread -g -O0")
 set (CMAKE_EXE_LINKER_FLAGS
 	"${CMAKE_EXE_LINKER_FLAGS} -std=c++11 -pthread -g -O0")
+
+#configuring `run_tests` target
+add_custom_target(run_tests
+	COMMAND libproject_test
+	)
+add_dependencies(run_tests libproject_test)
+
+#configuring `coverage` target
+find_package( GCOV )
+find_package( GCOVR )
+if(GCOV_FOUND AND GCOVR_FOUND)
+	add_custom_target(coverage
+#		WORKING_DIRECTORY test
+		COMMAND ${GCOV_EXECUTABLE} -o ../src/CMakeFiles/project.dir/libproject.cpp.gcno ../../src/libproject.cpp
+		COMMAND ${CMAKE_COMMAND} -E make_directory ../coverage_report
+		COMMAND ${GCOVR_EXECUTABLE} --object-directory= ../src -r ../../src/ --html --html-details -o ../coverage_report/report.html
+		)
+	add_dependencies(coverage run_tests)
+endif(GCOV_FOUND AND GCOVR_FOUND)

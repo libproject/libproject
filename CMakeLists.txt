@@ -20,26 +20,7 @@ add_subdirectory ( src )
 add_subdirectory ( test )
 add_subdirectory ( doc )
 
-#configuring `coverage` target
-find_package( GCOV )
-find_package( GCOVR )
-if(GCOV_FOUND AND GCOVR_FOUND)
-	add_custom_target(coverage
-		WORKING_DIRECTORY test
-		COMMAND libproject_test
-		COMMAND ${GCOV_EXECUTABLE} -o ../src/CMakeFiles/project.dir/libproject.cpp.gcno ../../src/libproject.cpp
-		COMMAND ${CMAKE_COMMAND} -E make_directory ../coverage_report
-		COMMAND ${GCOVR_EXECUTABLE} --object-directory= ../src -r ../../src/ --html --html-details -o ../coverage_report/report.html
-		)
-	add_dependencies(coverage libproject_test)
-endif(GCOV_FOUND AND GCOVR_FOUND)
 
-#configuring `run_tests` target
-add_custom_target(run_tests
-	WORKING_DIRECTORY test
-	COMMAND libproject_test
-	)
-add_dependencies(run_tests libproject_test)
 
 #configuring `uninstall` target
 configure_file(
