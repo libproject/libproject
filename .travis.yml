@@ -7,7 +7,7 @@ before_install:
   - sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
   - sudo apt-get update -qq
   - sudo apt-get install -qq g++-4.9 doxygen python3-setuptools
-  - sudo easy_install3 gcovr
+  - sudo easy_install3 gcovr cpp-coveralls
   - wget https://googlemock.googlecode.com/files/gmock-1.7.0.zip -O ../gmock.zip
   - unzip ../gmock.zip -d ..
   - mv ../gmock-1.7.0 ../gmock
@@ -20,4 +20,5 @@ script:
   - make
 
 after_success:
-  - make coverage
+  - make run_tests
+  - coveralls -b src/CMakeFiles/project.dir/libproject.cpp.gcno -r ../src/libproject.cpp
