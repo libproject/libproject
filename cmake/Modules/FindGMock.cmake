@@ -96,7 +96,7 @@ find_path(GMOCK_SOURCE src/gmock-all.cc
 message (STATUS "Gmock source is ${GMOCK_SOURCE}")
 
 if (GMOCK_SOURCE)
-    set (GMOCK_INCLUDE_DIRS "${GMOCK_SOURCE}/include/ ${GMOCK_SOURCE}/gtest/include")
+    set (GMOCK_INCLUDE_DIRS ${GMOCK_SOURCE}/include/ ${GMOCK_SOURCE}/gtest/include)
     set (GMOCK_LIBRARIES gmock)
     set (GMOCK_MAIN_LIBRARIES gmock_main)
     set (GMOCK_BOTH_LIBRARIES ${GMOCK_LIBRARIES} ${GMOCK_BOTH_LIBRARIES})
