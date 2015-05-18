@@ -1,9 +1,5 @@
 language: cpp
 
-branches:
-  only:
-    - LPROJ-22__RE_integrating_linux_build_on_travis_ci
-
 compiler:
   - gcc
 
