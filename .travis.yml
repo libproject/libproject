@@ -22,3 +22,9 @@ script:
 after_success:
   - make run_tests
   - coveralls -b src/CMakeFiles/project.dir/libproject.cpp.gcno -r ../src/libproject.cpp
+
+notifications:
+ email:
+  - batbko@gmail.com
+  - reutekaterina@gmail.com
+  - andrey.poltavets@gmail.com
