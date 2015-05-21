@@ -9,7 +9,7 @@ before_install:
   - sudo apt-get install -qq g++-4.9 doxygen python3-setuptools
   - sudo easy_install3 gcovr cpp-coveralls
   - wget https://googlemock.googlecode.com/files/gmock-1.7.0.zip -O ../gmock.zip
-  - unzip ../gmock.zip -d -qq ..
+  - unzip -qq ../gmock.zip -d ..
   - mv ../gmock-1.7.0 ../gmock
   - export CXX="g++-4.9" CC="gcc-4.9"
 
