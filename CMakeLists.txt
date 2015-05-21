@@ -20,8 +20,6 @@ add_subdirectory ( src )
 add_subdirectory ( test )
 add_subdirectory ( doc )
 
-
-
 #configuring `uninstall` target
 configure_file(
     "${CMAKE_CURRENT_SOURCE_DIR}/cmake_uninstall.cmake.in"
@@ -30,3 +28,8 @@ configure_file(
 add_custom_target(uninstall
     COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)
 
+#configuring CPack settings
+set(CPACK_GENERATOR "TGZ")
+set(CPACK_PACKAGE_FILE_NAME "libproject")
+set(CPACK_PACKAGING_INSTALL_PREFIX "${CMAKE_BINARY_DIR}")
+include(CPack)

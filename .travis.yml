@@ -9,17 +9,26 @@ before_install:
   - sudo apt-get install -qq g++-4.9 doxygen python3-setuptools
   - sudo easy_install3 gcovr cpp-coveralls
   - wget https://googlemock.googlecode.com/files/gmock-1.7.0.zip -O ../gmock.zip
-  - unzip ../gmock.zip -d ..
+  - unzip ../gmock.zip -d -qq ..
   - mv ../gmock-1.7.0 ../gmock
   - export CXX="g++-4.9" CC="gcc-4.9"
 
 script:
   - mkdir build
   - cd build
-  - cmake ..
+  - mkdir installdir
+  - export BUILD_DIR=`pwd`
+  - export INST_DIR=`pwd`/installdir
+  - cmake -DCMAKE_INSTALL_PREFIX=$INST_DIR ..
   - make
 
 after_success:
+  - make package
+  - make install
+  - cd $INST_DIR/share/doc/libproject
+  - tar -czf libproject-doc.tgz *
+  - mv libproject-doc.tgz $PREV_DIR
+  - cd $BUILD_DIR
   - make run_tests
   - coveralls -b src/CMakeFiles/project.dir/libproject.cpp.gcno -r ../src/libproject.cpp
 
