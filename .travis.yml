@@ -27,7 +27,7 @@ after_success:
   - make install
   - cd $INST_DIR/share/doc/libproject
   - tar -czf libproject-doc.tgz *
-  - mv libproject-doc.tgz $PREV_DIR
+  - mv libproject-doc.tgz $BUILD_DIR
   - cd $BUILD_DIR
   - coveralls -b src/CMakeFiles/project.dir/libproject.cpp.gcno -r ../src/libproject.cpp --gcov /usr/bin/gcov-4.9
 
