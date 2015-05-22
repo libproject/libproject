@@ -6,21 +6,21 @@ compiler:
 before_install:
   - sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
   - sudo apt-get update -qq
-  - sudo apt-get install -qq g++-4.9 doxygen python3-setuptools
-  - sudo easy_install3 gcovr cpp-coveralls
+  - sudo apt-get install -qq g++-4.9 doxygen python3-setuptools binutils
+  - sudo easy_install3 -q gcovr cpp-coveralls
   - wget https://googlemock.googlecode.com/files/gmock-1.7.0.zip -O ../gmock.zip
   - unzip -qq ../gmock.zip -d ..
   - mv ../gmock-1.7.0 ../gmock
   - export CXX="g++-4.9" CC="gcc-4.9"
 
 script:
-  - mkdir build
-  - cd build
+  - mkdir build && cd build
   - mkdir installdir
   - export BUILD_DIR=`pwd`
   - export INST_DIR=`pwd`/installdir
   - cmake -DCMAKE_INSTALL_PREFIX=$INST_DIR ..
   - make
+  - make run_tests
 
 after_success:
   - make package
@@ -29,7 +29,6 @@ after_success:
   - tar -czf libproject-doc.tgz *
   - mv libproject-doc.tgz $PREV_DIR
   - cd $BUILD_DIR
-  - make run_tests
   - coveralls -b src/CMakeFiles/project.dir/libproject.cpp.gcno -r ../src/libproject.cpp --gcov /usr/bin/gcov-4.9
 
 notifications:
