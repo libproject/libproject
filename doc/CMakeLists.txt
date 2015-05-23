@@ -17,7 +17,7 @@ if(DOXYGEN_FOUND)
         install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/html_doc/
         		DESTINATION share/doc/libproject
         )
-elseif()
-        MESSAGE(FATAL_ERROR "Doxygen not found! Aborting...")
+elseif(DOXYGEN_FOUND)
+        message("Doxygen not found! You can't generate documentation...")
 endif(DOXYGEN_FOUND)
 
