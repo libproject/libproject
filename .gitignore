@@ -2,3 +2,5 @@
 libproject/.idea
 .idea
 *.txt.user
+samples/frontend/build*
+build
