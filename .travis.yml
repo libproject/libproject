@@ -22,7 +22,7 @@ script:
   - cmake -DCMAKE_INSTALL_PREFIX=$INST_DIR ..
   - make
   - make run_tests
-  - coveralls  -r $SRC_DIR --gcov /usr/bin/gcov-4.9 -e $SRC_DIR/tools -e $SRC_DIR/samples
+  - coveralls  -r $SRC_DIR --gcov /usr/bin/gcov-4.9 -e $SRC_DIR/tools -e $SRC_DIR/samples --gcov-options '\-lpr'
 
 after_success:
   - make package
