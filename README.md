@@ -1,8 +1,8 @@
 # LPROJ-main
 
-[![Build Status](https://travis-ci.org/drewpts/LPROJ-main.svg?branch=LPROJ-22__RE_integrating_linux_build_on_travis_ci)](https://travis-ci.org/drewpts/LPROJ-main)
+[![Build Status](https://travis-ci.org/libproject/libproject.svg?branch=develop)](https://travis-ci.org/libproject/libproject)
 
-[![Coverage Status](https://coveralls.io/repos/drewpts/LPROJ-main/badge.svg)](https://coveralls.io/r/drewpts/LPROJ-main)
+[![Coverage Status](https://coveralls.io/repos/libproject/libproject/badge.svg)](https://coveralls.io/r/libproject/libproject)
 
 This is develop repository of LPROJ (at now)
 
