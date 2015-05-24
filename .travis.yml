@@ -16,11 +16,13 @@ before_install:
 script:
   - mkdir build && cd build
   - mkdir installdir
-  - export BUILD_DIR=`pwd`
-  - export INST_DIR=`pwd`/installdir
+  - export BUILD_DIR=$(pwd)
+  - export SRC_DIR=$(pwd)/../
+  - export INST_DIR=$(pwd)/installdir
   - cmake -DCMAKE_INSTALL_PREFIX=$INST_DIR ..
   - make
   - make run_tests
+  - coveralls  -r $SRC_DIR --gcov /usr/bin/gcov-4.9
 
 after_success:
   - make package
@@ -28,8 +30,6 @@ after_success:
   - cd $INST_DIR/share/doc/libproject
   - tar -czf libproject-doc.tgz *
   - mv libproject-doc.tgz $BUILD_DIR
-  - cd $BUILD_DIR
-  - coveralls -b src/CMakeFiles/project.dir/libproject.cpp.gcno -r ../src/libproject.cpp --gcov /usr/bin/gcov-4.9
 
 notifications:
  email:
