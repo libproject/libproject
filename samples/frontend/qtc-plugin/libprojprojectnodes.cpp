@@ -164,7 +164,7 @@ bool ProjectNode::addFiles(const QStringList &filePaths, QStringList *notAdded)
     return qobject_cast<Project*>(project)->addFiles(filePaths);
 }
 
-const QString& ProjectNode::getProjectPath() const
+const QString ProjectNode::getProjectPath() const
 {
     return qobject_cast<Project *>(project)->getPathToNode();
 }

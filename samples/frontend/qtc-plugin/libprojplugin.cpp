@@ -33,6 +33,7 @@ Plugin::~Plugin() {
 bool Plugin::initialize(const QStringList &Arguments, QString *ErrorString)
 {
     Q_UNUSED(Arguments)
+    Q_UNUSED(ErrorString)
 
     /* Registering own mime-type */
     const QString mimeTypes(":libprojplugin/libprojplugin.mimetypes.xml");
