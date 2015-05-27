@@ -25,7 +25,7 @@ using std::list;
 namespace LibprojManager {
 namespace Internal {
 
-Project::Project(Manager *manager, FileSetLoader *Loader)
+Project::Project(Manager * manager, FileSetLoader *Loader)
     : manager_(manager), loader(Loader) {
     try {
         qDebug() << "Calling c-tor for Project";

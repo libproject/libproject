@@ -19,9 +19,8 @@ public:
     virtual bool addSubProjects(const QStringList & proFilePaths);
     virtual bool removeSubProjects(const QStringList & proFilePaths);
 
-public:
     bool addFiles(const QStringList & filePaths, QStringList * notAdded);
-    const QString& getProjectPath() const;
+    const QString getProjectPath() const;
 };
 
 } // namespace Internal
