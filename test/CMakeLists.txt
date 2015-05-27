@@ -47,7 +47,7 @@ if (GMOCK_FOUND)
         add_custom_target(coverage
             COMMAND ${GCOV_EXECUTABLE} -o ../src/CMakeFiles/project.dir/libproject.cpp.gcno ../../src/libproject.cpp
             COMMAND ${CMAKE_COMMAND} -E make_directory ../coverage_report
-            COMMAND ${GCOVR_EXECUTABLE} --object-directory= ../src -r ../../src/ --html --html-details -o ../coverage_report/report.html
+            COMMAND ${GCOVR_EXECUTABLE} --object-directory= ../src -r ${CMAKE_SOURCE_DIR}/src/ --html --html-details -o ../coverage_report/report.html
             )
         add_dependencies(coverage run_tests)
     endif(GCOV_FOUND AND GCOVR_FOUND)
