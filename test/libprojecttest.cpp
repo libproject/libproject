@@ -116,20 +116,16 @@ public:
 
 class TestRegularNested : public TestRegular {
 public:
-  int subprojectsCount;
-  FileSetLoader::Subprojects subprojectsFilesRef;
-  vector<string> subprojectsNamesRef;
-  FileSetLoader::Path dirPath;
+  int subprojectsCount = 2;
+  FileSetLoader::Subprojects subprojectsFilesRef = {"sub/s1.libproject", "sub/s2.libproject"};
+  vector<string> subprojectsNamesRef = {"subpr1", "subpr2"};
+  FileSetLoader::Path dirPath = {"project_files/nested/"};
 
   void SetUp() {
     TestRegular::SetUp();
-    dirPath = {"project_files/nested/"};
     pathToMainFile = {"project_files/nested/normal.libproject"};
     projectNameRef = {"Nested *** 43"};
     projectFilesRef = {"main.cpp", "Test.h", "Test.cpp"};
-    subprojectsCount = 2;
-    subprojectsFilesRef = {"sub/s1.libproject", "sub/s2.libproject"};
-    subprojectsNamesRef = {"subpr1", "subpr2"};
   }
 
   void TearDown() {
@@ -170,12 +166,11 @@ class TestAddRegularSubprojectsToSingle : public TestAddSubprojects {
 public:
 
 
-    FileSetLoader::Path pathToMainFileWhichIsTargetForAddBrokenSubproject;
-    json contentReferenceForTryToAddBroken;
+    FileSetLoader::Path pathToMainFileWhichIsTargetForAddBrokenSubproject = R"(project_files/testaddtosingle/mainproject_addbroken.libproject)";
+    FileSetLoader::Path pathToOneRegularSingleSubproject = R"(project_files/testaddtosingle/regular/normalsingle.libproject)";
+    FileSetLoader::Path pathToOneRegularNestedSubproject = R"(project_files/testaddtosingle/regular/normalnested.libproject)";
+    FileSetLoader::Path pathToBrokenSubproject = R"(project_files/testaddtosingle/broken/broken.libproject)";
 
-    FileSetLoader::Path pathToOneRegularSingleSubproject;
-    FileSetLoader::Path pathToOneRegularNestedSubproject;
-    FileSetLoader::Path pathToBrokenSubproject;
     void SetUp() {
         pathToMainFile = R"(project_files/testaddtosingle/mainproject_addsingle.libproject)";
         pathToMainFileWhichIsTargetForAddBrokenSubproject = R"(project_files/testaddtosingle/mainproject_addbroken.libproject)";
@@ -199,16 +194,6 @@ public:
           { "subprojects", {"regular/normalnested.libproject"} }
         };
 
-        pathToOneRegularSingleSubproject =
-            R"(project_files/testaddtosingle/regular/normalsingle.libproject)";
-
-        pathToOneRegularNestedSubproject =
-            R"(project_files/testaddtosingle/regular/normalnested.libproject)";
-
-        pathToBrokenSubproject = {
-            "project_files/testaddtosingle/broken/broken.libproject"
-        };
-
         TestAddSubprojects::SetUp();
     }
 
@@ -219,19 +204,25 @@ public:
 
 class TestAddRegularSubprojectsToNested : public TestAddSubprojects {
 public:
-    FileSetLoader::Path pathToPresentSubproject;
-    json contentReferenceWithPairOfNewRegularSubprojects;
+    FileSetLoader::Path pathToPresentSubproject = R"(project_files/testaddtonested/presentsubproject/sub.libproject)";
+    json contentReferenceWithPairOfNewRegularSubprojects = {
+        { "project", "there must be subprojects" },
 
+        { "files", { "main.cpp", "Test.h" } },
 
-    FileSetLoader::Path pathToOneRegularSingleSubproject;
-    FileSetLoader::Path pathToOneRegularNestedSubproject;
-    FileSetLoader::Subprojects pathsToPairOfRegularSubprojects;
+        { "subprojects", {"presentsubproject/sub.libproject",
+                          "fortestwithtworegularsubprojects/nested.libproject",
+                          "fortestwithtworegularsubprojects/single.libproject"} }
+    };
+    FileSetLoader::Path pathToOneRegularSingleSubproject = R"(project_files/testaddtonested/regular/normalsingle.libproject)";
+    FileSetLoader::Path pathToOneRegularNestedSubproject = R"(project_files/testaddtonested/regular/normalnested.libproject)";
+    FileSetLoader::Subprojects pathsToPairOfRegularSubprojects = {
+        "project_files/testaddtonested/fortestwithtworegularsubprojects/single.libproject",
+        "project_files/testaddtonested/fortestwithtworegularsubprojects/nested.libproject"
+    };
 
     void SetUp() {
         pathToMainFile = pathToNestedMainFile;
-        pathToPresentSubproject = R"(project_files/testaddtonested/presentsubproject/sub.libproject)";
-
-
         contentReferenceWithSingle = {
           { "project", "there must be subprojects" },
 
@@ -255,26 +246,6 @@ public:
 
           { "subprojects", {"presentsubproject/sub.libproject"} }
         };
-        contentReferenceWithPairOfNewRegularSubprojects = {
-            { "project", "there must be subprojects" },
-
-            { "files", { "main.cpp", "Test.h" } },
-
-            { "subprojects", {"presentsubproject/sub.libproject",
-                              "fortestwithtworegularsubprojects/nested.libproject",
-                              "fortestwithtworegularsubprojects/single.libproject"} }
-        };
-        pathToOneRegularSingleSubproject =
-            R"(project_files/testaddtonested/regular/normalsingle.libproject)";
-
-        pathToOneRegularNestedSubproject =
-            R"(project_files/testaddtonested/regular/normalnested.libproject)";
-
-
-        pathsToPairOfRegularSubprojects = {
-            "project_files/testaddtonested/fortestwithtworegularsubprojects/single.libproject",
-            "project_files/testaddtonested/fortestwithtworegularsubprojects/nested.libproject"
-        };
 
         TestAddSubprojects::SetUp();
     }
@@ -287,10 +258,6 @@ public:
 class TestAddAbnormalSubprojects : public TestAddSubprojects,
                           public ::testing::WithParamInterface<FileSetLoader::Subprojects> {
 public:
-
-    json contentReference;
-    FileSetLoader::Path pathToMainFile;
-    string contentBackup;
   void SetUp() {
       contentReference = {
         { "project", "there must be subprojects" },
@@ -301,7 +268,7 @@ public:
       };
       pathToMainFile = pathToNestedMainFile;
 
-      TestSkeleton::SetUp();
+      TestAddSubprojects::SetUp();
   }
   void TearDown() {
       TestAddSubprojects::TearDown();
