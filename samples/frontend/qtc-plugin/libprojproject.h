@@ -17,8 +17,8 @@ class ProjectNode;
 class Project : public ProjectExplorer::Project
 {
     Q_OBJECT
-    Interface::FileSetLoader * loader;
     Manager * manager_;
+    Interface::FileSetLoader * loader;
     QString nameOfProject;
     QString pathToNode;
     QStringList projectFiles;

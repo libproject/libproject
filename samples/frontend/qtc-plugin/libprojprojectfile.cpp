@@ -21,6 +21,9 @@ ProjectFile::ProjectFile(AbstractProject * Parent, const QString &Filename)
 
 bool ProjectFile::save(QString *errorString, const QString &fileName, bool autoSave)
 {
+    Q_UNUSED(errorString)
+    Q_UNUSED(fileName)
+    Q_UNUSED(autoSave)
     return false;
 }
 QString ProjectFile::defaultPath() const
