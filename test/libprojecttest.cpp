@@ -113,14 +113,6 @@ public:
 
   virtual void TearDown() {
       delete loader;
-
-//      contentReference = { };
-//      contentReferenceWithSingle = { };
-//      contentReferenceWithNested = { };
-//      contentBackup = string();
-//      fileToTest = { };
-//      pathToMainFile = string();
-
       if (writableMainFile)
       {
         ofstream out (pathToMainFile);
@@ -604,12 +596,18 @@ TEST_P(TestAddAbnormalSubprojects, Set_of_attempts_to_add_abnormal_subprojects) 
 class TestGetSubprojectsPaths : public TestSkeleton {
 public:
 
+    FileSetLoader::Path pathToProjectWithOneNormalSubprojects = R"(project_files/getsubprojectspaths/getpath.libproject)";
     FileSetLoader::Path pathToProjectWithPairNormalSubprojects = R"(project_files/getsubprojectspaths/getpaths.libproject)";
-    FileSetLoader::Subprojects pathsReference = {
+    FileSetLoader::Path pathToProjectWithoutSubprojects;// = R"(project_files/getsubprojectspaths/nosubprojects.libproject)";
+    FileSetLoader::Subprojects pairOfPathsReference = {
         "sub/s1.libproject",
         "sub/s2.libproject"
     };
+    FileSetLoader::Subprojects pathReference = {
+        "sub/s1.libproject"
+    };
     void SetUp() {
+        pathToProjectWithoutSubprojects = R"(project_files/getsubprojectspaths/nosubprojects.libproject)";
         TestSkeleton::SetUp();
     }
     void TearDown() {
@@ -617,16 +615,38 @@ public:
     }
 };
 
-TEST_F(TestGetSubprojectsPaths, Get_paths_of_subprojects) {
-    loader = FileSetFactory::createFileSet(pathToProjectWithPairNormalSubprojects);
-    std::cout << pathToProjectWithPairNormalSubprojects << std::endl << "____________\n";
+TEST_F(TestGetSubprojectsPaths, Get_paths_of_lone_subproject) {
+    loader = FileSetFactory::createFileSet(pathToProjectWithOneNormalSubprojects);
     loader->open();
     FileSetLoader::Subprojects paths = loader->getSubprojectsPaths();
 
-    ASSERT_EQ(pathsReference, paths);
+    ASSERT_EQ(pathReference, paths);
 }
 
+TEST_F(TestGetSubprojectsPaths, Get_paths_of_two_subprojects) {
+    loader = FileSetFactory::createFileSet(pathToProjectWithPairNormalSubprojects);
+    loader->open();
+    FileSetLoader::Subprojects paths = loader->getSubprojectsPaths();
 
+    ASSERT_EQ(pairOfPathsReference, paths);
+}
+
+TEST_F(TestGetSubprojectsPaths, Get_subprojects_paths_of_project_without_them) {
+    //ASSERT_THROW ({
+                        loader = FileSetFactory::createFileSet(pathToProjectWithoutSubprojects);
+                        loader->open();
+                        FileSetLoader::Subprojects paths = loader->getSubprojectsPaths();
+//                  },
+//                  FileSetRuntimeError);
+}
+
+TEST_F(TestGetSubprojectsPaths, Get_paths_of_subprojects_on_not_loaded_interface) {
+    ASSERT_THROW ({
+                      loader = FileSetFactory::createFileSet(pathToProjectWithPairNormalSubprojects);
+                      FileSetLoader::Subprojects paths = loader->getSubprojectsPaths();
+                  },
+                  FileSetRuntimeError);
+}
 
 
 
@@ -764,10 +784,9 @@ TEST_P(TestIncorrectSubprojectsRemoving, Set_of_attempts_to_remove_subprojects_b
 
 
 
-// TODO Count_subprojects_after_removing
-//TODO test with pair broken path and regular
+//TODO Count_subprojects_after_removing
 //TODO Add tests for function getSubprojectsPaths() !!!!!!!!!!!!
-//TODO Add tests fot findSubprojectByPath() !!!!!!!!!!!!
+//TODO Add tests for findSubprojectByPath() !!!!!!!!!!!!
 
 } // namespace FileSetTests
 
