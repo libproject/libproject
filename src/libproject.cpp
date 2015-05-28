@@ -268,6 +268,8 @@ namespace Interface {
         if(loaded == false)
             throw FileSetRuntimeError(FileSetRuntimeError::NotLoaded, "Trying to add subprojects on not loaded interface");
 
+        if(subp.empty())
+             throw FileSetRuntimeError(FileSetRuntimeError::UnknownError, "Empty subprojects container detected");
 
         char * cPathToProjectFile, * dname;
         cPathToProjectFile = strdup(pathToProjectFile.c_str());
