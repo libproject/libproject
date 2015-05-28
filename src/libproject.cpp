@@ -236,13 +236,22 @@ namespace Interface {
     {
         if (loaded == false)
             throw FileSetRuntimeError(FileSetRuntimeError::NotLoaded, "Trying to get subprojects paths on not loaded interface");
-        auto& subprojects = jChangedContentOfProjectFile[SUBPR_DESCR];
-        vector<string> paths;
-        for (const auto& path : subprojects)
+
+        if (jChangedContentOfProjectFile.count(SUBPR_DESCR) > 0)
         {
-            paths.push_back(path);
+                    ostringstream x;
+                    x << jChangedContentOfProjectFile[SUBPR_DESCR].dump(4);
+                    string k = x.str();
+                    //is it bug of json lib (value of k)?
+            auto& subprojects = jChangedContentOfProjectFile[SUBPR_DESCR];
+            vector<string> paths;
+            for (const auto& path : subprojects)
+            {
+                paths.push_back(path);
+            }
+            return paths;
         }
-        return paths;
+        throw FileSetRuntimeError(FileSetRuntimeError::SubprojectsIncongruity, "Trying to get subprojects paths while there are no subprojects");
     }
 
     int JsonFileSetLoader::countSubprojects() const
@@ -268,6 +277,8 @@ namespace Interface {
         if(loaded == false)
             throw FileSetRuntimeError(FileSetRuntimeError::NotLoaded, "Trying to add subprojects on not loaded interface");
 
+        if(subp.empty())
+             throw FileSetRuntimeError(FileSetRuntimeError::UnknownError, "Empty subprojects container detected");
 
         char * cPathToProjectFile, * dname;
         cPathToProjectFile = strdup(pathToProjectFile.c_str());
@@ -386,7 +397,8 @@ namespace Interface {
             else if (j[FILES_DESCR].at(0).is_string() == false)
                 return json::parse(error_code + "Wrong values type of files key!\"}");
 
-            if (j[SUBPR_DESCR].is_array()) {
+            //if (j[SUBPR_DESCR].is_array()) { bug in json lib
+            if(j.count(SUBPR_DESCR) != 0) {
                 if (j[SUBPR_DESCR].at(0).is_string() == false)
                     return json::parse(error_code + "Wrong values type of subprojects key!\"}");
             } else if (!j[SUBPR_DESCR].is_null() && !j[SUBPR_DESCR].is_array()) {
