@@ -94,7 +94,7 @@ public:
   string contentBackup;
   FileSetLoader *loader = nullptr;
   json fileToTest = { };
-  FileSetLoader::Path pathToMainFile = "none";
+  FileSetLoader::Path pathToMainFile;
   bool writableMainFile = false;
   virtual void SetUp() {
     if (loader)
@@ -113,6 +113,14 @@ public:
 
   virtual void TearDown() {
       delete loader;
+
+//      contentReference = { };
+//      contentReferenceWithSingle = { };
+//      contentReferenceWithNested = { };
+//      contentBackup = string();
+//      fileToTest = { };
+//      pathToMainFile = string();
+
       if (writableMainFile)
       {
         ofstream out (pathToMainFile);
@@ -180,13 +188,13 @@ public:
 class TestRegularSingle : public TestRegular {
 public:
   void SetUp() {
-    TestRegular::SetUp();
     pathToMainFile = {"project_files/single/normal.libproject"};
     projectNameRef = {"SameAmmoniteOnPurpleSkies *** 42"};
     projectFilesRef = {"main.cpp",    "Test.h",      "Test.cpp",
                        "Foo.h",       "Foo.cpp",     "README",
                        "kekeke.cpp",  "testnew.cpp", "testadd2.cpp",
                        "testadd3.cpp"};
+    TestRegular::SetUp();
   }
   void TearDown() {
       TestRegular::TearDown();
@@ -280,10 +288,10 @@ public:
   vector<string> subprojectsNamesRef = {"subpr1", "subpr2"};
   FileSetLoader::Path dirPath = {"project_files/nested/"};
   void SetUp() {
-    TestRegular::SetUp();
     pathToMainFile = {"project_files/nested/normal.libproject"};
     projectNameRef = {"Nested *** 43"};
     projectFilesRef = {"main.cpp", "Test.h", "Test.cpp"};
+    TestRegular::SetUp();
   }
   void TearDown() {
       TestRegular::TearDown();
@@ -587,6 +595,35 @@ TEST_P(TestAddAbnormalSubprojects, Set_of_attempts_to_add_abnormal_subprojects) 
         fileToTest << i;
 
         ASSERT_EQ(contentReference.dump(4), fileToTest.dump(4));
+}
+
+
+
+
+
+class TestGetSubprojectsPaths : public TestSkeleton {
+public:
+
+    FileSetLoader::Path pathToProjectWithPairNormalSubprojects = R"(project_files/getsubprojectspaths/getpaths.libproject)";
+    FileSetLoader::Subprojects pathsReference = {
+        "sub/s1.libproject",
+        "sub/s2.libproject"
+    };
+    void SetUp() {
+        TestSkeleton::SetUp();
+    }
+    void TearDown() {
+        TestSkeleton::TearDown();
+    }
+};
+
+TEST_F(TestGetSubprojectsPaths, Get_paths_of_subprojects) {
+    loader = FileSetFactory::createFileSet(pathToProjectWithPairNormalSubprojects);
+    std::cout << pathToProjectWithPairNormalSubprojects << std::endl << "____________\n";
+    loader->open();
+    FileSetLoader::Subprojects paths = loader->getSubprojectsPaths();
+
+    ASSERT_EQ(pathsReference, paths);
 }
 
 
