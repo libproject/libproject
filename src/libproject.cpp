@@ -29,6 +29,7 @@ using std::ofstream;
 using std::vector;
 using std::remove_if;
 using std::set;
+
 /*!
  * \brief Covers all classes of present project except Qt creator plugin
  * instance
@@ -51,7 +52,7 @@ namespace Interface {
         const string pathToProjectFile;
         json jContentOfProjectFile;
         json jChangedContentOfProjectFile;
-        map<string, FileSetLoader *> subprojects;
+        FileSetLoader::Loaders subprojects;
         bool loaded; //! flag which becoming true condition when instance is busy
 
         //description constants:
@@ -117,9 +118,9 @@ namespace Interface {
 
         /*!
          * \brief Gives STL map with pointers to loaders
-         * \return map<string, FileSetLoader*> of subprojects associated with its names
+         * \return FileSetLoader::Loaders (map<string, FileSetLoader *>) of subprojects associated with its names
          */
-        /*virtual*/ map<string, FileSetLoader *> getSubprojectLoaders();
+        /*virtual*/ FileSetLoader::Loaders getSubprojectLoaders();
 
         /*!
          * \brief This function performs adding existing subprojects which are present on
@@ -258,11 +259,11 @@ namespace Interface {
 
     }
 
-    map<string, FileSetLoader *>
+    FileSetLoader::Loaders
     JsonFileSetLoader::getSubprojectLoaders()
     {
         if(loaded == false)
-            throw FileSetRuntimeError(FileSetRuntimeError::NotLoaded, "Trying to get subprojects loaders on not loaded interface");
+            throw FileSetRuntimeError(FileSetRuntimeError::NotLoaded, "Trying to get subprojects Loaders on not loaded interface");
         return subprojects;
 
     }
@@ -358,7 +359,7 @@ namespace Interface {
             jChangedContentOfProjectFile.erase(SUBPR_DESCR);
         }
 
-        //reload subproject loaders
+        //reload subproject FileSetLoader::Loaders
         loadSubprojects();
     }
 

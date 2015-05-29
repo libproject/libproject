@@ -30,6 +30,7 @@ public:
     typedef std::string Path;
     typedef std::vector<Path> Files;
     typedef std::vector<Path> Subprojects;
+    typedef std::map<std::string, FileSetLoader *> Loaders;
 
     virtual ~FileSetLoader() { }
 

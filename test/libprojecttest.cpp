@@ -25,7 +25,6 @@ using std::ofstream;
 using std::unique_ptr;
 
 
-
 namespace {
 list<FileSetLoader::Path> pathsToSingleAbnormal = {
     "project_files/single/empty.libproject",
@@ -300,15 +299,15 @@ TEST_F(TestRegularNested, Open_file) {
 
 TEST_F(TestRegularNested, Get_ACCESS_to_subprojects_if_not_loaded) {
     loader = LoaderPtr(FileSetFactory::createFileSet(pathToMainFile));
-    map<string, FileSetLoader *> msl;
+    FileSetLoader::Loaders msl;
     ASSERT_THROW(msl = loader->getSubprojectLoaders(), FileSetRuntimeError);
 }
 
 TEST_F(TestRegularNested, Get_project_name_for_1st_subproject) {
     loader = LoaderPtr(FileSetFactory::createFileSet(pathToMainFile));
     loader->open();
-    map<string, FileSetLoader *> msl = loader->getSubprojectLoaders();
-    map<string, FileSetLoader *>::const_iterator it = msl.cbegin();
+    FileSetLoader::Loaders msl = loader->getSubprojectLoaders();
+    FileSetLoader::Loaders::const_iterator it = msl.cbegin();
     string name = (*it).second->getProjectName();
     ASSERT_EQ(subprojectsNamesRef.at(0), name);
 }
@@ -322,8 +321,8 @@ TEST_F(TestRegularNested, Count_subprojects_of_nested_project) {
 TEST_F(TestRegularNested, Get_path_to_1st_subnode) {
     loader = LoaderPtr(FileSetFactory::createFileSet(pathToMainFile));
     loader->open();
-    map<string, FileSetLoader *> msl = loader->getSubprojectLoaders();
-    map<string, FileSetLoader *>::const_iterator it = msl.cbegin();
+    FileSetLoader::Loaders msl = loader->getSubprojectLoaders();
+    FileSetLoader::Loaders::const_iterator it = msl.cbegin();
     FileSetLoader::Path path = (*it).second->getPathToNode();
     ASSERT_EQ(dirPath + subprojectsFilesRef.at(0), path);
 }
@@ -331,8 +330,8 @@ TEST_F(TestRegularNested, Get_path_to_1st_subnode) {
 TEST_F(TestRegularNested, Get_path_to_2n_subnode) {
    loader = LoaderPtr(FileSetFactory::createFileSet(pathToMainFile));
     loader->open();
-    map<string, FileSetLoader *> msl = loader->getSubprojectLoaders();
-    map<string, FileSetLoader *>::const_reverse_iterator it = msl.crbegin();
+    FileSetLoader::Loaders msl = loader->getSubprojectLoaders();
+    FileSetLoader::Loaders::const_reverse_iterator it = msl.crbegin();
     //crbegin because we have only 2 item in map
     FileSetLoader::Path path = (*it).second->getPathToNode();
     ASSERT_EQ(dirPath + subprojectsFilesRef.at(1), path);
