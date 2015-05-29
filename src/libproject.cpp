@@ -29,6 +29,7 @@ using std::ofstream;
 using std::vector;
 using std::remove_if;
 using std::set;
+
 /*!
  * \brief Covers all classes of present project except Qt creator plugin
  * instance
@@ -51,7 +52,7 @@ namespace Interface {
         const string pathToProjectFile;
         json jContentOfProjectFile;
         json jChangedContentOfProjectFile;
-        map<string, FileSetLoader *> subprojects;
+        FileSetLoader::Loaders subprojects;
         bool loaded; //! flag which becoming true condition when instance is busy
 
         //description constants:
@@ -117,9 +118,9 @@ namespace Interface {
 
         /*!
          * \brief Gives STL map with pointers to loaders
-         * \return map<string, FileSetLoader*> of subprojects associated with its names
+         * \return FileSetLoader::Loaders (map<string, FileSetLoader *>) of subprojects associated with its names
          */
-        /*virtual*/ map<string, FileSetLoader *> getSubprojectLoaders();
+        /*virtual*/ FileSetLoader::Loaders getSubprojectLoaders();
 
         /*!
          * \brief This function performs adding existing subprojects which are present on
@@ -236,13 +237,18 @@ namespace Interface {
     {
         if (loaded == false)
             throw FileSetRuntimeError(FileSetRuntimeError::NotLoaded, "Trying to get subprojects paths on not loaded interface");
-        auto& subprojects = jChangedContentOfProjectFile[SUBPR_DESCR];
-        vector<string> paths;
-        for (const auto& path : subprojects)
+
+        if (jChangedContentOfProjectFile.count(SUBPR_DESCR) > 0)
         {
-            paths.push_back(path);
+            auto& subprojects = jChangedContentOfProjectFile[SUBPR_DESCR];
+            vector<string> paths;
+            for (const auto& path : subprojects)
+            {
+                paths.push_back(path);
+            }
+            return paths;
         }
-        return paths;
+        throw FileSetRuntimeError(FileSetRuntimeError::SubprojectsIncongruity, "Trying to get subprojects paths while there are no subprojects");
     }
 
     int JsonFileSetLoader::countSubprojects() const
@@ -253,7 +259,7 @@ namespace Interface {
 
     }
 
-    map<string, FileSetLoader *>
+    FileSetLoader::Loaders
     JsonFileSetLoader::getSubprojectLoaders()
     {
         if(loaded == false)
@@ -268,6 +274,8 @@ namespace Interface {
         if(loaded == false)
             throw FileSetRuntimeError(FileSetRuntimeError::NotLoaded, "Trying to add subprojects on not loaded interface");
 
+        if(subp.empty())
+             throw FileSetRuntimeError(FileSetRuntimeError::UnknownError, "Empty subprojects container detected");
 
         char * cPathToProjectFile, * dname;
         cPathToProjectFile = strdup(pathToProjectFile.c_str());
@@ -351,7 +359,7 @@ namespace Interface {
             jChangedContentOfProjectFile.erase(SUBPR_DESCR);
         }
 
-        //reload subproject loaders
+        //reload subproject FileSetLoader::Loaders
         loadSubprojects();
     }
 
@@ -386,16 +394,16 @@ namespace Interface {
             else if (j[FILES_DESCR].at(0).is_string() == false)
                 return json::parse(error_code + "Wrong values type of files key!\"}");
 
-            if (j[SUBPR_DESCR].is_array()) {
+            if (j[SUBPR_DESCR].is_array()) { //bug in json lib
                 if (j[SUBPR_DESCR].at(0).is_string() == false)
                     return json::parse(error_code + "Wrong values type of subprojects key!\"}");
-            } else if (!j[SUBPR_DESCR].is_null() && !j[SUBPR_DESCR].is_array()) {
+            } else if (!j[SUBPR_DESCR].is_null()) {
                 return json::parse(error_code + "Corrupted or absent subprojects key!\"}");
             }
 
             return j;
         } catch (const std::exception& e) {
-            throw FileSetRuntimeError(FileSetRuntimeError::UnknownError, (string)"Error gathered from json API: " + (string)e.what());
+            throw FileSetRuntimeError(FileSetRuntimeError::UnknownError, string("Error gathered from json API: ") + string(e.what()));
         }
     }
 
