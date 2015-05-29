@@ -30,6 +30,7 @@ public:
     typedef std::string Path;
     typedef std::vector<Path> Files;
     typedef std::vector<Path> Subprojects;
+    typedef std::map<std::string, FileSetLoader *> Loaders;
 
     virtual ~FileSetLoader() { }
 
@@ -95,10 +96,8 @@ protected:
         AbstractFileSetCreatorSingleton() { }
     public:
 
-        AbstractFileSetCreatorSingleton
-        (const AbstractFileSetCreatorSingleton&) = delete;
-        AbstractFileSetCreatorSingleton&
-        operator=(AbstractFileSetCreatorSingleton&) = delete;
+        AbstractFileSetCreatorSingleton (const AbstractFileSetCreatorSingleton&) = delete;
+        AbstractFileSetCreatorSingleton& operator=(AbstractFileSetCreatorSingleton&) = delete;
 
         static AbstractFileSetCreator& getCreator() {
             static FileSetCreator creator;
