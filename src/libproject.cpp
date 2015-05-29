@@ -263,7 +263,7 @@ namespace Interface {
     JsonFileSetLoader::getSubprojectLoaders()
     {
         if(loaded == false)
-            throw FileSetRuntimeError(FileSetRuntimeError::NotLoaded, "Trying to get subprojects Loaders on not loaded interface");
+            throw FileSetRuntimeError(FileSetRuntimeError::NotLoaded, "Trying to get subprojects loaders on not loaded interface");
         return subprojects;
 
     }
@@ -394,17 +394,16 @@ namespace Interface {
             else if (j[FILES_DESCR].at(0).is_string() == false)
                 return json::parse(error_code + "Wrong values type of files key!\"}");
 
-            //if (j[SUBPR_DESCR].is_array()) { bug in json lib
-            if(j.count(SUBPR_DESCR) != 0) {
+            if (j[SUBPR_DESCR].is_array()) { //bug in json lib
                 if (j[SUBPR_DESCR].at(0).is_string() == false)
                     return json::parse(error_code + "Wrong values type of subprojects key!\"}");
-            } else if (!j[SUBPR_DESCR].is_null() && !j[SUBPR_DESCR].is_array()) {
+            } else if (!j[SUBPR_DESCR].is_null()) {
                 return json::parse(error_code + "Corrupted or absent subprojects key!\"}");
             }
 
             return j;
         } catch (const std::exception& e) {
-            throw FileSetRuntimeError(FileSetRuntimeError::UnknownError, (string)"Error gathered from json API: " + (string)e.what());
+            throw FileSetRuntimeError(FileSetRuntimeError::UnknownError, string("Error gathered from json API: ") + string(e.what()));
         }
     }
 
