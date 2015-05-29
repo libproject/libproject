@@ -8,6 +8,7 @@
 #include "json.hpp"
 #include <fstream>
 #include <sstream>
+#include <memory>
 
 using namespace LibprojManager::Interface;
 using std::string;
@@ -21,6 +22,9 @@ using nlohmann::json;
 using std::ifstream;
 using std::ostringstream;
 using std::ofstream;
+using std::unique_ptr;
+
+
 
 namespace {
 list<FileSetLoader::Path> pathsToSingleAbnormal = {
@@ -87,18 +91,18 @@ namespace FileSetTests {
 // Skeleton classes:
 class TestSkeleton : public ::testing::Test {
 public:
+  typedef unique_ptr<FileSetLoader> LoaderPtr;
+
   virtual ~TestSkeleton() {}
   json contentReference;
   json contentReferenceWithSingle;
   json contentReferenceWithNested;
   string contentBackup;
-  FileSetLoader *loader = nullptr;
+  LoaderPtr loader;
   json fileToTest = { };
   FileSetLoader::Path pathToMainFile;
   bool writableMainFile = false;
   virtual void SetUp() {
-    if (loader)
-      delete loader;
     if (writableMainFile)
     {
         ifstream in(pathToMainFile);
@@ -112,7 +116,6 @@ public:
   }
 
   virtual void TearDown() {
-      delete loader;
       if (writableMainFile)
       {
         ofstream out (pathToMainFile);
@@ -194,12 +197,12 @@ public:
 };
 
 TEST_F(TestRegularSingle, Open_file) {
-  loader = FileSetFactory::createFileSet(pathToMainFile);
+  loader = LoaderPtr(FileSetFactory::createFileSet(pathToMainFile));
   ASSERT_NO_THROW(loader->open());
 }
 
 TEST_F(TestRegularSingle, Attemt_to_save_file_without_changes) {
-  loader = FileSetFactory::createFileSet(pathToMainFile);
+  loader = LoaderPtr(FileSetFactory::createFileSet(pathToMainFile));
   loader->open();
   ifstream i;
 
@@ -219,53 +222,53 @@ TEST_F(TestRegularSingle, Attemt_to_save_file_without_changes) {
 }
 
 TEST_F(TestRegularSingle, Open_file_while_already_loaded) {
-  loader = FileSetFactory::createFileSet(pathToMainFile);
+  loader = LoaderPtr(FileSetFactory::createFileSet(pathToMainFile));
   loader->open();
   ASSERT_THROW(loader->open(), FileSetRuntimeError);
 }
 
 TEST_F(TestRegularSingle, Get_path_to_root_node) {
-  loader = FileSetFactory::createFileSet(pathToMainFile);
+  loader = LoaderPtr(FileSetFactory::createFileSet(pathToMainFile));
   loader->open();
   FileSetLoader::Path path = loader->getPathToNode();
   ASSERT_EQ(pathToMainFile, path);
 }
 
 TEST_F(TestRegularSingle, Get_path_to_root_node_for_not_loaded) {
-  loader = FileSetFactory::createFileSet(pathToMainFile);
+  loader = LoaderPtr(FileSetFactory::createFileSet(pathToMainFile));
   ASSERT_THROW(loader->getPathToNode(), FileSetRuntimeError);
 }
 
 TEST_F(TestRegularSingle, Get_project_name) {
-  loader = FileSetFactory::createFileSet(pathToMainFile);
+  loader = LoaderPtr(FileSetFactory::createFileSet(pathToMainFile));
   loader->open();
   EXPECT_EQ(projectNameRef, loader->getProjectName());
 }
 
 TEST_F(TestRegularSingle, Get_project_name_for_not_loaded) {
-  loader = FileSetFactory::createFileSet(pathToMainFile);
+  loader = LoaderPtr(FileSetFactory::createFileSet(pathToMainFile));
   ASSERT_THROW(loader->getProjectName(), FileSetRuntimeError);
 }
 
 TEST_F(TestRegularSingle, Get_list_of_files) {
-  loader = FileSetFactory::createFileSet(pathToMainFile);
+  loader = LoaderPtr(FileSetFactory::createFileSet(pathToMainFile));
   loader->open();
   EXPECT_EQ(loader->getFileNames(), projectFilesRef);
 }
 
 TEST_F(TestRegularSingle, Get_list_of_files_for_not_loaded) {
-  loader = FileSetFactory::createFileSet(pathToMainFile);
+  loader = LoaderPtr(FileSetFactory::createFileSet(pathToMainFile));
   ASSERT_THROW(loader->getFileNames(), FileSetRuntimeError);
 }
 
 TEST_F(TestRegularSingle, Count_subprojects_of_single_project) {
-    loader = FileSetFactory::createFileSet(pathToMainFile);
+    loader = LoaderPtr(FileSetFactory::createFileSet(pathToMainFile));
     loader->open();
     ASSERT_EQ(0, loader->countSubprojects());
 }
 
 TEST_F(TestRegularSingle, Count_subprojects_of_sinlge_not_loaded) {
-    loader = FileSetFactory::createFileSet(pathToMainFile);
+    loader = LoaderPtr(FileSetFactory::createFileSet(pathToMainFile));
     ASSERT_THROW(loader->countSubprojects(), FileSetRuntimeError);
 }
 
@@ -291,18 +294,18 @@ public:
 };
 
 TEST_F(TestRegularNested, Open_file) {
-  loader = FileSetFactory::createFileSet(pathToMainFile);
+  loader = LoaderPtr(FileSetFactory::createFileSet(pathToMainFile));
   ASSERT_NO_THROW(loader->open());
 }
 
 TEST_F(TestRegularNested, Get_ACCESS_to_subprojects_if_not_loaded) {
-    loader = FileSetFactory::createFileSet(pathToMainFile);
+    loader = LoaderPtr(FileSetFactory::createFileSet(pathToMainFile));
     map<string, FileSetLoader *> msl;
     ASSERT_THROW(msl = loader->getSubprojectLoaders(), FileSetRuntimeError);
 }
 
 TEST_F(TestRegularNested, Get_project_name_for_1st_subproject) {
-    loader = FileSetFactory::createFileSet(pathToMainFile);
+    loader = LoaderPtr(FileSetFactory::createFileSet(pathToMainFile));
     loader->open();
     map<string, FileSetLoader *> msl = loader->getSubprojectLoaders();
     map<string, FileSetLoader *>::const_iterator it = msl.cbegin();
@@ -311,13 +314,13 @@ TEST_F(TestRegularNested, Get_project_name_for_1st_subproject) {
 }
 
 TEST_F(TestRegularNested, Count_subprojects_of_nested_project) {
-    loader = FileSetFactory::createFileSet(pathToMainFile);
+    loader = LoaderPtr(FileSetFactory::createFileSet(pathToMainFile));
     loader->open();
     ASSERT_EQ(subprojectsCount, loader->countSubprojects());
 }
 
 TEST_F(TestRegularNested, Get_path_to_1st_subnode) {
-    loader = FileSetFactory::createFileSet(pathToMainFile);
+    loader = LoaderPtr(FileSetFactory::createFileSet(pathToMainFile));
     loader->open();
     map<string, FileSetLoader *> msl = loader->getSubprojectLoaders();
     map<string, FileSetLoader *>::const_iterator it = msl.cbegin();
@@ -326,7 +329,7 @@ TEST_F(TestRegularNested, Get_path_to_1st_subnode) {
 }
 
 TEST_F(TestRegularNested, Get_path_to_2n_subnode) {
-    loader = FileSetFactory::createFileSet(pathToMainFile);
+   loader = LoaderPtr(FileSetFactory::createFileSet(pathToMainFile));
     loader->open();
     map<string, FileSetLoader *> msl = loader->getSubprojectLoaders();
     map<string, FileSetLoader *>::const_reverse_iterator it = msl.crbegin();
@@ -354,7 +357,7 @@ INSTANTIATE_TEST_CASE_P(InstantiationOfTestAbnormalSingles, TestAbnormalSingles,
                         ::testing::ValuesIn(pathsToSingleAbnormal));
 TEST_P(TestAbnormalSingles, Set_of_attempts_to_open_abnormal_files) {
   ASSERT_THROW({
-                 loader = FileSetFactory::createFileSet(GetParam());
+                 loader = LoaderPtr(FileSetFactory::createFileSet(GetParam()));
                  loader->open();
                },
                std::exception);
@@ -396,7 +399,7 @@ public:
 
 TEST_F(TestAddRegularSubprojectsToSingle, Add_one_regular_single_subproject) {
     ASSERT_NO_THROW({
-                        loader = FileSetFactory::createFileSet(pathToMainFile);
+                        loader = LoaderPtr(FileSetFactory::createFileSet(pathToMainFile));
                         loader->open();
                         loader->addSubproject(pathToOneRegularSingleSubproject);
                         loader->save();
@@ -409,7 +412,7 @@ TEST_F(TestAddRegularSubprojectsToSingle, Add_one_regular_single_subproject) {
 
 TEST_F(TestAddRegularSubprojectsToSingle, Add_one_regular_single_which_already_cached) {
     ASSERT_THROW({
-                        loader = FileSetFactory::createFileSet(pathToMainFile);
+                        loader = LoaderPtr(FileSetFactory::createFileSet(pathToMainFile));
                         loader->open();
                         loader->addSubproject(pathToOneRegularSingleSubproject);
                         loader->addSubproject(pathToOneRegularSingleSubproject);
@@ -470,7 +473,7 @@ public:
 
 TEST_F(TestAddRegularSubprojectsToNested, Add_one_regular_single_subproject) {
     ASSERT_NO_THROW({
-                        loader = FileSetFactory::createFileSet(pathToMainFile);
+                        loader = LoaderPtr(FileSetFactory::createFileSet(pathToMainFile));
                         loader->open();
                         loader->addSubproject(pathToOneRegularSingleSubproject);
                         loader->save();
@@ -483,7 +486,7 @@ TEST_F(TestAddRegularSubprojectsToNested, Add_one_regular_single_subproject) {
 
 TEST_F(TestAddRegularSubprojectsToNested, Add_one_regular_nested_subproject) {
     ASSERT_NO_THROW({
-                        loader = FileSetFactory::createFileSet(pathToMainFile);
+                        loader = LoaderPtr(FileSetFactory::createFileSet(pathToMainFile));
                         loader->open();
                         loader->addSubproject(pathToOneRegularNestedSubproject);
                         loader->save();
@@ -495,7 +498,7 @@ TEST_F(TestAddRegularSubprojectsToNested, Add_one_regular_nested_subproject) {
 
 TEST_F(TestAddRegularSubprojectsToNested, Add_one_regular_single_which_already_cached) {
     ASSERT_THROW({
-                        loader = FileSetFactory::createFileSet(pathToMainFile);
+                        loader = LoaderPtr(FileSetFactory::createFileSet(pathToMainFile));
                         loader->open();
                         loader->addSubproject(pathToOneRegularSingleSubproject);
                         loader->addSubproject(pathToOneRegularSingleSubproject);
@@ -508,7 +511,7 @@ TEST_F(TestAddRegularSubprojectsToNested, Add_one_regular_single_which_already_c
 
 TEST_F(TestAddRegularSubprojectsToNested, Add_one_regular_single_which_already_present_in_project_file) {
     ASSERT_THROW({
-                        loader = FileSetFactory::createFileSet(pathToMainFile);
+                        loader = LoaderPtr(FileSetFactory::createFileSet(pathToMainFile));
                         loader->open();
                         loader->addSubproject(pathToOneRegularSingleSubproject);
                         loader->save();
@@ -525,7 +528,7 @@ TEST_F(TestAddRegularSubprojectsToNested, Add_already_cached_and_present_subproj
     FileSetLoader::Subprojects subprojectsToAdd = {pathToOneRegularNestedSubproject, pathToPresentSubproject};
 
     ASSERT_NO_THROW({
-                        loader = FileSetFactory::createFileSet(pathToMainFile);
+                        loader = LoaderPtr(FileSetFactory::createFileSet(pathToMainFile));
                         loader->open();
                         loader->addSubproject(pathToOneRegularNestedSubproject);
                         loader->save();
@@ -542,7 +545,7 @@ TEST_F(TestAddRegularSubprojectsToNested, Add_already_cached_and_present_subproj
 
 TEST_F(TestAddRegularSubprojectsToNested, Add_two_regular_subprojects) {
     ASSERT_NO_THROW({
-                        loader = FileSetFactory::createFileSet(pathToMainFile);
+                        loader = LoaderPtr(FileSetFactory::createFileSet(pathToMainFile));
                         loader->open();
                         loader->addSubprojects(pathsToPairOfRegularSubprojects);
                         loader->save();
@@ -577,7 +580,7 @@ INSTANTIATE_TEST_CASE_P(InstantiationOfTestAbnormalSubprojects, TestAddAbnormalS
                         ::testing::ValuesIn(pathsToAbnormalSubprojects));
 TEST_P(TestAddAbnormalSubprojects, Set_of_attempts_to_add_abnormal_subprojects) {
     ASSERT_THROW({
-                     loader = FileSetFactory::createFileSet(pathToMainFile);
+                     loader = LoaderPtr(FileSetFactory::createFileSet(pathToMainFile));
                      loader->open();
                      loader->addSubprojects(GetParam());
                  },
@@ -598,7 +601,7 @@ public:
 
     FileSetLoader::Path pathToProjectWithOneNormalSubprojects = R"(project_files/getsubprojectspaths/getpath.libproject)";
     FileSetLoader::Path pathToProjectWithPairNormalSubprojects = R"(project_files/getsubprojectspaths/getpaths.libproject)";
-    FileSetLoader::Path pathToProjectWithoutSubprojects;// = R"(project_files/getsubprojectspaths/nosubprojects.libproject)";
+    FileSetLoader::Path pathToProjectWithoutSubprojects = R"(project_files/getsubprojectspaths/nosubprojects.libproject)";
     FileSetLoader::Subprojects pairOfPathsReference = {
         "sub/s1.libproject",
         "sub/s2.libproject"
@@ -607,7 +610,6 @@ public:
         "sub/s1.libproject"
     };
     void SetUp() {
-        pathToProjectWithoutSubprojects = R"(project_files/getsubprojectspaths/nosubprojects.libproject)";
         TestSkeleton::SetUp();
     }
     void TearDown() {
@@ -616,7 +618,7 @@ public:
 };
 
 TEST_F(TestGetSubprojectsPaths, Get_paths_of_lone_subproject) {
-    loader = FileSetFactory::createFileSet(pathToProjectWithOneNormalSubprojects);
+    loader = LoaderPtr(FileSetFactory::createFileSet(pathToProjectWithOneNormalSubprojects));
     loader->open();
     FileSetLoader::Subprojects paths = loader->getSubprojectsPaths();
 
@@ -624,7 +626,7 @@ TEST_F(TestGetSubprojectsPaths, Get_paths_of_lone_subproject) {
 }
 
 TEST_F(TestGetSubprojectsPaths, Get_paths_of_two_subprojects) {
-    loader = FileSetFactory::createFileSet(pathToProjectWithPairNormalSubprojects);
+    loader = LoaderPtr(FileSetFactory::createFileSet(pathToProjectWithPairNormalSubprojects));
     loader->open();
     FileSetLoader::Subprojects paths = loader->getSubprojectsPaths();
 
@@ -632,17 +634,17 @@ TEST_F(TestGetSubprojectsPaths, Get_paths_of_two_subprojects) {
 }
 
 TEST_F(TestGetSubprojectsPaths, Get_subprojects_paths_of_project_without_them) {
-    //ASSERT_THROW ({
-                        loader = FileSetFactory::createFileSet(pathToProjectWithoutSubprojects);
+    ASSERT_THROW ({
+                        loader = LoaderPtr(FileSetFactory::createFileSet(pathToProjectWithoutSubprojects));
                         loader->open();
                         FileSetLoader::Subprojects paths = loader->getSubprojectsPaths();
-//                  },
-//                  FileSetRuntimeError);
+                  },
+                  FileSetRuntimeError);
 }
 
 TEST_F(TestGetSubprojectsPaths, Get_paths_of_subprojects_on_not_loaded_interface) {
     ASSERT_THROW ({
-                      loader = FileSetFactory::createFileSet(pathToProjectWithPairNormalSubprojects);
+                      loader = LoaderPtr(FileSetFactory::createFileSet(pathToProjectWithPairNormalSubprojects));
                       FileSetLoader::Subprojects paths = loader->getSubprojectsPaths();
                   },
                   FileSetRuntimeError);
@@ -710,7 +712,7 @@ public:
 
 TEST_F(TestRemoveSubprojects, Remove_one_subproject_from_file_with_two) {
     ASSERT_NO_THROW({
-                        loader = FileSetFactory::createFileSet(pathToMainFileWhereNeedToRemoveOneSubprojectInArrayOfTwo);
+                        loader = LoaderPtr(FileSetFactory::createFileSet(pathToMainFileWhereNeedToRemoveOneSubprojectInArrayOfTwo));
                         loader->open();
                         loader->removeSubproject(pathToPresentSubproject);
                         loader->save();
@@ -722,7 +724,7 @@ TEST_F(TestRemoveSubprojects, Remove_one_subproject_from_file_with_two) {
 
 TEST_F(TestRemoveSubprojects, Remove_lone_subproject) {
     ASSERT_NO_THROW({
-                        loader = FileSetFactory::createFileSet(pathToMainFileWhereIsOneSubprojectWithWillBeRemoved);
+                        loader = LoaderPtr(FileSetFactory::createFileSet(pathToMainFileWhereIsOneSubprojectWithWillBeRemoved));
                         loader->open();
                         loader->removeSubproject(pathToPresentSubproject);
                         loader->save();
@@ -734,7 +736,7 @@ TEST_F(TestRemoveSubprojects, Remove_lone_subproject) {
 
 TEST_F(TestRemoveSubprojects, Remove_on_not_loaded_interface) {
     ASSERT_THROW({
-                        loader = FileSetFactory::createFileSet(pathToMainFileWhichWillNotBeLoaded);
+                        loader = LoaderPtr(FileSetFactory::createFileSet(pathToMainFileWhichWillNotBeLoaded));
                         loader->removeSubproject(pathToPresentSubproject);
                  }, FileSetRuntimeError);
     loader->save();
@@ -767,7 +769,7 @@ INSTANTIATE_TEST_CASE_P(InstantiationOfTestIncorrectSubprojectsRemoving, TestInc
                         ::testing::ValuesIn(incorrectPathsOfSubprojects));
 TEST_P(TestIncorrectSubprojectsRemoving, Set_of_attempts_to_remove_subprojects_by_incorrect_paths) {
   ASSERT_THROW({
-                 loader = FileSetFactory::createFileSet(pathToMainFile);
+                 loader = LoaderPtr(FileSetFactory::createFileSet(pathToMainFile));
                  loader->open();
                  loader->removeSubprojects(GetParam());
     }, FileSetRuntimeError);

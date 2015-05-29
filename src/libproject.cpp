@@ -239,10 +239,6 @@ namespace Interface {
 
         if (jChangedContentOfProjectFile.count(SUBPR_DESCR) > 0)
         {
-                    ostringstream x;
-                    x << jChangedContentOfProjectFile[SUBPR_DESCR].dump(4);
-                    string k = x.str();
-                    //is it bug of json lib (value of k)?
             auto& subprojects = jChangedContentOfProjectFile[SUBPR_DESCR];
             vector<string> paths;
             for (const auto& path : subprojects)

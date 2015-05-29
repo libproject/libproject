@@ -95,10 +95,8 @@ protected:
         AbstractFileSetCreatorSingleton() { }
     public:
 
-        AbstractFileSetCreatorSingleton
-        (const AbstractFileSetCreatorSingleton&) = delete;
-        AbstractFileSetCreatorSingleton&
-        operator=(AbstractFileSetCreatorSingleton&) = delete;
+        AbstractFileSetCreatorSingleton (const AbstractFileSetCreatorSingleton&) = delete;
+        AbstractFileSetCreatorSingleton& operator=(AbstractFileSetCreatorSingleton&) = delete;
 
         static AbstractFileSetCreator& getCreator() {
             static FileSetCreator creator;
