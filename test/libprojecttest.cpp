@@ -132,9 +132,7 @@ public:
         writableMainFile = true;
         TestSkeleton::SetUp();
     }
-    void TearDown() {
-        TestSkeleton::TearDown();
-    }
+
 };
 
 class TestRegular : public TestSkeleton {
@@ -166,12 +164,6 @@ public:
         { "files", { "main.cpp", "Test.h", "Test.cpp" } }
   };
 
-    void SetUp() {
-        TestSkeleton::SetUp();
-    }
-    void TearDown() {
-        TestSkeleton::TearDown();
-    }
 };
 
 
@@ -189,9 +181,6 @@ public:
                        "kekeke.cpp",  "testnew.cpp", "testadd2.cpp",
                        "testadd3.cpp"};
     TestRegular::SetUp();
-  }
-  void TearDown() {
-      TestRegular::TearDown();
   }
 };
 
@@ -287,9 +276,6 @@ public:
     projectFilesRef = {"main.cpp", "Test.h", "Test.cpp"};
     TestRegular::SetUp();
   }
-  void TearDown() {
-      TestRegular::TearDown();
-  }
 };
 
 TEST_F(TestRegularNested, Open_file) {
@@ -343,13 +329,6 @@ TEST_F(TestRegularNested, Get_path_to_2n_subnode) {
 
 class TestAbnormalSingles : public TestSkeleton,
                           public ::testing::WithParamInterface<FileSetLoader::Path> {
-public:
-    void SetUp() {
-        TestSkeleton::SetUp();
-    }
-    void TearDown() {
-        TestSkeleton::TearDown();
-    }
 };
 
 INSTANTIATE_TEST_CASE_P(InstantiationOfTestAbnormalSingles, TestAbnormalSingles,
@@ -390,9 +369,6 @@ public:
           { "subprojects", {"regular/normalnested.libproject"} }
         };
         TestAddSubprojects::SetUp();
-    }
-    void TearDown() {
-        TestAddSubprojects::TearDown();
     }
 };
 
@@ -464,9 +440,6 @@ public:
         };
 
         TestAddSubprojects::SetUp();
-    }
-    void TearDown() {
-      TestAddSubprojects::TearDown();
     }
 };
 
@@ -570,9 +543,6 @@ public:
       pathToMainFile = pathToNestedMainFile;
       TestAddSubprojects::SetUp();
   }
-  void TearDown() {
-      TestAddSubprojects::TearDown();
-  }
 };
 
 INSTANTIATE_TEST_CASE_P(InstantiationOfTestAbnormalSubprojects, TestAddAbnormalSubprojects,
@@ -608,12 +578,6 @@ public:
     FileSetLoader::Subprojects pathReference = {
         "sub/s1.libproject"
     };
-    void SetUp() {
-        TestSkeleton::SetUp();
-    }
-    void TearDown() {
-        TestSkeleton::TearDown();
-    }
 };
 
 TEST_F(TestGetSubprojectsPaths, Get_paths_of_lone_subproject) {
@@ -758,10 +722,6 @@ public:
         writableMainFile = true;
         pathToMainFile = R"(project_files/testremove/case_1.libproject)";
         TestProjectsWithFewSubprojects::SetUp();
-    }
-
-    void TearDown() {
-        TestProjectsWithFewSubprojects::TearDown();
     }
 };
 
