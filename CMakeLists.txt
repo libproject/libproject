@@ -14,7 +14,7 @@ set(CMAKE_SKIP_RPATH FALSE)
 set(GCOV_FOUND FALSE)
 set(GCOVR_FOUND FALSE)
 
-SET(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/Modules/")
+set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 
 #setting subprojects
 add_subdirectory ( include )
