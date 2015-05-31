@@ -8,10 +8,7 @@ set (SOURCES
 	libproject.cpp)
 
 #setting visibility of headers in project tree
-set (HEADERS
-        ../include/libproject/libproject.h
-        ../include/libproject/libproject_error.h
-    )
+file (GLOB HEADERS "${CMAKE_SOURCE_DIR}/include/libproject/*.h")
 
 #setting what to build
 add_library(project SHARED ${SOURCES} ${HEADERS})
@@ -29,3 +26,5 @@ set (CMAKE_C_FLAGS
 	"${CMAKE_C_FLAGS} -std=c++11 -g -O0 -fprofile-arcs -ftest-coverage")
 set (CMAKE_EXE_LINKER_FLAGS
 	"${CMAKE_EXE_LINKER_FLAGS} -std=c++11 -g -O0 -fprofile-arcs -ftest-coverage")
+
+message(${HEADERS})
