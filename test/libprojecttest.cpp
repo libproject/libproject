@@ -34,7 +34,8 @@ list<FileSetLoader::Path> pathsToSingleAbnormal = {
     "project_files/single/nofileskey.libproject",
     "project_files/single/broken.libproject",
     "project_files/single/noprojectkey.libproject",
-    "project_files/single/notexist.libproject"
+    "project_files/single/notexist.libproject",
+    "project_files/single/filesarrayisarrayofdigits.libproject",
 };
 
 vector<FileSetLoader::Subprojects> pathsToAbnormalSubprojects = {
