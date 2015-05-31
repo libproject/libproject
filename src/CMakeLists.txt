@@ -26,5 +26,3 @@ set (CMAKE_C_FLAGS
 	"${CMAKE_C_FLAGS} -std=c++11 -g -O0 -fprofile-arcs -ftest-coverage")
 set (CMAKE_EXE_LINKER_FLAGS
 	"${CMAKE_EXE_LINKER_FLAGS} -std=c++11 -g -O0 -fprofile-arcs -ftest-coverage")
-
-message(${HEADERS})
