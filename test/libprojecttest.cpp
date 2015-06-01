@@ -34,7 +34,8 @@ list<FileSetLoader::Path> pathsToSingleAbnormal = {
     "project_files/single/nofileskey.libproject",
     "project_files/single/broken.libproject",
     "project_files/single/noprojectkey.libproject",
-    "project_files/single/notexist.libproject"
+    "project_files/single/notexist.libproject",
+    "project_files/single/filesarrayisarrayofdigits.libproject",
 };
 
 vector<FileSetLoader::Subprojects> pathsToAbnormalSubprojects = {
@@ -741,14 +742,7 @@ TEST_P(TestIncorrectSubprojectsRemoving, Set_of_attempts_to_remove_subprojects_b
   ASSERT_EQ(contentReference_withTwoSuprojects.dump(4), fileToTest.dump(4));
 };
 
-
-
-
-
-
 //TODO Count_subprojects_after_removing
-//TODO Add tests for function getSubprojectsPaths() !!!!!!!!!!!!
-//TODO Add tests for findSubprojectByPath() !!!!!!!!!!!!
 
 } // namespace FileSetTests
 
