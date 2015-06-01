@@ -7,8 +7,11 @@ project (libproject)
 set (SOURCES
 	libproject.cpp)
 
+#setting visibility of headers in project tree
+file (GLOB HEADERS "${CMAKE_SOURCE_DIR}/include/libproject/*.h")
+
 #setting what to build
-add_library(project SHARED ${SOURCES})
+add_library(project SHARED ${SOURCES} ${HEADERS})
 
 #part of configuring `install` target (library)
 install(TARGETS project
