@@ -100,7 +100,7 @@ namespace Interface {
          */
         /*virtual*/ const string getPathToNode() const {
             return loaded ? pathToProjectFile :
-                        throw FileSetRuntimeError(FileSetRuntimeError::NotLoaded,
+                        throw FileSetRuntimeError(FileSetRuntimeError::NotLoadedInterface,
                                                   "Trying to get path to root node on not loaded interface"); }
 
         /*!
@@ -170,10 +170,10 @@ namespace Interface {
     JsonFileSetLoader::open()
     {
         if (loaded)
-            throw FileSetRuntimeError(FileSetRuntimeError::AlreadyLoaded, "Project already loaded");
+            throw FileSetRuntimeError(FileSetRuntimeError::ProjectAlreadyLoaded);
         ifstream i(pathToProjectFile);
         if(!i)
-            throw FileSetRuntimeError(FileSetRuntimeError::IncorrectSource, "Error with input stream");
+            throw FileSetRuntimeError(FileSetRuntimeError::UnknownError, "Error with input stream");
 
         jChangedContentOfProjectFile = jContentOfProjectFile = checkProjectFileForErrors(i); /// Checking JSON-data for consistentness, correctness and reading it
 
@@ -208,7 +208,7 @@ namespace Interface {
     JsonFileSetLoader::getFileNames() const
     {
         if(loaded == false)
-            throw FileSetRuntimeError(FileSetRuntimeError::NotLoaded, "Trying to get file names on not loaded interface");
+            throw FileSetRuntimeError(FileSetRuntimeError::NotLoadedInterface, "Trying to get file names on not loaded interface");
         FileSetLoader::Files files;
         for(const auto& item : jContentOfProjectFile[FILES_DESCR]) {
             files.push_back(item.get<string>());
@@ -220,7 +220,7 @@ namespace Interface {
     JsonFileSetLoader::getProjectName() const
     {
         if(loaded == false)
-            throw FileSetRuntimeError(FileSetRuntimeError::NotLoaded, "Trying to get project name on not loaded interface");
+            throw FileSetRuntimeError(FileSetRuntimeError::NotLoadedInterface, "Trying to get project name on not loaded interface");
         return jContentOfProjectFile[PROJECT_DESCR].get<string>();
     }
 
@@ -228,7 +228,7 @@ namespace Interface {
     JsonFileSetLoader::getSubprojectsPaths() const
     {
         if (loaded == false)
-            throw FileSetRuntimeError(FileSetRuntimeError::NotLoaded, "Trying to get subprojects paths on not loaded interface");
+            throw FileSetRuntimeError(FileSetRuntimeError::NotLoadedInterface, "Trying to get subprojects paths on not loaded interface");
 
         if (jChangedContentOfProjectFile.count(SUBPR_DESCR) > 0)
         {
@@ -246,7 +246,7 @@ namespace Interface {
     int JsonFileSetLoader::countSubprojects() const
     {
         if(loaded == false)
-            throw FileSetRuntimeError(FileSetRuntimeError::NotLoaded, "Trying to count subprojects on not loaded interface");
+            throw FileSetRuntimeError(FileSetRuntimeError::NotLoadedInterface, "Trying to count subprojects on not loaded interface");
         return subprojects.empty()? 0 : subprojects.size();
 
     }
@@ -255,7 +255,7 @@ namespace Interface {
     JsonFileSetLoader::getSubprojectLoaders()
     {
         if(loaded == false)
-            throw FileSetRuntimeError(FileSetRuntimeError::NotLoaded, "Trying to get subprojects loaders on not loaded interface");
+            throw FileSetRuntimeError(FileSetRuntimeError::NotLoadedInterface, "Trying to get subprojects loaders on not loaded interface");
         return subprojects;
 
     }
@@ -264,7 +264,7 @@ namespace Interface {
     JsonFileSetLoader::addSubprojects(const FileSetLoader::Subprojects & subp)
     {
         if(loaded == false)
-            throw FileSetRuntimeError(FileSetRuntimeError::NotLoaded, "Trying to add subprojects on not loaded interface");
+            throw FileSetRuntimeError(FileSetRuntimeError::NotLoadedInterface, "Trying to add subprojects on not loaded interface");
 
         if(subp.empty())
              throw FileSetRuntimeError(FileSetRuntimeError::UnknownError, "Empty subprojects container detected");
@@ -281,7 +281,7 @@ namespace Interface {
             checkSubprojectsStream.open(string(dname)+string("/")+relativePath);
             json check = checkProjectFileForErrors(checkSubprojectsStream);
             if (check.count(ERROR_DESCR) != 0)
-                throw FileSetRuntimeError(FileSetRuntimeError::BrokenSubproject, "Trying to add broken subproject(s)");
+                throw FileSetRuntimeError(FileSetRuntimeError::AddBrokenSubproject, "Trying to add broken subproject(s)");
             checkSubprojectsStream.close();
 
             if(jChangedContentOfProjectFile.count(SUBPR_DESCR) != 0) {
@@ -320,7 +320,7 @@ namespace Interface {
     {
 
         if(loaded == false)
-            throw FileSetRuntimeError(FileSetRuntimeError::NotLoaded, "Trying to remove subprojects on not loaded interface");
+            throw FileSetRuntimeError(FileSetRuntimeError::NotLoadedInterface, "Trying to remove subprojects on not loaded interface");
 
         //find duplicates
         FileSetLoader::Subprojects sorted = subp;
@@ -426,7 +426,7 @@ namespace Interface {
 
             return;
             } catch (const FileSetRuntimeError& re) {
-                throw FileSetRuntimeError(FileSetRuntimeError::BrokenSubproject, string(re.what()));
+                throw FileSetRuntimeError(FileSetRuntimeError::LoadBrokenSubproject, string(re.what()));
             }
     }
 

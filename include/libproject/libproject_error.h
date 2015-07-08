@@ -19,13 +19,14 @@ public:
     enum ErrType {
         UnknownError,
         IncorrectSource,
-        AlreadyLoaded,
-        NotLoaded,
-        BrokenSubproject,
+        ProjectAlreadyLoaded,
+        NotLoadedInterface,
+        AddBrokenSubproject,
+        LoadBrokenSubproject,
         SubprojectsIncongruity
     };
 
-    FileSetRuntimeError(const ErrType type, const std::string& message)
+    FileSetRuntimeError(const ErrType type, const std::string& message = std::string())
         : runtime_error(message), errorType(type) { }
 
     ErrType getErrorType() const { return errorType; }
