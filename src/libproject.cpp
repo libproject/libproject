@@ -100,8 +100,7 @@ namespace Interface {
          */
         /*virtual*/ const string getPathToNode() const {
             return loaded ? pathToProjectFile :
-                        throw LoaderStateError(FileSetRuntimeError::ProjectNotLoaded,
-                                                  "Trying to get path to root node on not loaded interface"); }
+                        throw LoaderStateError(FileSetRuntimeError::GetPathToRootNodeOnNotLoaded); }
 
         /*!
           * \brief Gives paths to subprojects to user
@@ -173,13 +172,13 @@ namespace Interface {
             throw LoaderStateError(FileSetRuntimeError::ProjectAlreadyLoaded);
         ifstream i(pathToProjectFile);
         if(!i)
-            throw IncorrectSourceError("Error with input stream");
+            throw IncorrectSourceError(FileSetRuntimeError::InputStreamError);
 
         jChangedContentOfProjectFile = jContentOfProjectFile = checkProjectFileForErrors(i); /// Checking JSON-data for consistentness, correctness and reading it
 
         if (jContentOfProjectFile.count(ERROR_DESCR) != 0) { /// Checking data for higher abstract errors - project level errors
             loaded = false;
-            throw IncorrectSourceError(jContentOfProjectFile[ERROR_DESCR].get<string>());
+            throw IncorrectSourceError(FileSetRuntimeError::SourceError, jContentOfProjectFile[ERROR_DESCR].get<string>());
         } else {
             if (jContentOfProjectFile[SUBPR_DESCR].is_array()) /// Checking project data for subprojects
                loadSubprojects(); /// If above is true loading subprojects
@@ -198,7 +197,7 @@ namespace Interface {
         jContentOfProjectFile = jChangedContentOfProjectFile;
         ofstream o(pathToProjectFile);
         if (!o)
-            throw UnknownRuntimeError("Unidentified problem with output file stream");
+            throw IncorrectLoaderBehaviour(FileSetRuntimeError::OutputStreamError);
         o << std::setw(4) << jContentOfProjectFile;
         o.close();
         return;
@@ -208,7 +207,7 @@ namespace Interface {
     JsonFileSetLoader::getFileNames() const
     {
         if(loaded == false)
-            throw LoaderStateError(FileSetRuntimeError::ProjectNotLoaded, "Trying to get file names on not loaded interface");
+            throw LoaderStateError(FileSetRuntimeError::GetFileNamesOnNotLoaded);
         FileSetLoader::Files files;
         for(const auto& item : jContentOfProjectFile[FILES_DESCR]) {
             files.push_back(item.get<string>());
@@ -220,7 +219,7 @@ namespace Interface {
     JsonFileSetLoader::getProjectName() const
     {
         if(loaded == false)
-            throw LoaderStateError(FileSetRuntimeError::ProjectNotLoaded, "Trying to get project name on not loaded interface");
+            throw LoaderStateError(FileSetRuntimeError::GetProjectNameOnNotLoaded);
         return jContentOfProjectFile[PROJECT_DESCR].get<string>();
     }
 
@@ -228,7 +227,7 @@ namespace Interface {
     JsonFileSetLoader::getSubprojectsPaths() const
     {
         if (loaded == false)
-            throw LoaderStateError(FileSetRuntimeError::ProjectNotLoaded, "Trying to get subprojects paths on not loaded interface");
+            throw LoaderStateError(FileSetRuntimeError::GetSubprojectsPathsOnNotLoaded);
 
         if (jChangedContentOfProjectFile.count(SUBPR_DESCR) > 0)
         {
@@ -240,13 +239,13 @@ namespace Interface {
             }
             return paths;
         }
-        throw SubprojectsError(FileSetRuntimeError::SubprojectsIncongruity, "Trying to get subprojects paths while there are no subprojects");
+        throw SubprojectsError(FileSetRuntimeError::GetSubprojectsPathWhereThereAreNoneOfThem);
     }
 
     int JsonFileSetLoader::countSubprojects() const
     {
         if(loaded == false)
-            throw LoaderStateError(FileSetRuntimeError::ProjectNotLoaded, "Trying to count subprojects on not loaded interface");
+            throw LoaderStateError(FileSetRuntimeError::CountSubprojectsOnNotLoaded);
         return subprojects.empty()? 0 : subprojects.size();
 
     }
@@ -255,7 +254,7 @@ namespace Interface {
     JsonFileSetLoader::getSubprojectLoaders()
     {
         if(loaded == false)
-            throw LoaderStateError(FileSetRuntimeError::ProjectNotLoaded, "Trying to get subprojects loaders on not loaded interface");
+            throw LoaderStateError(FileSetRuntimeError::GetSubprojectsLoadersOnNotLoaded);
         return subprojects;
 
     }
@@ -264,10 +263,10 @@ namespace Interface {
     JsonFileSetLoader::addSubprojects(const FileSetLoader::Subprojects & subp)
     {
         if(loaded == false)
-            throw LoaderStateError(FileSetRuntimeError::ProjectNotLoaded, "Trying to add subprojects on not loaded interface");
+            throw LoaderStateError(FileSetRuntimeError::AddSubprojectsOnNotLoaded);
 
         if(subp.empty())
-             throw UnknownRuntimeError("Empty subprojects container detected");
+             throw IncorrectLoaderBehaviour(FileSetRuntimeError::EmptySubprojectsContainerDetected);
 
         char * cPathToProjectFile, * dname;
         cPathToProjectFile = strdup(pathToProjectFile.c_str());
@@ -287,13 +286,13 @@ namespace Interface {
             if(jChangedContentOfProjectFile.count(SUBPR_DESCR) != 0) {
                 for (const auto& cachedSubproject : jChangedContentOfProjectFile[SUBPR_DESCR]) {
                     if (relativePath == cachedSubproject)
-                        throw SubprojectsError(FileSetRuntimeError::SubprojectsIncongruity,"Trying to add subproject(s) which already exists in cache");
+                        throw SubprojectsError(FileSetRuntimeError::AddExistingSubproject);
                 }
             }
 
             auto result = candidates.insert(relativePath);
             if(result.second == false)
-                throw SubprojectsError(FileSetRuntimeError::SubprojectsIncongruity, "Trying to add duplicated subprojects");
+                throw SubprojectsError(FileSetRuntimeError::AddEqualSubprojects);
         }
 
         if (jChangedContentOfProjectFile.count(SUBPR_DESCR) == 0)
@@ -320,15 +319,14 @@ namespace Interface {
     {
 
         if(loaded == false)
-            throw LoaderStateError(FileSetRuntimeError::ProjectNotLoaded, "Trying to remove subprojects on not loaded interface");
+            throw LoaderStateError(FileSetRuntimeError::RemoveSubprojectsOnNotLoaded);
 
         //find duplicates
         FileSetLoader::Subprojects sorted = subp;
         std::sort(sorted.begin(), sorted.end());
         for (auto it = sorted.begin() + 1; it != sorted.end(); ++it)
             if (*it == *(it - 1))
-                throw SubprojectsError(FileSetRuntimeError::SubprojectsIncongruity,
-                                          "Duplicate found in candidates to remove");
+                throw IncorrectLoaderBehaviour(FileSetRuntimeError::FoundDuplicateInCandidatesToRemove);
 
         //get reference for subprojects array
         auto& subprojects = jChangedContentOfProjectFile[SUBPR_DESCR];
@@ -338,8 +336,7 @@ namespace Interface {
         for (const auto& path : subp) {
             const auto& found = std::find(subprojects.begin(), subprojects.end(), path);
             if (found == subprojects.end())
-                throw SubprojectsError(FileSetRuntimeError::SubprojectsIncongruity,
-                                                      "Trying to remove nonexistent subproject(s)");
+                throw SubprojectsError(FileSetRuntimeError::RemoveNonExistentSubproject);
             else
                 candidates.push_back(found);
 
@@ -395,7 +392,7 @@ namespace Interface {
 
             return j;
         } catch (const std::exception& e) {
-            throw UnknownRuntimeError(string("Error gathered from json API: ") + string(e.what()));
+            throw IncorrectLoaderBehaviour(FileSetRuntimeError::SourceAPIError, string("Error gathered from json API: ") + string(e.what()));
         }
     }
 

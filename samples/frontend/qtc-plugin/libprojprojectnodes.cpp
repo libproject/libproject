@@ -116,13 +116,8 @@ bool ProjectNode::removeSubProjects(const QStringList &proFilePaths)
         }
         catch (const FileSetRuntimeError& re)
         {
-
-            //if the path isn't found
-            if (re.getErrorType() == FileSetRuntimeError::SubprojectsIncongruity)
-            {
-                qWarning() << QString(re.what()) + proFilePath;
-                return false;
-            }
+            qWarning() << QString(re.what()) + proFilePath;
+            return false;
         }
     }
 
