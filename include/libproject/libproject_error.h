@@ -16,63 +16,93 @@ namespace Error {
  */
 class FileSetRuntimeError : public std::runtime_error {
 public:
-    enum ErrType {
-        SourceAPIError,
-        SourceError,
-        InputStreamError,
-        OutputStreamError,
-        ProjectAlreadyLoaded,
-        GetPathToRootNodeOnNotLoaded,
-        GetFileNamesOnNotLoaded,
-        GetProjectNameOnNotLoaded,
-        GetSubprojectsPathsOnNotLoaded,
-        GetSubprojectsLoadersOnNotLoaded,
-        AddSubprojectsOnNotLoaded,
-        RemoveSubprojectsOnNotLoaded,
-        CountSubprojectsOnNotLoaded,
-        AddExistingSubproject,
-        AddEqualSubprojects,
-        AddBrokenSubproject,
-        LoadBrokenSubproject,
-        RemoveNonExistentSubproject,
-        GetSubprojectsPathWhereThereAreNoneOfThem,
-        FoundDuplicateInCandidatesToRemove,
-        EmptySubprojectsContainerDetected,
-        UnknownError
-    };
 
-    FileSetRuntimeError(ErrType type, const std::string& message)
-        : runtime_error(message), errorType(type) { }
-
-    //ErrType getErrorType() const { return errorType; }
-protected:
-    ErrType errorType;
+    FileSetRuntimeError(const std::string& message)
+        : runtime_error(message) { }
 };
 
 class IncorrectLoaderBehaviour : public FileSetRuntimeError {
 public:
-    IncorrectLoaderBehaviour(ErrType type, const std::string& message = std::string())
-        : FileSetRuntimeError(type, message) { }
+    enum ErrorType {
+        EmptySubprojectsContainerDetected,
+        FoundDuplicateInCandidatesToRemove,
+        UnknownError
+    };
+
+    IncorrectLoaderBehaviour(ErrorType type, const std::string& message = std::string())
+        : FileSetRuntimeError(message), errorType(type) { }
+
+private:
+    ErrorType errorType;
 
 };
 
 class IncorrectSourceError : public FileSetRuntimeError {
 public:
-    IncorrectSourceError(ErrType type, const std::string& message = std::string())
-        : FileSetRuntimeError(type, message) { }
+    enum ErrorType {
+        SourceError
+    };
+
+    IncorrectSourceError(ErrorType type, const std::string& message = std::string())
+        : FileSetRuntimeError(message), errorType(type) { }
+
+private:
+    ErrorType errorType;
 };
 
 class LoaderStateError : public FileSetRuntimeError {
 public:
-    LoaderStateError(ErrType type, const std::string& message = std::string())
-        : FileSetRuntimeError(type, message) { }
+    enum ErrorType {
+        LoadProjectWhileAlreadyLoaded,
+        GetPathToRootNodeWhileNotLoaded,
+        GetFileNamesWhileNotLoaded,
+        GetProjectNameWhileNotLoaded,
+        GetSubprojectsPathsWhileNotLoaded,
+        CountSubprojectsWhileNotLoaded,
+        GetSubprojectsLoadersWhileNotLoaded,
+        AddSubprojectsWhileNotLoaded,
+        RemoveSubprojectsWhileNotLoaded
+    };
+
+    LoaderStateError(ErrorType type, const std::string& message = std::string())
+        : FileSetRuntimeError(message), errorType(type) { }
+
+private:
+    ErrorType errorType;
 };
 
 class SubprojectsError : public FileSetRuntimeError {
 public:
-    SubprojectsError(ErrType type, const std::string& message = std::string())
-        : FileSetRuntimeError(type, message) { }
+    enum ErrorType {
+        GetSubprojectsPathWhereThereAreNoneOfThem,
+        AddBrokenSubproject,
+        AddExistingSubproject,
+        AddEqualSubprojects,
+        RemoveNonExistentSubproject,
+        LoadBrokenSubproject
 
+    };
+
+    SubprojectsError(ErrorType type, const std::string& message = std::string())
+        : FileSetRuntimeError(message), errorType(type) { }
+
+private:
+    ErrorType errorType;
+};
+
+class StreamError : public FileSetRuntimeError {
+public:
+    enum ErrorType {
+        InputStreamError,
+        OutputStreamError,
+        SourceAPIError
+    };
+
+    StreamError(ErrorType type, const std::string& message = std::string())
+        : FileSetRuntimeError(message), errorType(type) { }
+
+private:
+    ErrorType errorType;
 };
 
 

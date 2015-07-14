@@ -100,7 +100,7 @@ namespace Interface {
          */
         /*virtual*/ const string getPathToNode() const {
             return loaded ? pathToProjectFile :
-                        throw LoaderStateError(FileSetRuntimeError::GetPathToRootNodeOnNotLoaded); }
+                        throw LoaderStateError(LoaderStateError::GetPathToRootNodeWhileNotLoaded); }
 
         /*!
           * \brief Gives paths to subprojects to user
@@ -169,16 +169,16 @@ namespace Interface {
     JsonFileSetLoader::open()
     {
         if (loaded)
-            throw LoaderStateError(FileSetRuntimeError::ProjectAlreadyLoaded);
+            throw LoaderStateError(LoaderStateError::LoadProjectWhileAlreadyLoaded);
         ifstream i(pathToProjectFile);
         if(!i)
-            throw IncorrectSourceError(FileSetRuntimeError::InputStreamError);
+            throw StreamError(StreamError::InputStreamError);
 
         jChangedContentOfProjectFile = jContentOfProjectFile = checkProjectFileForErrors(i); /// Checking JSON-data for consistentness, correctness and reading it
 
         if (jContentOfProjectFile.count(ERROR_DESCR) != 0) { /// Checking data for higher abstract errors - project level errors
             loaded = false;
-            throw IncorrectSourceError(FileSetRuntimeError::SourceError, jContentOfProjectFile[ERROR_DESCR].get<string>());
+            throw IncorrectSourceError(IncorrectSourceError::SourceError, jContentOfProjectFile[ERROR_DESCR].get<string>());
         } else {
             if (jContentOfProjectFile[SUBPR_DESCR].is_array()) /// Checking project data for subprojects
                loadSubprojects(); /// If above is true loading subprojects
@@ -197,7 +197,7 @@ namespace Interface {
         jContentOfProjectFile = jChangedContentOfProjectFile;
         ofstream o(pathToProjectFile);
         if (!o)
-            throw IncorrectLoaderBehaviour(FileSetRuntimeError::OutputStreamError);
+            throw StreamError(StreamError::OutputStreamError);
         o << std::setw(4) << jContentOfProjectFile;
         o.close();
         return;
@@ -207,7 +207,7 @@ namespace Interface {
     JsonFileSetLoader::getFileNames() const
     {
         if(loaded == false)
-            throw LoaderStateError(FileSetRuntimeError::GetFileNamesOnNotLoaded);
+            throw LoaderStateError(LoaderStateError::GetFileNamesWhileNotLoaded);
         FileSetLoader::Files files;
         for(const auto& item : jContentOfProjectFile[FILES_DESCR]) {
             files.push_back(item.get<string>());
@@ -219,7 +219,7 @@ namespace Interface {
     JsonFileSetLoader::getProjectName() const
     {
         if(loaded == false)
-            throw LoaderStateError(FileSetRuntimeError::GetProjectNameOnNotLoaded);
+            throw LoaderStateError(LoaderStateError::GetProjectNameWhileNotLoaded);
         return jContentOfProjectFile[PROJECT_DESCR].get<string>();
     }
 
@@ -227,7 +227,7 @@ namespace Interface {
     JsonFileSetLoader::getSubprojectsPaths() const
     {
         if (loaded == false)
-            throw LoaderStateError(FileSetRuntimeError::GetSubprojectsPathsOnNotLoaded);
+            throw LoaderStateError(LoaderStateError::GetSubprojectsPathsWhileNotLoaded);
 
         if (jChangedContentOfProjectFile.count(SUBPR_DESCR) > 0)
         {
@@ -239,13 +239,13 @@ namespace Interface {
             }
             return paths;
         }
-        throw SubprojectsError(FileSetRuntimeError::GetSubprojectsPathWhereThereAreNoneOfThem);
+        throw SubprojectsError(SubprojectsError::GetSubprojectsPathWhereThereAreNoneOfThem);
     }
 
     int JsonFileSetLoader::countSubprojects() const
     {
         if(loaded == false)
-            throw LoaderStateError(FileSetRuntimeError::CountSubprojectsOnNotLoaded);
+            throw LoaderStateError(LoaderStateError::CountSubprojectsWhileNotLoaded);
         return subprojects.empty()? 0 : subprojects.size();
 
     }
@@ -254,7 +254,7 @@ namespace Interface {
     JsonFileSetLoader::getSubprojectLoaders()
     {
         if(loaded == false)
-            throw LoaderStateError(FileSetRuntimeError::GetSubprojectsLoadersOnNotLoaded);
+            throw LoaderStateError(LoaderStateError::GetSubprojectsLoadersWhileNotLoaded);
         return subprojects;
 
     }
@@ -263,10 +263,10 @@ namespace Interface {
     JsonFileSetLoader::addSubprojects(const FileSetLoader::Subprojects & subp)
     {
         if(loaded == false)
-            throw LoaderStateError(FileSetRuntimeError::AddSubprojectsOnNotLoaded);
+            throw LoaderStateError(LoaderStateError::AddSubprojectsWhileNotLoaded);
 
         if(subp.empty())
-             throw IncorrectLoaderBehaviour(FileSetRuntimeError::EmptySubprojectsContainerDetected);
+             throw IncorrectLoaderBehaviour(IncorrectLoaderBehaviour::EmptySubprojectsContainerDetected);
 
         char * cPathToProjectFile, * dname;
         cPathToProjectFile = strdup(pathToProjectFile.c_str());
@@ -280,19 +280,19 @@ namespace Interface {
             checkSubprojectsStream.open(string(dname)+string("/")+relativePath);
             json check = checkProjectFileForErrors(checkSubprojectsStream);
             if (check.count(ERROR_DESCR) != 0)
-                throw SubprojectsError(FileSetRuntimeError::AddBrokenSubproject);
+                throw SubprojectsError(SubprojectsError::AddBrokenSubproject);
             checkSubprojectsStream.close();
 
             if(jChangedContentOfProjectFile.count(SUBPR_DESCR) != 0) {
                 for (const auto& cachedSubproject : jChangedContentOfProjectFile[SUBPR_DESCR]) {
                     if (relativePath == cachedSubproject)
-                        throw SubprojectsError(FileSetRuntimeError::AddExistingSubproject);
+                        throw SubprojectsError(SubprojectsError::AddExistingSubproject);
                 }
             }
 
             auto result = candidates.insert(relativePath);
             if(result.second == false)
-                throw SubprojectsError(FileSetRuntimeError::AddEqualSubprojects);
+                throw SubprojectsError(SubprojectsError::AddEqualSubprojects);
         }
 
         if (jChangedContentOfProjectFile.count(SUBPR_DESCR) == 0)
@@ -319,14 +319,14 @@ namespace Interface {
     {
 
         if(loaded == false)
-            throw LoaderStateError(FileSetRuntimeError::RemoveSubprojectsOnNotLoaded);
+            throw LoaderStateError(LoaderStateError::RemoveSubprojectsWhileNotLoaded);
 
         //find duplicates
         FileSetLoader::Subprojects sorted = subp;
         std::sort(sorted.begin(), sorted.end());
         for (auto it = sorted.begin() + 1; it != sorted.end(); ++it)
             if (*it == *(it - 1))
-                throw IncorrectLoaderBehaviour(FileSetRuntimeError::FoundDuplicateInCandidatesToRemove);
+                throw IncorrectLoaderBehaviour(IncorrectLoaderBehaviour::FoundDuplicateInCandidatesToRemove);
 
         //get reference for subprojects array
         auto& subprojects = jChangedContentOfProjectFile[SUBPR_DESCR];
@@ -336,7 +336,7 @@ namespace Interface {
         for (const auto& path : subp) {
             const auto& found = std::find(subprojects.begin(), subprojects.end(), path);
             if (found == subprojects.end())
-                throw SubprojectsError(FileSetRuntimeError::RemoveNonExistentSubproject);
+                throw SubprojectsError(SubprojectsError::RemoveNonExistentSubproject);
             else
                 candidates.push_back(found);
 
@@ -392,7 +392,7 @@ namespace Interface {
 
             return j;
         } catch (const std::exception& e) {
-            throw IncorrectLoaderBehaviour(FileSetRuntimeError::SourceAPIError, string("Error gathered from json API: ") + string(e.what()));
+            throw StreamError(StreamError::SourceAPIError, string("Error gathered from json API: ") + string(e.what()));
         }
     }
 
@@ -423,7 +423,7 @@ namespace Interface {
 
             return;
             } catch (const FileSetRuntimeError& re) {
-                throw SubprojectsError(FileSetRuntimeError::LoadBrokenSubproject, string(re.what()));
+                throw SubprojectsError(SubprojectsError::LoadBrokenSubproject, string(re.what()));
             }
     }
 
