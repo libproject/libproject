@@ -74,7 +74,7 @@ private:
 class SubprojectsError : public FileSetRuntimeError {
 public:
     enum ErrorType {
-        GetSubprojectsPathWhereThereAreNoneOfThem,
+        GetSubprojectsPathsWhileThereAreNoSubprojects,
         AddBrokenSubproject,
         AddExistingSubproject,
         AddEqualSubprojects,
@@ -110,6 +110,3 @@ private:
 } // namespace Interface
 } // namespace LibprojManager
 
-// x в FileSetRuntimeError убрать второй аргумент
-// ? создать абстрактную функцию ErrDescr() в FileSetRuntimeError
-//породить классы от FileSetRuntimeError

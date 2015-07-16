@@ -239,7 +239,7 @@ namespace Interface {
             }
             return paths;
         }
-        throw SubprojectsError(SubprojectsError::GetSubprojectsPathWhereThereAreNoneOfThem);
+        throw SubprojectsError(SubprojectsError::GetSubprojectsPathsWhileThereAreNoSubprojects);
     }
 
     int JsonFileSetLoader::countSubprojects() const
