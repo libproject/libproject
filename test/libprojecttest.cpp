@@ -562,7 +562,14 @@ TEST_P(TestAddAbnormalSubprojects, Set_of_attempts_to_add_abnormal_subprojects) 
         ASSERT_EQ(contentReference.dump(4), fileToTest.dump(4));
 }
 
-
+class TestFindSubprojectByPath : public TestSkeleton {
+public:
+    FileSetLoader::Path pathToProjectWithPairNormalSubprojects = R"(project_files/findsubprojectbypath/findsubproject.libproject)";
+    string subproject1Name = "single_project_1";
+    string subproject2Name = "single_project_2";
+    FileSetLoader::Path pathToFirstSubproject = "sub/s1.libproject";
+    FileSetLoader::Path pathToSecondSubproject = "sub/s2.libproject";
+};
 
 
 
