@@ -565,13 +565,39 @@ TEST_P(TestAddAbnormalSubprojects, Set_of_attempts_to_add_abnormal_subprojects) 
 class TestFindSubprojectByPath : public TestSkeleton {
 public:
     FileSetLoader::Path pathToProjectWithPairNormalSubprojects = R"(project_files/findsubprojectbypath/findsubproject.libproject)";
+    FileSetLoader::Path pathToProjectWithoutSubprojects = R"(project_files/findsubprojectbypath/nosubproject.libproject)";
     string subproject1Name = "single_project_1";
     string subproject2Name = "single_project_2";
-    FileSetLoader::Path pathToFirstSubproject = "sub/s1.libproject";
-    FileSetLoader::Path pathToSecondSubproject = "sub/s2.libproject";
+    FileSetLoader::Path pathToFirstSubproject = "project_files/findsubprojectbypath/sub/s1.libproject";
+    FileSetLoader::Path pathToSecondSubproject = "project_files/findsubprojectbypath/sub/s2.libproject";
+    FileSetLoader::Path pathToNonExistentSubproject = "project_files/findsubprojectbypath/sub/ne.libproject";
+
 };
 
+TEST_F(TestFindSubprojectByPath, Find_subprojects_by_paths) {
+    loader = LoaderPtr(FileSetFactory::createFileSet(pathToProjectWithPairNormalSubprojects));
+    loader->open();
+    ASSERT_EQ(subproject1Name, loader->findSubprojectByPath(pathToFirstSubproject)->getProjectName());
+    ASSERT_EQ(subproject2Name, loader->findSubprojectByPath(pathToSecondSubproject)->getProjectName());
+}
 
+TEST_F(TestFindSubprojectByPath, Find_subproject_by_path_of_root_node) {
+    loader = LoaderPtr(FileSetFactory::createFileSet(pathToProjectWithPairNormalSubprojects));
+    loader->open();
+    ASSERT_THROW(loader->findSubprojectByPath(pathToProjectWithPairNormalSubprojects), FileSetRuntimeError);
+}
+
+TEST_F(TestFindSubprojectByPath, Find_nonexistent_subproject) {
+    loader = LoaderPtr(FileSetFactory::createFileSet(pathToProjectWithPairNormalSubprojects));
+    loader->open();
+    ASSERT_EQ(nullptr, loader->findSubprojectByPath(pathToNonExistentSubproject));
+}
+
+TEST_F(TestFindSubprojectByPath, Find_subproject_in_project_without_subprojects) {
+    loader = LoaderPtr(FileSetFactory::createFileSet(pathToProjectWithoutSubprojects));
+    loader->open();
+    ASSERT_THROW(loader->findSubprojectByPath(subproject1Name), FileSetRuntimeError);
+}
 
 class TestGetSubprojectsPaths : public TestSkeleton {
 public:

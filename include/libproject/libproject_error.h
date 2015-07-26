@@ -80,7 +80,8 @@ public:
         AddEqualSubprojects,
         RemoveNonExistentSubproject,
         LoadBrokenSubproject,
-        SubprojectNotFound
+        FindSubprojectWhileThereAreNoSubprojects,
+        RepresentRootProjectPathAsOwnSubprojectPath
 
     };
 

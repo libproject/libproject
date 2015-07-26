@@ -438,12 +438,24 @@ namespace Interface {
     FileSetLoader *
     JsonFileSetLoader::findSubprojectByPath(const Path &path) const
     {
+        if (jChangedContentOfProjectFile.find(SUBPR_DESCR) == jChangedContentOfProjectFile.end())
+        {
+            throw SubprojectsError(SubprojectsError::FindSubprojectWhileThereAreNoSubprojects);
+        }
+        if(jChangedContentOfProjectFile[SUBPR_DESCR].size() == 0)
+        {
+            throw SubprojectsError(SubprojectsError::FindSubprojectWhileThereAreNoSubprojects);
+        }
+        if (path == pathToProjectFile)
+        {
+            throw SubprojectsError(SubprojectsError::RepresentRootProjectPathAsOwnSubprojectPath);
+        }
         for (auto it = subprojects.cbegin(); it != subprojects.cend(); ++it)
         {
             if (it->second->getPathToNode() == path)
                 return it->second;
         }
-        throw SubprojectsError(SubprojectsError::SubprojectNotFound);
+        return nullptr;
     }
 
     FileSetLoader *
