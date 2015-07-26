@@ -46,7 +46,7 @@ public:
     virtual void addSubproject(const Path&) = 0;
     virtual void removeSubprojects(const Subprojects&) = 0;
     virtual void removeSubproject(const Path&) = 0;
-
+    virtual FileSetLoader * findSubprojectByPath(const Path&) const = 0;
 };
 
 /*!
