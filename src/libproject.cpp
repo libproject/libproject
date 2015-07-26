@@ -153,7 +153,7 @@ namespace Interface {
          * \brief This function performs searching existing subproject loader by path to
          * subproject
          * \param[in] std::string with path to subproject
-         * \return loader of subproject
+         * \return loader of subproject or nullptr if there is no such subproject
          */
         /*virtual*/ FileSetLoader * findSubprojectByPath(const FileSetLoader::Path & path) const;
 
