@@ -79,7 +79,8 @@ public:
         AddExistingSubproject,
         AddEqualSubprojects,
         RemoveNonExistentSubproject,
-        LoadBrokenSubproject
+        LoadBrokenSubproject,
+        SubprojectNotFound
 
     };
 
