@@ -596,7 +596,7 @@ TEST_F(TestFindSubprojectByPath, Find_nonexistent_subproject) {
 TEST_F(TestFindSubprojectByPath, Find_subproject_in_project_without_subprojects) {
     loader = LoaderPtr(FileSetFactory::createFileSet(pathToProjectWithoutSubprojects));
     loader->open();
-    ASSERT_THROW(loader->findSubprojectByPath(subproject1Name), FileSetRuntimeError);
+    ASSERT_EQ(nullptr, loader->findSubprojectByPath(pathToNonExistentSubproject));
 }
 
 class TestGetSubprojectsPaths : public TestSkeleton {

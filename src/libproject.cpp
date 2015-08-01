@@ -438,13 +438,11 @@ namespace Interface {
     FileSetLoader *
     JsonFileSetLoader::findSubprojectByPath(const Path &path) const
     {
-        if (jChangedContentOfProjectFile.find(SUBPR_DESCR) == jChangedContentOfProjectFile.end())
+        if (jChangedContentOfProjectFile.find(SUBPR_DESCR) == jChangedContentOfProjectFile.end()
+                || jChangedContentOfProjectFile[SUBPR_DESCR].size() == 0)
+            /* so strange if condition due to strange behaviour of json api in such situation*/
         {
-            throw SubprojectsError(SubprojectsError::FindSubprojectWhileThereAreNoSubprojects);
-        }
-        if(jChangedContentOfProjectFile[SUBPR_DESCR].size() == 0)
-        {
-            throw SubprojectsError(SubprojectsError::FindSubprojectWhileThereAreNoSubprojects);
+            return nullptr;
         }
         if (path == pathToProjectFile)
         {
