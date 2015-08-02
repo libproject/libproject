@@ -149,6 +149,14 @@ namespace Interface {
          */
         /*virtual*/ void removeSubproject(const FileSetLoader::Path & s);
 
+        /*!
+         * \brief This function performs searching existing subproject loader by path to
+         * subproject
+         * \param[in] std::string with path to subproject
+         * \return loader of subproject or nullptr if there is no such subproject
+         */
+        /*virtual*/ FileSetLoader * findSubprojectByPath(const FileSetLoader::Path & path) const;
+
     private:
 
         /*!
@@ -425,6 +433,27 @@ namespace Interface {
             } catch (const FileSetRuntimeError& re) {
                 throw SubprojectsError(SubprojectsError::LoadBrokenSubproject, string(re.what()));
             }
+    }
+
+    FileSetLoader *
+    JsonFileSetLoader::findSubprojectByPath(const Path &path) const
+    {
+        if (jChangedContentOfProjectFile.find(SUBPR_DESCR) == jChangedContentOfProjectFile.end()
+                || jChangedContentOfProjectFile[SUBPR_DESCR].size() == 0)
+            /* so strange if condition due to strange behaviour of json api in such situation*/
+        {
+            return nullptr;
+        }
+        if (path == pathToProjectFile)
+        {
+            throw SubprojectsError(SubprojectsError::RepresentRootProjectPathAsOwnSubprojectPath);
+        }
+        for (auto it = subprojects.cbegin(); it != subprojects.cend(); ++it)
+        {
+            if (it->second->getPathToNode() == path)
+                return it->second;
+        }
+        return nullptr;
     }
 
     FileSetLoader *
