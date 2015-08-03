@@ -21,6 +21,7 @@ add_subdirectory ( include )
 add_subdirectory ( src )
 add_subdirectory ( test )
 add_subdirectory ( doc )
+add_subdirectory ( drafts )
 
 #configuring `uninstall` target
 configure_file(
