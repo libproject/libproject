@@ -8,7 +8,7 @@ include_directories (
 	${PROJECT_SOURCE_DIR}/include
 )
 #setting path to directory with cmake modules
-set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules")
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules")
 
 set(CMAKE_SKIP_RPATH FALSE)
 set(GCOV_FOUND FALSE)
