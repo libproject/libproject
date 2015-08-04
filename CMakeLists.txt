@@ -21,7 +21,7 @@ add_subdirectory ( include )
 add_subdirectory ( src )
 add_subdirectory ( test )
 add_subdirectory ( doc )
-add_subdirectory ( drafts )
+add_subdirectory ( samples/utils/load-qtc-plugin )
 
 #configuring `uninstall` target
 configure_file(
