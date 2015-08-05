@@ -4,7 +4,7 @@ cmake_minimum_required (VERSION 2.8.11)
 project (load_plugin)
 
 set(QT_CMAKE_MODULES NO CACHE PATH "CMake's modules which provided by Qt itself for Qt bindings")
-set(QTC_SRC_FOUND FALSE)
+
 find_package(QtCSource)
 if (QTC_SRC_FOUND AND QT_CMAKE_MODULES)
     #setting necessary paths to CMake modules provided by Qt
