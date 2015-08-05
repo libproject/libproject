@@ -3,12 +3,10 @@ cmake_minimum_required (VERSION 2.8.11)
 #setting name
 project (load_plugin)
 
-#setting variable for QtCreator's sources path
-set(QTC_SRC NO CACHE PATH "QtCreator's sources path")
-
 set(QT_CMAKE_MODULES NO CACHE PATH "CMake's modules which provided by Qt itself for Qt bindings")
-
-if (QTC_SRC AND QT_CMAKE_MODULES)
+set(QTC_SRC_FOUND FALSE)
+find_package(QtCSource)
+if (QTC_SRC_FOUND AND QT_CMAKE_MODULES)
     #setting necessary paths to CMake modules provided by Qt
     set(Qt5Core_DIR "${QT_CMAKE_MODULES}/Qt5Core")
     set(Qt5_DIR "${QT_CMAKE_MODULES}/Qt5")
@@ -33,4 +31,4 @@ if (QTC_SRC AND QT_CMAKE_MODULES)
 
 else (QTC_SRC AND QT_CMAKE_MODULES)
     message("Paths to QtCreator sources or/and Qt-CMake modules not defined!..")
-endif(QTC_SRC AND QT_CMAKE_MODULES)
+endif(QTC_SRC_FOUND AND QT_CMAKE_MODULES)
