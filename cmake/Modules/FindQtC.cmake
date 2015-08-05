@@ -7,7 +7,7 @@
 # QTC_BLD_CORELIB - path to core library of QtCreator
 #
 # Usage sample:
-# find_package(QtCSource)
+# find_package(QtC)
 # if (QTC_BLD_FOUND)
 #  do_some_stuff...
 # endif(QTC_BLD_FOUND)
@@ -27,7 +27,6 @@ if (NOT DEFINED $ENV{QTC_BUILD})
   else (NOT QTC_BLD_BINARY)
     set(QTC_BLD "${CMAKE_SOURCE_DIR}/../qt-creator-build" CACHE PATH "QtCreator build path")
     set(QTC_BLD_FOUND TRUE)
-    message(STATUS "QtCreator build found")
   endif (NOT QTC_BLD_BINARY)
 endif(NOT DEFINED $ENV{QTC_BUILD})
 
@@ -43,6 +42,8 @@ if(QTC_BLD_FOUND)
     set(QTC_BLD_CORELIB "${QTC_BLD}/lib/qtcreator/plugins/libCore.dll" CACHE FILEPATH "QtCreator's core library")
   endif(UNIX OR APPLE)
 endif(QTC_BLD_FOUND)
+
+message(STATUS "QtCreator build found")
 
 include(FindPackageHandleStandardArgs)
 FIND_PACKAGE_HANDLE_STANDARD_ARGS(QtC DEFAULT_MSG QTC_BLD QTC_BLD_BINARY QTC_BLD_CORELIB)
