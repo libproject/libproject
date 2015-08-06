@@ -16,8 +16,6 @@ find_package(QtCSource)
 #looking for QtCreator build
 find_package(QtC)
 
-#main part
-
 #setting necessary paths to CMake modules provided by Qt
 set(Qt5Core_DIR "${QT_CMAKE_MODULES}/Qt5Core")
 set(Qt5_DIR "${QT_CMAKE_MODULES}/Qt5")
