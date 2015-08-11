@@ -8,19 +8,18 @@ include_directories (
 	${PROJECT_SOURCE_DIR}/include
 )
 #setting path to directory with cmake modules
-set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules")
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules")
 
 set(CMAKE_SKIP_RPATH FALSE)
 set(GCOV_FOUND FALSE)
 set(GCOVR_FOUND FALSE)
-
-set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 
 #setting subprojects
 add_subdirectory ( include )
 add_subdirectory ( src )
 add_subdirectory ( test )
 add_subdirectory ( doc )
+add_subdirectory ( samples/utils/load-qtc-plugin )
 
 #configuring `uninstall` target
 configure_file(

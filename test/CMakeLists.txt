@@ -55,7 +55,3 @@ if (GMOCK_FOUND)
 else (GMOCK_FOUND)
     message("GMock wasn't found, tests and corresponding targest will be unavailable")
 endif(GMOCK_FOUND)
-
-
-
-
