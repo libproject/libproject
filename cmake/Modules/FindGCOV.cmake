@@ -7,7 +7,7 @@ MARK_AS_ADVANCED(GCOV_EXECUTABLE)
 
 if(NOT GCOV_EXECUTABLE)
  set(GCOV_FOUND FALSE)
- message("gcov not found! You can't perform coverage tests...")
+ message(WARNING "gcov not found! You can't perform coverage tests...")
 elseif(NOT GCOV_EXECUTABLE)
  set(GCOV_FOUND TRUE)
 endif()

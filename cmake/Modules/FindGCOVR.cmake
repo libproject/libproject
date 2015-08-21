@@ -28,9 +28,9 @@ FIND_PACKAGE_HANDLE_STANDARD_ARGS(gcovr DEFAULT_MSG GCOVR_EXECUTABLE)
 MARK_AS_ADVANCED(GCOVR_EXECUTABLE)
 
 #drewpts' modifications
-if(NOT GCOVR_EXECUTABLE)
+if ( NOT GCOVR_EXECUTABLE )
  set(GCOVR_FOUND FALSE)
- message("gcovr not found! You can't perform coverage tests...")
-elseif(NOT GCOVR_EXECUTABLE)
+ message(WARNING "gcovr not found! You can't perform coverage tests...")
+elseif ()
  set(GCOVR_FOUND TRUE)
-endif()
+endif ()
