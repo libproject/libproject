@@ -10,10 +10,7 @@ set (SOURCES
 #looking for Qt libs
 find_package(Qt5CMakeModules)
 
-#looking for QtCreator sources
-find_package(QtCSource)
-
-#looking for QtCreator build
+#looking for QtCreator sources and build
 find_package(QtC)
 
 #setting necessary paths to CMake modules provided by Qt
