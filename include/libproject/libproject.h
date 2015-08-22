@@ -24,29 +24,28 @@ namespace Interface {
  * getting file names of project in STL list<string> format,
  * getting name of project and path to root node in notions of input format
  */
-class FileSetLoader
-{
+class FileSetLoader {
 public:
-    typedef std::string Path;
-    typedef std::vector<Path> Files;
-    typedef std::vector<Path> Subprojects;
-    typedef std::map<std::string, FileSetLoader *> Loaders;
+  typedef std::string Path;
+  typedef std::vector<Path> Files;
+  typedef std::vector<Path> Subprojects;
+  typedef std::map<std::string, FileSetLoader *> Loaders;
 
-    virtual ~FileSetLoader() { }
+  virtual ~FileSetLoader() {}
 
-    virtual bool open() = 0;
-    virtual void save() = 0;
-    virtual const Files getFileNames() const = 0;
-    virtual const std::string getProjectName() const = 0;
-    virtual const std::string getPathToNode() const = 0;
-    virtual const Subprojects getSubprojectsPaths() const = 0;
-    virtual int countSubprojects() const = 0;
-    virtual std::map<std::string, FileSetLoader *> getSubprojectLoaders() = 0;
-    virtual void addSubprojects(const Subprojects&) = 0;
-    virtual void addSubproject(const Path&) = 0;
-    virtual void removeSubprojects(const Subprojects&) = 0;
-    virtual void removeSubproject(const Path&) = 0;
-    virtual FileSetLoader * findSubprojectByPath(const Path&) const = 0;
+  virtual bool open() = 0;
+  virtual void save() = 0;
+  virtual const Files getFileNames() const = 0;
+  virtual const std::string getProjectName() const = 0;
+  virtual const std::string getPathToNode() const = 0;
+  virtual const Subprojects getSubprojectsPaths() const = 0;
+  virtual int countSubprojects() const = 0;
+  virtual std::map<std::string, FileSetLoader *> getSubprojectLoaders() = 0;
+  virtual void addSubprojects(const Subprojects &) = 0;
+  virtual void addSubproject(const Path &) = 0;
+  virtual void removeSubprojects(const Subprojects &) = 0;
+  virtual void removeSubproject(const Path &) = 0;
+  virtual FileSetLoader *findSubprojectByPath(const Path &) const = 0;
 };
 
 /*!
@@ -54,10 +53,9 @@ public:
  */
 class AbstractFileSetCreator {
 public:
+  virtual ~AbstractFileSetCreator() {}
 
-    virtual ~AbstractFileSetCreator() { }
-
-    virtual FileSetLoader * create(const std::string & pathToRootNode) const = 0;
+  virtual FileSetLoader *create(const std::string &pathToRootNode) const = 0;
 };
 
 /*!
@@ -65,15 +63,14 @@ public:
  */
 class FileSetCreator : public AbstractFileSetCreator {
 public:
+  virtual ~FileSetCreator() {}
 
-    virtual ~FileSetCreator() { }
-
-    /*!
-     * \brief generic function of present pattern
-     * \param[in] pathToRootNode specifying path to input source
-     * \return Pointer to interface instance
-     */
-    virtual FileSetLoader * create(const std::string & pathToRootNode) const;
+  /*!
+   * \brief generic function of present pattern
+   * \param[in] pathToRootNode specifying path to input source
+   * \return Pointer to interface instance
+   */
+  virtual FileSetLoader *create(const std::string &pathToRootNode) const;
 };
 
 /*!
@@ -82,39 +79,36 @@ public:
  * This Factory is degenerate kind of such pattern because at this
  * moment this facility originates objects of only one kind
  */
-class FileSetFactory
-{
+class FileSetFactory {
 protected:
-    /*!
-     * \brief The Singleton for Factory skeleton instance
-     *
-     */
-    class AbstractFileSetCreatorSingleton
-    {
-    private:
-        AbstractFileSetCreatorSingleton() { }
-    public:
+  /*!
+   * \brief The Singleton for Factory skeleton instance
+   *
+   */
+  class AbstractFileSetCreatorSingleton {
+  private:
+    AbstractFileSetCreatorSingleton() {}
 
-        AbstractFileSetCreatorSingleton (const AbstractFileSetCreatorSingleton&) = delete;
-        AbstractFileSetCreatorSingleton& operator=(AbstractFileSetCreatorSingleton&) = delete;
+  public:
+    AbstractFileSetCreatorSingleton(const AbstractFileSetCreatorSingleton &) =
+        delete;
+    AbstractFileSetCreatorSingleton &
+    operator=(AbstractFileSetCreatorSingleton &) = delete;
 
-        static AbstractFileSetCreator& getCreator() {
-            static FileSetCreator creator;
-            return creator;
-        }
-    };
+    static AbstractFileSetCreator &getCreator() {
+      static FileSetCreator creator;
+      return creator;
+    }
+  };
 
 public:
-
-    /*!
-     * \brief Public interface of Factory facility
-     * \param[in] pathToRootNode_ specifying path to input source
-     * \return Pointer to interface instance
-     */
-    static FileSetLoader * createFileSet(const std::string & pathToRootNode_);
+  /*!
+   * \brief Public interface of Factory facility
+   * \param[in] pathToRootNode_ specifying path to input source
+   * \return Pointer to interface instance
+   */
+  static FileSetLoader *createFileSet(const std::string &pathToRootNode_);
 };
-
-
 
 } // namespace Interface
 } // namespace LibprojManager

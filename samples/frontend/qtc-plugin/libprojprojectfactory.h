@@ -10,39 +10,37 @@ namespace Interface {
 class FileSetLoader;
 class AbstractProjectCreator {
 public:
+  virtual ~AbstractProjectCreator() {}
 
-    virtual ~AbstractProjectCreator() { }
-
-    virtual ProjectExplorer::Project * create(LibprojManager::Internal::Manager * Manager_,
-                                              const FileSetLoader * Loader_);
+  virtual ProjectExplorer::Project *
+  create(LibprojManager::Internal::Manager *Manager_,
+         const FileSetLoader *Loader_);
 };
 
 class ProjectCreator : public AbstractProjectCreator {
 public:
+  virtual ~ProjectCreator() {}
 
-    virtual ~ProjectCreator() { }
-
-    virtual ProjectExplorer::Project * create(LibprojManager::Internal::Manager * Manager_,
-                                              const FileSetLoader * Loader_) const {
-        qDebug() << "Creating project by factory method";
-        return new LibprojManager::Internal::Project(Manager_, Loader_);
-    }
+  virtual ProjectExplorer::Project *
+  create(LibprojManager::Internal::Manager *Manager_,
+         const FileSetLoader *Loader_) const {
+    qDebug() << "Creating project by factory method";
+    return new LibprojManager::Internal::Project(Manager_, Loader_);
+  }
 };
 
-class ProjectFactory
-{
+class ProjectFactory {
 protected:
-    static AbstractProjectCreator * creator;
+  static AbstractProjectCreator *creator;
+
 public:
+  ~ProjectFactory();
 
-    ~ProjectFactory();
-
-    static ProjectExplorer::Project * createProject(LibprojManager::Internal::Manager * Manager__,
-                                      const FileSetLoader * Loader__)
-    {
-        return creator->create(Manager__, Loader__);
-    }
-
+  static ProjectExplorer::Project *
+  createProject(LibprojManager::Internal::Manager *Manager__,
+                const FileSetLoader *Loader__) {
+    return creator->create(Manager__, Loader__);
+  }
 };
 
 } // namespace Interface
