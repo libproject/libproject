@@ -26,11 +26,3 @@ FIND_PROGRAM(GCOVR_EXECUTABLE gcovr HINTS ${GCOVR_ROOT})
 FIND_PACKAGE_HANDLE_STANDARD_ARGS(gcovr DEFAULT_MSG GCOVR_EXECUTABLE)
 # only visible in advanced view
 MARK_AS_ADVANCED(GCOVR_EXECUTABLE)
-
-#drewpts' modifications
-if ( NOT GCOVR_EXECUTABLE )
- set(GCOVR_FOUND FALSE)
- message(WARNING "gcovr not found! You can't perform coverage tests...")
-elseif ()
- set(GCOVR_FOUND TRUE)
-endif ()

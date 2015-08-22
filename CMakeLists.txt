@@ -31,7 +31,7 @@ add_custom_target(uninstall
 
 #configuring `normalize_codestyle` target
 find_package(ClangFormat)
-if ( NOT CLANGFORMAT_FOUND )
+if ( CLANGFORMAT_EXECUTABLE )
 	add_custom_target(normalize_codestyle
 	COMMAND ${CLANGFORMAT_EXECUTABLE} -i --style=LLVM ${CMAKE_SOURCE_DIR}/include/libproject/*.h
 	COMMAND ${CLANGFORMAT_EXECUTABLE} -i --style=LLVM ${CMAKE_SOURCE_DIR}/src/*.cpp
