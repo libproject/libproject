@@ -20,4 +20,3 @@ if(DOXYGEN_FOUND)
 elseif(DOXYGEN_FOUND)
         message("Doxygen not found! You can't generate documentation...")
 endif(DOXYGEN_FOUND)
-
