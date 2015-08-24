@@ -13,13 +13,13 @@ addons:
     packages:
       - g++-4.9
       - doxygen
-      - python3-setuptools
+      - python-pip
       - binutils
       - cmake
 
 
 before_install:
-  - easy_install3 -q gcovr cpp-coveralls
+  - pip install gcovr cpp-coveralls
   - wget https://googlemock.googlecode.com/files/gmock-1.7.0.zip -O ../gmock.zip
   - unzip -qq ../gmock.zip -d ..
   - mv ../gmock-1.7.0 ../gmock
@@ -46,5 +46,4 @@ after_success:
 notifications:
  email:
   - batbko@gmail.com
-  - reutekaterina@gmail.com
   - andrey.poltavets@gmail.com
