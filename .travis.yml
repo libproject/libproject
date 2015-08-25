@@ -37,11 +37,11 @@ script:
   - coveralls  -r $SRC_DIR --gcov /usr/bin/gcov-4.9 -e $SRC_DIR/tools -e $SRC_DIR/samples -e $BUILD_DIR/CMakeFiles --gcov-options '\-lp'
 
 after_success:
-  - make package
-  - make install
-  - cd $INST_DIR/share/doc/libproject
-  - tar -czf libproject-doc.tgz *
-  - mv libproject-doc.tgz $BUILD_DIR
+#  - make package
+#  - make install
+#  - cd $INST_DIR/share/doc/libproject
+#  - tar -czf libproject-doc.tgz *
+#  - mv libproject-doc.tgz $BUILD_DIR
 
 notifications:
  email:
