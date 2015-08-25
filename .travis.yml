@@ -8,8 +8,8 @@ compiler:
 addons:
   apt:
     sources:
-      - ubuntu-toolchain-r/test
-      - kalakris/cmake
+      - ubuntu-toolchain-r-test
+      - kalakris-cmake
     packages:
       - g++-4.9
       - doxygen
