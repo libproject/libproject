@@ -28,7 +28,7 @@ include_directories (
 )
 
 #setting what to build
-add_executable(load_plugin ${SOURCES})
+add_executable(load_plugin EXCLUDE_FROM_ALL ${SOURCES})
 
 #linking with Qt and QtCreator libs
 target_link_libraries(load_plugin Qt5::Core)
